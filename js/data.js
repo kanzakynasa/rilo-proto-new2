@@ -1,165 +1,316 @@
 /**
- * RILO Mobile Prototype - Data Layer & Mock Database
- * Struktur data disesuaikan dengan skema tabel database (MySQL / phpMyAdmin)
- * untuk mempermudah integrasi backend di masa mendatang.
+ * RILO Mobile App - Data Layer & Mock Database
+ * Diadaptasi dari referensi UI RuntahPedia dengan palet warna signature RILO
  */
 
 const INITIAL_DATA = {
-  // Profil pengguna yang sedang login
+  // Profil Nasabah
   user: {
     id: 1,
     name: "Kaila Zanita",
     email: "kaila.zanita@example.com",
     phone: "0812-3456-7890",
-    address: "Jl. Margonda Raya No. 12, Depok, Jawa Barat",
+    address: "Jl. Margonda Raya No. 12, Depok",
+    locationTag: "Margonda, Depok",
+    nearestHub: "Smart Drop Box Kampus A (120m)",
     points: 1240,
     totalWeight: 18.4,
     completedDeposits: 42,
     avatar: "K",
-    tier: "RILO Eco Hero",
+    levelName: "Pahlawan Hijau",
     joinedDate: "September 2026"
   },
 
-  // Tabel Master Material Sampah
-  materials: [
+  // Daftar Titik Smart Drop Box & Hub RILO
+  qrLocations: [
     {
-      code: "PET",
-      name: "Botol Plastik (PET)",
-      rate: 100,
-      unit: "kg",
-      icon: "🧴",
-      category: "Plastik",
-      description: "Botol air mineral, botol minuman soda bening atau berwarna transparan.",
-      tips: "Kosongkan sisa cairan, bilas bersih, dan remas untuk menghemat ruang."
+      id: "RILO-BOX-01",
+      name: "Smart Drop Box Kampus A",
+      location: "Gedung Rektorat Lt. 1",
+      distance: "120m dari lokasimu",
+      status: "Siap Terima",
+      slotsAvailable: "Tersedia (Kapasitas 82%)",
+      type: "Smart Box"
     },
     {
-      code: "HDPE",
-      name: "Plastik Tebal (HDPE/PP)",
-      rate: 60,
-      unit: "kg",
-      icon: "🧴",
-      category: "Plastik",
-      description: "Botol sampo, deterjen cair, wadah skincare tebal, tutup galon.",
-      tips: "Pastikan cairan kimia/sabun sudah terbilas dan kering."
+      id: "RILO-BOX-02",
+      name: "RILO Hub Margonda Raya",
+      location: "Jl. Margonda Raya No. 45",
+      distance: "850m dari lokasimu",
+      status: "Siap Terima",
+      slotsAvailable: "Tersedia (Drop Point & Timbangan)",
+      type: "Mitra Hub"
     },
     {
-      code: "PAPER",
-      name: "Kertas & Dokumen",
-      rate: 50,
-      unit: "kg",
-      icon: "📄",
-      category: "Kertas",
-      description: "Kertas HVS, buku tulis bekas, majalah, kertas struk non-thermal.",
-      tips: "Jaga agar tidak terkena air, minyak, atau noda makanan."
-    },
-    {
-      code: "CARTON",
-      name: "Kardus & Karton",
-      rate: 45,
-      unit: "kg",
-      icon: "📦",
-      category: "Kertas",
-      description: "Kardus cokelat bekas paket, packaging box tebal bergelombang.",
-      tips: "Lepaskan selotip lakban plastik sebisa mungkin dan lipat pipih."
-    },
-    {
-      code: "CAN",
-      name: "Kaleng & Logam",
-      rate: 150,
-      unit: "kg",
-      icon: "🥫",
-      category: "Logam",
-      description: "Kaleng soda aluminium, kaleng biskuit, kaleng susu kental manis.",
-      tips: "Cuci sisa isi agar tidak mengundang semut. Hati-hati bagian pinggir yang tajam."
-    },
-    {
-      code: "GLASS",
-      name: "Kaca & Botol Beling",
-      rate: 30,
-      unit: "kg",
-      icon: "🫙",
-      category: "Kaca",
-      description: "Botol kecap, sirup, toples kaca utuh.",
-      tips: "Kemas dengan aman agar tidak pecah selama pengangkutan."
+      id: "RILO-BOX-03",
+      name: "Smart Drop Box Asrama Mahasiswa",
+      location: "Lobi Asrama Gedung C",
+      distance: "1.4 km dari lokasimu",
+      status: "Siap Terima",
+      slotsAvailable: "Tersedia (Kapasitas 65%)",
+      type: "Smart Box"
     }
   ],
 
-  // Tabel Transaksi Setoran
+  // 1. KATEGORI PER PIECE (SATUAN PER UKURAN ML / PCS)
+  itemsPerPiece: [
+    // Botol Plastik PET
+    {
+      id: "p_pet_250",
+      category: "Botol Plastik PET",
+      label: "Botol Plastik 250 ml",
+      spec: "250 ml",
+      icon: "🧴",
+      pointsPerUnit: 20,
+      unitLabel: "botol"
+    },
+    {
+      id: "p_pet_330",
+      category: "Botol Plastik PET",
+      label: "Botol Plastik 330 ml",
+      spec: "330 ml",
+      icon: "🧴",
+      pointsPerUnit: 30,
+      unitLabel: "botol"
+    },
+    {
+      id: "p_pet_600",
+      category: "Botol Plastik PET",
+      label: "Botol Plastik 600 ml",
+      spec: "600 ml",
+      icon: "🧴",
+      pointsPerUnit: 50,
+      unitLabel: "botol"
+    },
+    {
+      id: "p_pet_1500",
+      category: "Botol Plastik PET",
+      label: "Botol Plastik 1.500 ml (1.5 L)",
+      spec: "1.500 ml",
+      icon: "🧴",
+      pointsPerUnit: 100,
+      unitLabel: "botol"
+    },
+
+    // Kaleng Minuman
+    {
+      id: "p_can_250",
+      category: "Kaleng Minuman",
+      label: "Kaleng Minuman 250 ml",
+      spec: "250 ml",
+      icon: "🥫",
+      pointsPerUnit: 35,
+      unitLabel: "kaleng"
+    },
+    {
+      id: "p_can_330",
+      category: "Kaleng Minuman",
+      label: "Kaleng Minuman 330 ml",
+      spec: "330 ml",
+      icon: "🥫",
+      pointsPerUnit: 50,
+      unitLabel: "kaleng"
+    },
+    {
+      id: "p_can_500",
+      category: "Kaleng Minuman",
+      label: "Kaleng Minuman 500 ml",
+      spec: "500 ml",
+      icon: "🥫",
+      pointsPerUnit: 75,
+      unitLabel: "kaleng"
+    },
+
+    // Tutup Botol Plastik
+    {
+      id: "p_cap",
+      category: "Tutup Botol",
+      label: "Tutup Botol Plastik",
+      spec: "per piece",
+      icon: "🔘",
+      pointsPerUnit: 5,
+      unitLabel: "pcs"
+    },
+
+    // Botol Kaca
+    {
+      id: "p_glass_300",
+      category: "Botol Kaca",
+      label: "Botol Kaca 300 ml",
+      spec: "300 ml",
+      icon: "🫙",
+      pointsPerUnit: 40,
+      unitLabel: "botol"
+    },
+    {
+      id: "p_glass_500",
+      category: "Botol Kaca",
+      label: "Botol Kaca 500 ml",
+      spec: "500 ml",
+      icon: "🫙",
+      pointsPerUnit: 65,
+      unitLabel: "botol"
+    },
+    {
+      id: "p_glass_1000",
+      category: "Botol Kaca",
+      label: "Botol Kaca 1.000 ml (1 L)",
+      spec: "1.000 ml",
+      icon: "🫙",
+      pointsPerUnit: 120,
+      unitLabel: "botol"
+    },
+
+    // Kemasan Karton Minuman (Tetra Pak)
+    {
+      id: "p_tetra_125",
+      category: "Kemasan Karton Minuman",
+      label: "Karton Minuman 125 ml",
+      spec: "125 ml",
+      icon: "🧃",
+      pointsPerUnit: 15,
+      unitLabel: "kotak"
+    },
+    {
+      id: "p_tetra_200",
+      category: "Kemasan Karton Minuman",
+      label: "Karton Minuman 200 ml",
+      spec: "200 ml",
+      icon: "🧃",
+      pointsPerUnit: 25,
+      unitLabel: "kotak"
+    },
+    {
+      id: "p_tetra_250",
+      category: "Kemasan Karton Minuman",
+      label: "Karton Minuman 250 ml",
+      spec: "250 ml",
+      icon: "🧃",
+      pointsPerUnit: 30,
+      unitLabel: "kotak"
+    },
+    {
+      id: "p_tetra_1000",
+      category: "Kemasan Karton Minuman",
+      label: "Karton Minuman 1.000 ml (1 L)",
+      spec: "1.000 ml",
+      icon: "🧃",
+      pointsPerUnit: 80,
+      unitLabel: "kotak"
+    }
+  ],
+
+  // 2. KATEGORI PER KG (TIMBANGAN KILOAN)
+  itemsPerKg: [
+    {
+      id: "kg_plastic",
+      label: "Plastik Campuran Kiloan",
+      desc: "Kantong kresek, botol campur, wadah plastik",
+      rate: 60,
+      icon: "♻️"
+    },
+    {
+      id: "kg_carton",
+      label: "Kardus Paket Kiloan",
+      desc: "Kardus kemasan paket & box cokelat tebal",
+      rate: 45,
+      icon: "📦"
+    },
+    {
+      id: "kg_paper",
+      label: "Kertas & Arsip HVS Kiloan",
+      desc: "Kertas bekas, majalah, dokumen tanpa staples",
+      rate: 50,
+      icon: "📄"
+    },
+    {
+      id: "kg_metal",
+      label: "Kaleng & Besi Kiloan",
+      desc: "Aluminium, kaleng biskuit, rongsok logam",
+      rate: 150,
+      icon: "🥫"
+    },
+    {
+      id: "kg_glass",
+      label: "Kaca & Beling Kiloan",
+      desc: "Pecahan kaca atau botol campur utuh",
+      rate: 30,
+      icon: "🫙"
+    }
+  ],
+
+  // Riwayat Transaksi Setoran
   deposits: [
     {
       id: "DEP-20261018-01",
       date: "2026-10-18",
-      materialCode: "PET",
-      materialName: "Botol Plastik (PET)",
-      weight: 1.8,
-      method: "Drop-off",
-      location: "RILO Point Kampus",
-      pointsEarned: 180,
-      status: "Selesai",
-      notes: "Botol plastik bersih sudah dipilah"
+      time: "14:20 WIB",
+      qrBox: "Smart Drop Box Kampus A",
+      mode: "Satuan (Per Piece)",
+      summary: "3x Botol Plastik 600ml, 2x Kaleng 330ml",
+      weightApprox: 0.8,
+      pointsEarned: 250,
+      status: "Selesai"
     },
     {
       id: "DEP-20261015-02",
       date: "2026-10-15",
-      materialCode: "PAPER",
-      materialName: "Kertas & Dokumen",
-      weight: 2.4,
-      method: "Drop-off",
-      location: "RILO Hub Margonda",
+      time: "09:45 WIB",
+      qrBox: "RILO Hub Margonda Raya",
+      mode: "Kiloan (Per Kg)",
+      summary: "2.4 kg Kertas & Arsip HVS",
+      weightApprox: 2.4,
       pointsEarned: 120,
-      status: "Selesai",
-      notes: "Kertas arsip tugas kuliah"
+      status: "Selesai"
     },
     {
       id: "DEP-20261011-03",
       date: "2026-10-11",
-      materialCode: "CARTON",
-      materialName: "Kardus & Karton",
-      weight: 1.2,
-      method: "Pickup",
-      location: "Jl. Margonda Raya No. 12",
-      pointsEarned: 54,
-      status: "Selesai",
-      notes: "Kardus paket online shop"
+      time: "16:10 WIB",
+      qrBox: "Smart Drop Box Asrama Mahasiswa",
+      mode: "Satuan (Per Piece)",
+      summary: "5x Botol Plastik 1.500ml, 10x Tutup Botol",
+      weightApprox: 1.2,
+      pointsEarned: 550,
+      status: "Selesai"
     },
     {
       id: "DEP-20261008-04",
       date: "2026-10-08",
-      materialCode: "CAN",
-      materialName: "Kaleng & Logam",
-      weight: 0.7,
-      method: "Drop-off",
-      location: "RILO Point Kampus",
+      time: "11:30 WIB",
+      qrBox: "Smart Drop Box Kampus A",
+      mode: "Kiloan (Per Kg)",
+      summary: "0.7 kg Kaleng & Besi",
+      weightApprox: 0.7,
       pointsEarned: 105,
-      status: "Selesai",
-      notes: "Kaleng minuman ringan"
+      status: "Selesai"
     }
   ],
 
-  // Tabel Katalog Reward
+  // Katalog Reward & Voucher
   rewards: [
     {
       id: "REW-01",
       title: "Voucher Minuman Rp 15.000",
-      description: "Berlaku di Kopi Kenangan & Fore mitra RILO kampus.",
+      description: "Berlaku di Kopi Kenangan, Fore, dan Tomoro.",
       pointsCost: 500,
       icon: "☕",
-      category: "Voucher F&B",
-      stock: 45
+      category: "Kuliner",
+      stock: 35
     },
     {
       id: "REW-02",
-      title: "Diskon Ongkir Pickup 100%",
-      description: "Gratis biaya penjemputan sampah langsung ke rumah.",
+      title: "Diskon Belanja Rp 20.000",
+      description: "Voucher mitra minimarket & Sayurbox.",
       pointsCost: 750,
-      icon: "🚚",
-      category: "Layanan",
-      stock: 100
+      icon: "🛒",
+      category: "Belanja",
+      stock: 50
     },
     {
       id: "REW-03",
       title: "RILO Eco Tote Bag",
-      description: "Tas kain ramah lingkungan hasil daur ulang serat tekstil.",
+      description: "Tas ramah lingkungan hasil daur ulang serat tekstil.",
       pointsCost: 1500,
       icon: "👜",
       category: "Merchandise",
@@ -168,100 +319,81 @@ const INITIAL_DATA = {
     {
       id: "REW-04",
       title: "Donasi 1 Bibit Pohon Bakau",
-      description: "Ditanam bersama Komunitas Mangrove Pesisir.",
+      description: "Ditanam bersama Komunitas Pesisir Hijau.",
       pointsCost: 500,
       icon: "🌱",
-      category: "Donasi Lingkungan",
+      category: "Donasi",
       stock: 999
-    },
-    {
-      id: "REW-05",
-      title: "Voucher Saldo e-Wallet Rp 25.000",
-      description: "Dapat ditukarkan ke saldo Gopay, OVO, atau ShopeePay.",
-      pointsCost: 2000,
-      icon: "💳",
-      category: "e-Money",
-      stock: 20
     }
   ],
 
-  // Riwayat Penukaran Reward
+  // Voucher Saya yang Telah Ditukar
   redemptions: [
     {
-      id: "RDM-20260920-01",
+      id: "RDM-01",
       date: "2026-09-20",
       rewardTitle: "Voucher Minuman Rp 15.000",
       pointsSpent: 500,
       code: "RILO-KOPI-7891",
-      status: "Sudah Digunakan"
+      expiry: "30 Nov 2026",
+      status: "Aktif"
     }
   ],
 
-  // Data Tantangan Komunitas
-  community: {
-    monthlyTargetKg: 1000,
-    currentKg: 720,
-    activeChallenge: "Tantangan Pilah Bareng Kampus Hijau",
-    joinedChallenge: true,
-    leaderboard: [
-      { rank: "01", name: "Komunitas Kampus A", weight: 240, status: "Aktif", badge: "🥇" },
-      { rank: "02", name: "Bank Sampah RW 05", weight: 190, status: "Aktif", badge: "🥈" },
-      { rank: "03", name: "Green Youth Club", weight: 165, status: "Berlangsung", badge: "🥉" },
-      { rank: "04", name: "Komunitas Penggiat Depok", weight: 125, status: "Aktif", badge: "4" }
-    ]
-  },
+  // Data Banner Berita / Kampanye Komunitas
+  banners: [
+    {
+      id: "b1",
+      tag: "TANTANGAN KAMPUS",
+      title: "Pilah 10 Botol Hari Ini, Raih Bonus Poin!",
+      desc: "Dukung gerakan zero waste kampus dan kumpulkan hadiah menarik.",
+      icon: "🏆"
+    },
+    {
+      id: "b2",
+      tag: "EDUKASI",
+      title: "Kenali Jenis Plastik yang Bernilai Daur Ulang Tinggi",
+      desc: "Simak panduan praktis memilah sampah plastik dari rumah.",
+      icon: "💡"
+    }
+  ],
 
-  // Materi Edukasi RILO Learn
+  // Edukasi RILO Learn
   guides: [
     {
       id: "g1",
       title: "Botol Plastik PET",
       icon: "🧴",
-      short: "Kosongkan isi, bilas ringan, dan lepaskan label jika memungkinkan.",
-      content: "Botol berbahan Polyethylene Terephthalate (PET) berlogo daur ulang angka 1 paling diminati industri daur ulang. Pastikan botol bebas dari sisa cairan manis dan minyak. Mengempeskan botol membantu mengoptimalkan ruang tampung bank sampah."
+      short: "Kosongkan cairan, bilas ringan, dan pisahkan tutup botolnya.",
+      content: "Botol PET transparan berlabel daur ulang kode 1 adalah material yang paling dicari oleh industri tekstil dan botol daur ulang. Selalu tiriskan sisa minuman manis agar tidak mengundang semut dan bau."
     },
     {
       id: "g2",
-      title: "Kertas & Kardus Bekas",
-      icon: "📦",
-      short: "Pisahkan kardus dari plastik perekat dan simpan dalam kondisi kering.",
-      content: "Kertas yang basah atau tercampur minyak makanan (seperti kotak pizza berlemak) tidak bisa didaur ulang dengan baik. Lipat kardus hingga pipih untuk mempermudah penimbangan dan pengangkutan."
+      title: "Kaleng Minuman Aluminium",
+      icon: "🥫",
+      short: "Tiriskan sisa air minuman sebelum dimasukkan ke drop box.",
+      content: "Kaleng aluminium dapat didaur ulang tanpa batas waktu tanpa penurunan kualitas. Satu kaleng daur ulang menghemat energi hingga 95% dibandingkan memproduksi aluminium baru."
     },
     {
       id: "g3",
-      title: "Kaleng & Aluminium",
-      icon: "🥫",
-      short: "Bilas bersih kaleng bekas makanan atau minuman agar tidak membusuk.",
-      content: "Aluminium dan logam memiliki nilai daur ulang sangat tinggi dan dapat didaur ulang tanpa henti. Cukup bersihkan sisa saus/minuman dan keringkan sebelum disetor."
+      title: "Kemasan Karton Minuman",
+      icon: "🧃",
+      short: "Buka lipatan dan pipihkan kemasan susu atau jus.",
+      content: "Kemasan karton tetra pak memiliki lapisan serat kayu berkualitas tinggi serta lapisan aluminium tipis. Pipihkan kotak agar muat lebih banyak di dalam smart drop box."
     },
     {
       id: "g4",
-      title: "Kaca & Botol Beling",
+      title: "Botol Kaca",
       icon: "🫙",
-      short: "Kemas dengan hati-hati. Hindari mencampur kaca pecah dengan kaca utuh.",
-      content: "Kaca adalah material 100% dapat didaur ulang berulang kali. Pastikan botol tidak pecah dan dikemas dalam wadah yang aman agar tidak melukai petugas bank sampah."
-    },
-    {
-      id: "g5",
-      title: "Prinsip Bersih & Kering",
-      icon: "🧼",
-      short: "Standar utama penerimaan sampah daur ulang bernilai tinggi.",
-      content: "Sampah daur ulang bukan sampah kotor. Membersihkan secukupnya mencegah timbulnya aroma tak sedap, belatung, serta kontaminasi pada tumpukan sampah lain di gudang penyimpanan."
-    },
-    {
-      id: "g6",
-      title: "Alur Perjalanan Sampah",
-      icon: "🔄",
-      short: "Dari tanganmu, ditimbang, dicatat, hingga diproses oleh mitra industri.",
-      content: "Setiap gram sampah yang kamu setorkan akan melewati proses sortasi manual di RILO Hub, dipadatkan dengan mesin pres (baling), lalu dikirim ke pabrik peleburan mitra untuk diolah kembali menjadi produk baru."
+      short: "Pastikan botol kaca utuh dan tidak retak berbahaya.",
+      content: "Kaca adalah material 100% daur ulang. Selalu letakkan botol kaca dengan hati-hati ke dalam lubang penerimaan agar tidak pecah dan melukai petugas sortasi."
     }
   ]
 };
 
-// Objek penampung state aktif runtime aplikasi
+// In-Memory App State
 let AppState = JSON.parse(JSON.stringify(INITIAL_DATA));
 
-// Helper untuk reset state kembali ke awal (karena data in-memory)
 function resetAppState() {
   AppState = JSON.parse(JSON.stringify(INITIAL_DATA));
 }

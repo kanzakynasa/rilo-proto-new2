@@ -1,411 +1,536 @@
 /**
- * RILO Mobile App Prototype - Logic & Interaction Layer
- * Siap diintegrasikan ke endpoint REST API / PHP / phpMyAdmin
+ * RILO Mobile App - Interactive Controller
+ * Mengadaptasi alur UX RuntahPedia dengan palet warna signature RILO
  */
 
+// Sesi aktif setoran saat ini
+let currentDepositSession = {
+  selectedBox: null,
+  activeMode: "piece", // 'piece' atau 'kg'
+  pieceCounts: {},     // { p_pet_600: 2, ... }
+  kgWeights: {}        // { kg_plastic: 1.5, ... }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Inisialisasi Aplikasi
   initApp();
 });
 
 function initApp() {
   setupNavigation();
-  setupDepositForm();
-  setupModals();
-  setupProfile();
+  setupQrScanner();
+  setupDepositModeSwitcher();
+  setupDepositItems();
+  setupProfileForm();
   renderAllViews();
 }
 
-// Format Angka ke Format Indonesia
-const fmt = (num) => new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(num);
+// Format Angka Ribuan
+const fmt = (n) => new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(n);
 
 // Format Tanggal
-function formatDate(dateStr) {
+function formatDate(dStr) {
   try {
-    const d = new Date(dateStr + "T12:00:00");
-    return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+    return new Date(dStr + "T12:00:00").toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
   } catch (e) {
-    return dateStr;
+    return dStr;
   }
 }
 
-// === TOAST NOTIFICATION SYSTEM ===
-let toastTimeout;
+// === TOAST NOTIFICATION ===
+let toastTimer;
 function showToast(message, icon = "✓") {
-  const toast = document.getElementById("mobileToast");
-  const iconEl = document.getElementById("toastIcon");
-  const msgEl = document.getElementById("toastMsg");
-
+  const toast = document.getElementById("mobileToastNotice");
   if (!toast) return;
 
-  iconEl.textContent = icon;
-  msgEl.textContent = message;
-  toast.classList.add("show");
+  document.getElementById("toastNoticeIcon").textContent = icon;
+  document.getElementById("toastNoticeMsg").textContent = message;
 
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    toast.classList.remove("show");
+  toast.classList.add("visible");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("visible");
   }, 3200);
 }
 
-// === NAVIGATION & SCREEN ROUTER ===
+// === ROUTER & NAVIGATION ===
 let currentView = "home";
 
 function switchView(viewName) {
   currentView = viewName;
 
-  // Toggle sections
-  document.querySelectorAll(".view-section").forEach((sec) => {
-    sec.classList.remove("active-view");
+  document.querySelectorAll(".view-panel").forEach((panel) => {
+    panel.classList.remove("active");
   });
 
-  const targetSection = document.getElementById(`view-${viewName}`);
-  if (targetSection) {
-    targetSection.classList.add("active-view");
+  const target = document.getElementById(`panel-${viewName}`);
+  if (target) {
+    target.classList.add("active");
   }
 
-  // Update Bottom Nav active state
-  document.querySelectorAll(".nav-tab-item").forEach((tab) => {
-    if (tab.dataset.nav === viewName) {
-      tab.classList.add("active");
+  // Update navbar state
+  document.querySelectorAll(".navbar-item").forEach((btn) => {
+    if (btn.dataset.nav === viewName) {
+      btn.classList.add("active");
     } else {
-      tab.classList.remove("active");
+      btn.classList.remove("active");
     }
   });
 
   // Scroll to top
-  const container = document.getElementById("mainScrollArea");
-  if (container) {
-    container.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  const scrollArea = document.getElementById("mainScrollView");
+  if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: "smooth" });
 
-  // Khusus view tertentu yang butuh re-render dinamis
-  if (viewName === "transactions") {
-    renderTransactionsList();
-  } else if (viewName === "impact") {
-    renderImpactStats();
-  }
+  if (viewName === "transactions") renderTransactions();
+  if (viewName === "rewards") renderRewards();
+  if (viewName === "impact") renderImpact();
+  if (viewName === "my-vouchers") renderMyVouchers();
 }
 
 function setupNavigation() {
-  // Bottom bar navigation buttons
+  // Bottom navbar
   document.querySelectorAll("[data-nav]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.nav;
-      switchView(target);
+      if (target === "deposit") {
+        openQrScanFlow();
+      } else {
+        switchView(target);
+      }
     });
   });
 
-  // Universal button navigators (misal tombol di hero card atau quick actions)
+  // Universal button navigators (data-go)
   document.addEventListener("click", (e) => {
-    const trigger = e.target.closest("[data-go-view]");
+    const trigger = e.target.closest("[data-go]");
     if (trigger) {
-      const view = trigger.dataset.goView;
-      switchView(view);
+      const page = trigger.dataset.go;
+      if (page === "deposit") {
+        openQrScanFlow();
+      } else {
+        switchView(page);
+      }
     }
   });
 
-  // Tombol reset demo data di pengaturan
+  // Tombol Reset Demo
   const btnReset = document.getElementById("btnResetDemo");
   if (btnReset) {
     btnReset.addEventListener("click", () => {
-      if (confirm("Kembalikan data prototype ke contoh awal? Semua data input sesi ini akan direset.")) {
+      if (confirm("Kembalikan data demo ke nilai awal? Semua saldo poin dan transaksi sesi ini akan direset.")) {
         resetAppState();
         renderAllViews();
-        showToast("Data demo berhasil dikembalikan ke awal.", "↺");
+        showToast("Data demo dikembalikan ke awal.", "↺");
         switchView("home");
       }
     });
   }
+}
 
-  // Tombol notifikasi di topbar
-  const btnNotif = document.getElementById("btnNotification");
-  if (btnNotif) {
-    btnNotif.addEventListener("click", () => {
-      openNotificationSheet();
-    });
+// === FLOW 1: SCAN QR DROP BOX TERLEBIH DAHULU ===
+function openQrScanFlow() {
+  if (!currentDepositSession.selectedBox) {
+    currentDepositSession.selectedBox = AppState.qrLocations[0];
   }
+  renderQrDetectedBox();
+  switchView("scan-qr");
 }
 
-// === RENDER UTAMA SEMUA TAMPILAN ===
-function renderAllViews() {
-  renderHome();
-  renderTransactionsList();
-  renderRewardsList();
-  renderImpactStats();
-  renderCommunityView();
-  renderLearnGuides();
-  updateProfileUI();
-}
-
-// 1. Tampilan Home / Beranda
-function renderHome() {
-  const user = AppState.user;
-  document.getElementById("homeUserGreeting").textContent = `Halo, ${user.name.split(" ")[0]} 👋`;
-  document.getElementById("topbarAvatar").textContent = user.avatar || user.name[0];
-  document.getElementById("homePointsVal").textContent = fmt(user.points);
-  document.getElementById("homeTotalWeight").textContent = `${fmt(user.totalWeight)} kg`;
-  document.getElementById("homeDepositCount").textContent = `${user.completedDeposits}x`;
-
-  // Hitung target bulanan (misal target 20 kg)
-  const monthlyTarget = 20;
-  const currentMonthWeight = Math.min(user.totalWeight, monthlyTarget);
-  const percent = Math.min(100, Math.round((currentMonthWeight / monthlyTarget) * 100));
-
-  const progressBar = document.getElementById("homeMonthlyProgress");
-  const percentText = document.getElementById("homeMonthlyPercent");
-  const weightText = document.getElementById("homeMonthlyWeight");
-
-  if (progressBar) progressBar.style.width = `${percent}%`;
-  if (percentText) percentText.textContent = `${percent}%`;
-  if (weightText) weightText.textContent = `${fmt(currentMonthWeight)} kg`;
-
-  // Render recent 3 transactions di Home
-  const recentList = document.getElementById("homeRecentTxList");
-  if (recentList) {
-    const recent = AppState.deposits.slice(0, 3);
-    if (recent.length === 0) {
-      recentList.innerHTML = `<div style="text-align:center;padding:16px;font-size:12px;color:var(--text-muted)">Belum ada transaksi.</div>`;
-    } else {
-      recentList.innerHTML = recent.map((tx) => createTxItemHTML(tx)).join("");
-    }
-  }
-}
-
-// Helper membuat item riwayat transaksi
-function createTxItemHTML(tx) {
-  const mat = AppState.materials.find((m) => m.code === tx.materialCode) || {};
-  const icon = mat.icon || "♻️";
-  const isDone = tx.status === "Selesai";
-
-  return `
-    <div class="tx-card-item" onclick="openTxDetail('${tx.id}')">
-      <div class="tx-icon-wrap">${icon}</div>
-      <div class="tx-details">
-        <div class="tx-title">${tx.materialName}</div>
-        <div class="tx-sub">${formatDate(tx.date)} • ${fmt(tx.weight)} kg • ${tx.method}</div>
-      </div>
-      <div class="tx-right">
-        <div class="tx-points" style="color: ${isDone ? 'var(--wine)' : 'var(--amber)'}">
-          ${isDone ? `+${fmt(tx.pointsEarned)} pts` : 'Proses'}
-        </div>
-        <span class="status-badge ${isDone ? 'selesai' : 'menunggu'}">${tx.status}</span>
-      </div>
-    </div>
-  `;
-}
-
-// 2. Form Setor Sampah & Live Kalkulator
-let selectedMaterialCode = "PET";
-let selectedMethod = "Drop-off";
-
-function setupDepositForm() {
-  const container = document.getElementById("materialSelectorGrid");
+function renderQrDetectedBox() {
+  const container = document.getElementById("qrDetectedBoxInfo");
   if (!container) return;
 
-  // Render pilihan material dalam kartu chip
-  container.innerHTML = AppState.materials.map((m) => `
-    <div class="material-card-chip ${m.code === selectedMaterialCode ? 'selected' : ''}" data-mat="${m.code}">
-      <span class="mat-icon">${m.icon}</span>
-      <div class="mat-info">
-        <strong>${m.name}</strong>
-        <span>${m.rate} pts / ${m.unit}</span>
-      </div>
+  const box = currentDepositSession.selectedBox || AppState.qrLocations[0];
+
+  container.innerHTML = `
+    <div class="detected-box-title">
+      <strong>📍 ${box.name}</strong>
+      <span style="font-size:11px;font-weight:700;color:var(--eco-green);">● ${box.status}</span>
     </div>
-  `).join("");
+    <div class="detected-box-desc">
+      ${box.location} • ${box.distance}<br>
+      <span style="color:var(--wine-primary);font-weight:700;">${box.slotsAvailable}</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <select id="selectOtherQrBox" class="kg-text-input" style="font-size:12px;padding:6px 10px;" onchange="changeSelectedQrBox(this.value)">
+        ${AppState.qrLocations.map((b) => `<option value="${b.id}" ${b.id === box.id ? 'selected' : ''}>Pilih: ${b.name}</option>`).join("")}
+      </select>
+    </div>
+    <button class="btn-primary-action" id="btnConfirmQrScan">
+      <span>📷</span> Hubungkan Drop Box & Buka Pintu
+    </button>
+  `;
 
-  // Event listener klik material
-  container.querySelectorAll(".material-card-chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      container.querySelectorAll(".material-card-chip").forEach((c) => c.classList.remove("selected"));
-      chip.classList.add("selected");
-      selectedMaterialCode = chip.dataset.mat;
-      recalculateEstimate();
+  document.getElementById("btnConfirmQrScan").onclick = () => {
+    showToast(`Terhubung ke ${box.name}!`, "🟢");
+    document.getElementById("activeHubNameDisplay").textContent = box.name;
+    document.getElementById("activeHubLocationDisplay").textContent = box.location;
+
+    setTimeout(() => {
+      switchView("deposit-input");
+    }, 350);
+  };
+}
+
+window.changeSelectedQrBox = function (boxId) {
+  const box = AppState.qrLocations.find((b) => b.id === boxId);
+  if (box) {
+    currentDepositSession.selectedBox = box;
+    renderQrDetectedBox();
+  }
+};
+
+function setupQrScanner() {
+  // Listener telah terpasang di renderQrDetectedBox
+}
+
+// === FLOW 2: INPUT SETORAN SAMPAH (PER PIECE & PER KG) ===
+function setupDepositModeSwitcher() {
+  const tabPiece = document.getElementById("tabModePiece");
+  const tabKg = document.getElementById("tabModeKg");
+  const panelPiece = document.getElementById("panelModePiece");
+  const panelKg = document.getElementById("panelModeKg");
+
+  if (tabPiece && tabKg) {
+    tabPiece.addEventListener("click", () => {
+      tabPiece.classList.add("active");
+      tabKg.classList.remove("active");
+      panelPiece.style.display = "block";
+      panelKg.style.display = "none";
+      currentDepositSession.activeMode = "piece";
+      calculateDepositTotal();
     });
+
+    tabKg.addEventListener("click", () => {
+      tabKg.classList.add("active");
+      tabPiece.classList.remove("active");
+      panelPiece.style.display = "none";
+      panelKg.style.display = "block";
+      currentDepositSession.activeMode = "kg";
+      calculateDepositTotal();
+    });
+  }
+}
+
+function setupDepositItems() {
+  // 1. Render Kategori Per Piece (Satuan per Ukuran ml / pcs)
+  const pieceContainer = document.getElementById("panelModePiece");
+  if (pieceContainer) {
+    const categories = [
+      "Botol Plastik PET",
+      "Kaleng Minuman",
+      "Tutup Botol",
+      "Botol Kaca",
+      "Kemasan Karton Minuman"
+    ];
+
+    let html = "";
+    categories.forEach((cat) => {
+      const itemsInCat = AppState.itemsPerPiece.filter((i) => i.category === cat);
+      html += `<div class="group-label-title">${cat}</div>`;
+      itemsInCat.forEach((item) => {
+        const count = currentDepositSession.pieceCounts[item.id] || 0;
+        html += `
+          <div class="item-counter-card">
+            <div class="icc-left">
+              <div class="icc-icon">${item.icon}</div>
+              <div class="icc-meta">
+                <strong>${item.label}</strong>
+                <span>+${item.pointsPerUnit} poin / ${item.unitLabel}</span>
+              </div>
+            </div>
+            <div class="stepper-wrap">
+              <button class="btn-step" type="button" onclick="stepPiece('${item.id}', -1)">−</button>
+              <span class="step-num" id="val_${item.id}">${count}</span>
+              <button class="btn-step" type="button" onclick="stepPiece('${item.id}', 1)">+</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    pieceContainer.innerHTML = html;
+  }
+
+  // 2. Render Kategori Per Kg (Kiloan)
+  const kgContainer = document.getElementById("panelModeKg");
+  if (kgContainer) {
+    kgContainer.innerHTML = AppState.itemsPerKg.map((item) => {
+      const w = currentDepositSession.kgWeights[item.id] || 0;
+      return `
+        <div class="kg-material-card">
+          <div class="kg-card-head">
+            <strong>${item.icon} ${item.label}</strong>
+            <span class="kg-card-rate">${item.rate} poin / kg</span>
+          </div>
+          <div class="kg-card-desc">${item.desc}</div>
+          <div class="kg-input-box">
+            <input type="number" 
+                   class="kg-text-input" 
+                   step="0.1" 
+                   min="0" 
+                   max="200" 
+                   placeholder="0.0 kg" 
+                   value="${w > 0 ? w : ''}" 
+                   oninput="setKgWeight('${item.id}', this.value)" />
+            <span style="font-size:12px;font-weight:700;color:var(--text-sub);">kg</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // Tombol Kirim Setoran
+  const btnFinal = document.getElementById("btnConfirmDepositFinal");
+  if (btnFinal) {
+    btnFinal.addEventListener("click", submitFinalDeposit);
+  }
+
+  calculateDepositTotal();
+}
+
+window.stepPiece = function (itemId, delta) {
+  const current = currentDepositSession.pieceCounts[itemId] || 0;
+  const next = Math.max(0, current + delta);
+  currentDepositSession.pieceCounts[itemId] = next;
+
+  const el = document.getElementById(`val_${itemId}`);
+  if (el) el.textContent = next;
+
+  calculateDepositTotal();
+};
+
+window.setKgWeight = function (itemId, val) {
+  const num = Math.max(0, parseFloat(val) || 0);
+  currentDepositSession.kgWeights[itemId] = num;
+  calculateDepositTotal();
+};
+
+function calculateDepositTotal() {
+  let totalPoints = 0;
+  let totalCount = 0;
+  let totalWeight = 0;
+
+  AppState.itemsPerPiece.forEach((item) => {
+    const qty = currentDepositSession.pieceCounts[item.id] || 0;
+    if (qty > 0) {
+      totalPoints += qty * item.pointsPerUnit;
+      totalCount += qty;
+      if (item.category.includes("Botol Plastik")) totalWeight += qty * 0.035;
+      else if (item.category.includes("Kaleng")) totalWeight += qty * 0.015;
+      else if (item.category.includes("Tutup")) totalWeight += qty * 0.002;
+      else if (item.category.includes("Kaca")) totalWeight += qty * 0.35;
+      else totalWeight += qty * 0.02;
+    }
   });
 
-  // Pilihan metode Drop-off atau Pickup
-  document.querySelectorAll("[data-method-radio]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("[data-method-radio]").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      selectedMethod = btn.dataset.methodRadio;
+  AppState.itemsPerKg.forEach((item) => {
+    const w = currentDepositSession.kgWeights[item.id] || 0;
+    if (w > 0) {
+      totalPoints += Math.round(w * item.rate);
+      totalWeight += w;
+    }
+  });
 
-      const locInput = document.getElementById("depositLocation");
-      const locLabel = document.getElementById("depositLocationLabel");
-      if (selectedMethod === "Pickup") {
-        locLabel.textContent = "Alamat Penjemputan";
-        locInput.value = AppState.user.address || "Jl. Margonda Raya No. 12, Depok";
-      } else {
-        locLabel.textContent = "Pilihan RILO Point / Drop Point";
-        locInput.value = "RILO Point Kampus Utama";
+  const estPtsEl = document.getElementById("checkoutEstPoints");
+  const estSubEl = document.getElementById("checkoutEstSummary");
+  const btn = document.getElementById("btnConfirmDepositFinal");
+
+  if (estPtsEl) estPtsEl.textContent = `+${fmt(totalPoints)} pts`;
+
+  if (estSubEl) {
+    if (currentDepositSession.activeMode === "piece") {
+      estSubEl.textContent = `${totalCount} item terpilih`;
+    } else {
+      estSubEl.textContent = `${fmt(totalWeight)} kg tercatat`;
+    }
+  }
+
+  if (btn) {
+    btn.disabled = totalPoints <= 0;
+  }
+}
+
+function submitFinalDeposit() {
+  const box = currentDepositSession.selectedBox || AppState.qrLocations[0];
+  let summaryText = "";
+  let totalPoints = 0;
+  let totalWeight = 0;
+
+  if (currentDepositSession.activeMode === "piece") {
+    const summaryItems = [];
+    AppState.itemsPerPiece.forEach((item) => {
+      const qty = currentDepositSession.pieceCounts[item.id] || 0;
+      if (qty > 0) {
+        totalPoints += qty * item.pointsPerUnit;
+        summaryItems.push(`${qty}x ${item.label}`);
+        totalWeight += qty * 0.04;
       }
-      recalculateEstimate();
     });
-  });
-
-  // Input berat
-  const weightInput = document.getElementById("depositWeight");
-  if (weightInput) {
-    weightInput.addEventListener("input", recalculateEstimate);
+    summaryText = summaryItems.slice(0, 3).join(", ") + (summaryItems.length > 3 ? "..." : "");
+  } else {
+    const summaryItems = [];
+    AppState.itemsPerKg.forEach((item) => {
+      const w = currentDepositSession.kgWeights[item.id] || 0;
+      if (w > 0) {
+        totalPoints += Math.round(w * item.rate);
+        totalWeight += w;
+        summaryItems.push(`${fmt(w)} kg ${item.label.split(" ")[0]}`);
+      }
+    });
+    summaryText = summaryItems.join(", ");
   }
 
-  // Submit form setoran
-  const form = document.getElementById("formDepositWaste");
-  if (form) {
-    form.addEventListener("submit", handleDepositSubmit);
-  }
-
-  recalculateEstimate();
-}
-
-function recalculateEstimate() {
-  const mat = AppState.materials.find((m) => m.code === selectedMaterialCode);
-  const weightInput = document.getElementById("depositWeight");
-  const w = parseFloat(weightInput ? weightInput.value : 1.0) || 0;
-
-  if (!mat) return;
-
-  const pts = Math.round(w * mat.rate);
-  const prevPoints = document.getElementById("calcPointsVal");
-  const prevSub = document.getElementById("calcFormulaText");
-
-  if (prevPoints) prevPoints.textContent = `${fmt(pts)} pts`;
-  if (prevSub) prevSub.textContent = `${fmt(w)} kg × ${mat.rate} poin/kg (${mat.name})`;
-}
-
-function handleDepositSubmit(e) {
-  e.preventDefault();
-
-  const weightInput = document.getElementById("depositWeight");
-  const weightVal = parseFloat(weightInput.value);
-
-  if (!weightVal || weightVal <= 0) {
-    showToast("Harap masukkan perkiraan berat yang valid.", "⚠️");
+  if (totalPoints <= 0) {
+    showToast("Pilih minimal 1 sampah untuk disetor.", "⚠️");
     return;
   }
-
-  const mat = AppState.materials.find((m) => m.code === selectedMaterialCode);
-  const notes = document.getElementById("depositNotes").value.trim();
-  const location = document.getElementById("depositLocation").value.trim() || "RILO Point";
-  const pts = Math.round(weightVal * mat.rate);
-
-  // Status: jika Drop-off langsung selesai (simulasi ditimbang petugas), jika Pickup maka Menunggu
-  const status = selectedMethod === "Pickup" ? "Menunggu" : "Selesai";
 
   const newTx = {
     id: `DEP-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(100 + Math.random() * 900)}`,
     date: new Date().toISOString().slice(0, 10),
-    materialCode: mat.code,
-    materialName: mat.name,
-    weight: weightVal,
-    method: selectedMethod,
-    location: location,
-    pointsEarned: pts,
-    status: status,
-    notes: notes || "Setoran melalui aplikasi mobile RILO"
+    time: "Baru saja",
+    qrBox: box.name,
+    mode: currentDepositSession.activeMode === "piece" ? "Satuan (Per Piece)" : "Kiloan (Per Kg)",
+    summary: summaryText,
+    weightApprox: parseFloat(totalWeight.toFixed(1)) || 0.5,
+    pointsEarned: totalPoints,
+    status: "Selesai"
   };
 
-  // Simpan ke array
   AppState.deposits.unshift(newTx);
+  AppState.user.points += totalPoints;
+  AppState.user.totalWeight += newTx.weightApprox;
+  AppState.user.completedDeposits += 1;
 
-  if (status === "Selesai") {
-    AppState.user.points += pts;
-    AppState.user.totalWeight += weightVal;
-    AppState.user.completedDeposits += 1;
-    showToast(`Setoran berhasil dicatat! +${fmt(pts)} poin diperoleh.`, "🎉");
-  } else {
-    showToast("Permintaan jemput dibuat! Petugas akan memverifikasi berat.", "🚚");
-  }
-
-  // Reset form
-  weightInput.value = "1.0";
-  document.getElementById("depositNotes").value = "";
-  recalculateEstimate();
+  // Reset counter
+  currentDepositSession.pieceCounts = {};
+  currentDepositSession.kgWeights = {};
+  setupDepositItems();
 
   renderAllViews();
+  showToast(`Setoran berhasil! +${fmt(totalPoints)} poin diperoleh.`, "🎉");
 
-  // Arahkan otomatis ke layar Riwayat untuk melihat transaksinya
   setTimeout(() => {
     switchView("transactions");
   }, 400);
 }
 
-// 3. Tampilan Riwayat Transaksi & Filter
-let currentTxFilter = "all";
+// === RENDER UTAMA SEMUA VIEW ===
+function renderAllViews() {
+  renderHome();
+  renderTransactions();
+  renderRewards();
+  renderImpact();
+  renderGuides();
+  renderProfile();
+}
 
-function renderTransactionsList() {
-  const container = document.getElementById("txListContainer");
-  const countText = document.getElementById("txCountSummary");
+// 1. Beranda (Home)
+function renderHome() {
+  const user = AppState.user;
+
+  // Lokasi & Header
+  document.getElementById("userLocationText").textContent = user.locationTag || "Margonda, Depok";
+  document.getElementById("homeUserGreetingName").textContent = `Halo, ${user.name.split(" ")[0]}! 👋`;
+  document.getElementById("userLevelBadge").textContent = user.levelName;
+  document.getElementById("homeAvatarChar").textContent = user.avatar || user.name[0];
+
+  // Saldo Poin & Estimasi Rupiah
+  document.getElementById("walletBalanceNum").textContent = fmt(user.points);
+  const rupiahEst = Math.round(user.points * 10);
+  document.getElementById("walletRupiahEst").textContent = `≈ Rp ${fmt(rupiahEst)}`;
+
+  // 2 Transaksi Terakhir di Beranda
+  const recentList = document.getElementById("homeRecentActivityList");
+  if (recentList) {
+    const list = AppState.deposits.slice(0, 3);
+    if (list.length === 0) {
+      recentList.innerHTML = `<div style="text-align:center;padding:16px;font-size:12px;color:var(--text-sub);">Belum ada riwayat setoran.</div>`;
+    } else {
+      recentList.innerHTML = list.map((tx) => `
+        <div class="activity-card-item" onclick="openTxReceiptModal('${tx.id}')">
+          <div class="act-left">
+            <div class="act-icon">♻️</div>
+            <div class="act-details">
+              <strong>${tx.summary}</strong>
+              <span>${formatDate(tx.date)} • ${tx.qrBox}</span>
+            </div>
+          </div>
+          <div class="act-right">
+            <div class="act-points">+${fmt(tx.pointsEarned)} pts</div>
+            <span class="badge-status-done">Selesai</span>
+          </div>
+        </div>
+      `).join("");
+    }
+  }
+}
+
+// 2. Riwayat Transaksi
+function renderTransactions() {
+  const container = document.getElementById("txListFullContainer");
   if (!container) return;
 
-  const filtered = AppState.deposits.filter((t) => {
-    if (currentTxFilter === "all") return true;
-    return t.status === currentTxFilter;
-  });
-
-  if (countText) {
-    countText.textContent = `${filtered.length} transaksi`;
-  }
-
-  if (filtered.length === 0) {
+  if (AppState.deposits.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:18px;border:1px solid var(--border-color);">
-        <div style="font-size:36px;margin-bottom:8px;">📦</div>
-        <strong style="font-size:14px;display:block;">Tidak ada transaksi</strong>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Belum ada setoran pada kategori filter ini.</p>
+      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:16px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">Belum ada riwayat setoran sampah.</p>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = filtered.map((tx) => createTxItemHTML(tx)).join("");
+  container.innerHTML = AppState.deposits.map((tx) => `
+    <div class="activity-card-item" onclick="openTxReceiptModal('${tx.id}')">
+      <div class="act-left">
+        <div class="act-icon">🧾</div>
+        <div class="act-details">
+          <strong>${tx.summary}</strong>
+          <span>${formatDate(tx.date)} • ${tx.qrBox}</span>
+        </div>
+      </div>
+      <div class="act-right">
+        <div class="act-points">+${fmt(tx.pointsEarned)} pts</div>
+        <span class="badge-status-done">Selesai</span>
+      </div>
+    </div>
+  `).join("");
 }
 
-// Setup event tombol filter transaksi
-document.querySelectorAll(".filter-chip").forEach((chip) => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
-    chip.classList.add("active");
-    currentTxFilter = chip.dataset.filter;
-    renderTransactionsList();
-  });
-});
+// 3. Rewards & Penukaran (Poin Pasti Berkurang)
+function renderRewards() {
+  const container = document.getElementById("rewardsCatalogContainer");
+  const balanceEl = document.getElementById("rewardsBalanceDisplay");
 
-// 4. Katalog Reward & Penukaran Poin
-function renderRewardsList() {
-  const container = document.getElementById("rewardCatalogGrid");
-  const balanceText = document.getElementById("rewardUserBalance");
-
-  if (balanceText) {
-    balanceText.textContent = `${fmt(AppState.user.points)} pts`;
-  }
+  if (balanceEl) balanceEl.textContent = `${fmt(AppState.user.points)} pts`;
 
   if (!container) return;
 
   container.innerHTML = AppState.rewards.map((r) => {
     const canAfford = AppState.user.points >= r.pointsCost;
     return `
-      <div class="reward-mobile-card">
-        <div class="reward-art-box">${r.icon}</div>
-        <div class="reward-info-box">
+      <div class="reward-card-item">
+        <div class="rci-icon-box">${r.icon}</div>
+        <div class="rci-body">
           <strong>${r.title}</strong>
           <p>${r.description}</p>
-          <div class="reward-btn-row">
-            <span class="reward-tag-cost">${fmt(r.pointsCost)} Poin</span>
-            <button class="btn-redeem-chip" 
-              onclick="promptRedeemReward('${r.id}')"
-              style="background: ${canAfford ? 'var(--wine)' : '#a99fa4'}">
-              Tukar
-            </button>
-          </div>
+          <span class="rci-cost">${fmt(r.pointsCost)} Poin</span>
         </div>
+        <button class="btn-redeem-chip" 
+                onclick="promptVoucherRedeem('${r.id}')"
+                style="background: ${canAfford ? 'var(--wine-primary)' : 'var(--text-muted)'}">
+          Tukar
+        </button>
       </div>
     `;
   }).join("");
 }
 
-function promptRedeemReward(rewardId) {
+window.promptVoucherRedeem = function (rewardId) {
   const reward = AppState.rewards.find((r) => r.id === rewardId);
   if (!reward) return;
 
@@ -414,335 +539,240 @@ function promptRedeemReward(rewardId) {
     return;
   }
 
-  // Tampilkan sheet konfirmasi penukaran
-  openRedeemSheet(reward);
-}
-
-// 5. Dampak Lingkungan (Eco Impact)
-function renderImpactStats() {
-  const user = AppState.user;
-  document.getElementById("impactTotalWeight").textContent = `${fmt(user.totalWeight)} kg`;
-  document.getElementById("impactDepositsCount").textContent = `${user.completedDeposits}`;
-
-  // Estimasi dampak lingkungan:
-  // 1 kg sampah daur ulang rata-rata mencegah ~1.5 kg CO2e emisi
-  const co2Saved = (user.totalWeight * 1.48).toFixed(1);
-  const treesEq = (user.totalWeight * 0.08).toFixed(1);
-
-  document.getElementById("impactCO2Saved").textContent = `${co2Saved} kg`;
-  document.getElementById("impactTreesSaved").textContent = `${treesEq} pohon`;
-
-  // Komposisi sampah
-  const breakdownContainer = document.getElementById("impactBreakdownBars");
-  if (!breakdownContainer) return;
-
-  const weightByMaterial = {};
-  AppState.deposits.forEach((tx) => {
-    if (tx.status === "Selesai") {
-      weightByMaterial[tx.materialName] = (weightByMaterial[tx.materialName] || 0) + tx.weight;
-    }
-  });
-
-  const total = Object.values(weightByMaterial).reduce((a, b) => a + b, 0) || 1;
-
-  breakdownContainer.innerHTML = Object.entries(weightByMaterial)
-    .sort((a, b) => b[1] - a[1])
-    .map(([name, weight]) => {
-      const pct = Math.max(8, Math.round((weight / total) * 100));
-      return `
-        <div style="margin-bottom: 12px;">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
-            <span style="font-weight:600;">${name}</span>
-            <span style="font-weight:700;color:var(--wine);">${fmt(weight)} kg (${pct}%)</span>
-          </div>
-          <div class="progress-container" style="height:6px;margin:0;">
-            <div class="progress-fill" style="width: ${pct}%;"></div>
-          </div>
-        </div>
-      `;
-    }).join("") || `<div style="text-align:center;color:var(--text-muted);font-size:12px;">Belum ada setoran selesai.</div>`;
-}
-
-// 6. Komunitas & Leaderboard
-function renderCommunityView() {
-  const comm = AppState.community;
-  const currentKgEl = document.getElementById("commCurrentKg");
-  const targetBarEl = document.getElementById("commTargetBar");
-  const commLeaderboardEl = document.getElementById("commLeaderboardRows");
-
-  if (currentKgEl) currentKgEl.textContent = `${comm.currentKg} kg`;
-  if (targetBarEl) {
-    const pct = Math.min(100, Math.round((comm.currentKg / comm.monthlyTargetKg) * 100));
-    targetBarEl.style.width = `${pct}%`;
-  }
-
-  if (commLeaderboardEl) {
-    commLeaderboardEl.innerHTML = comm.leaderboard.map((item) => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border-bottom:1px solid var(--border-color);">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:16px;width:24px;text-align:center;">${item.badge || item.rank}</span>
-          <div>
-            <strong style="font-size:13px;display:block;">${item.name}</strong>
-            <span style="font-size:11px;color:var(--text-muted);">${item.weight} kg terkumpul</span>
-          </div>
-        </div>
-        <span class="status-badge selesai">${item.status}</span>
-      </div>
-    `).join("");
-  }
-}
-
-// 7. Edukasi RILO Learn
-function renderLearnGuides() {
-  const container = document.getElementById("learnGuidesList");
-  if (!container) return;
-
-  container.innerHTML = AppState.guides.map((g) => `
-    <div class="learn-tile" onclick="openGuideDetail('${g.id}')">
-      <div style="font-size:28px;width:44px;height:44px;border-radius:12px;background:var(--wine-soft);display:grid;place-items:center;flex-shrink:0;">
-        ${g.icon}
-      </div>
-      <div>
-        <strong style="font-size:13px;color:var(--text-main);">${g.title}</strong>
-        <p style="font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.35;">${g.short}</p>
-      </div>
-    </div>
-  `).join("");
-}
-
-// 8. Profil Pengguna
-function setupProfile() {
-  const form = document.getElementById("formEditProfile");
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const newName = document.getElementById("profInputName").value.trim();
-      const newEmail = document.getElementById("profInputEmail").value.trim();
-      const newAddress = document.getElementById("profInputAddress").value.trim();
-
-      if (newName) {
-        AppState.user.name = newName;
-        AppState.user.avatar = newName[0].toUpperCase();
-      }
-      if (newEmail) AppState.user.email = newEmail;
-      if (newAddress) AppState.user.address = newAddress;
-
-      updateProfileUI();
-      renderHome();
-      showToast("Data profil berhasil diperbarui!", "✓");
-    });
-  }
-}
-
-function updateProfileUI() {
-  const user = AppState.user;
-  const avatar = user.avatar || user.name[0];
-
-  document.querySelectorAll(".user-avatar-text").forEach((el) => {
-    el.textContent = avatar;
-  });
-
-  document.getElementById("profNameDisplay").textContent = user.name;
-  document.getElementById("profEmailDisplay").textContent = user.email;
-  document.getElementById("profTierDisplay").textContent = user.tier;
-
-  const inpName = document.getElementById("profInputName");
-  const inpEmail = document.getElementById("profInputEmail");
-  const inpAddress = document.getElementById("profInputAddress");
-
-  if (inpName) inpName.value = user.name;
-  if (inpEmail) inpEmail.value = user.email;
-  if (inpAddress) inpAddress.value = user.address;
-}
-
-// === BOTTOM SHEETS & MODALS MANAGEMENT ===
-function setupModals() {
-  const backdrop = document.getElementById("bottomSheetBackdrop");
-  if (backdrop) {
-    backdrop.addEventListener("click", closeAllSheets);
-  }
-
-  document.querySelectorAll(".sheet-close-btn").forEach((btn) => {
-    btn.addEventListener("click", closeAllSheets);
-  });
-}
-
-function closeAllSheets() {
-  const backdrop = document.getElementById("bottomSheetBackdrop");
-  if (backdrop) backdrop.classList.remove("active");
-
-  document.querySelectorAll(".bottom-sheet").forEach((sheet) => {
-    sheet.classList.remove("active");
-  });
-}
-
-function openSheet(sheetId) {
-  closeAllSheets();
-  const backdrop = document.getElementById("bottomSheetBackdrop");
-  const sheet = document.getElementById(sheetId);
-
-  if (backdrop && sheet) {
-    backdrop.classList.add("active");
-    sheet.classList.add("active");
-  }
-}
-
-// Buka Detail Transaksi
-window.openTxDetail = function (txId) {
-  const tx = AppState.deposits.find((t) => t.id === txId);
-  if (!tx) return;
-
-  const content = document.getElementById("txDetailSheetContent");
-  const isDone = tx.status === "Selesai";
+  const content = document.getElementById("modalSheetDynamicContent");
 
   content.innerHTML = `
     <div style="text-align:center;margin-bottom:16px;">
-      <div style="width:52px;height:52px;border-radius:18px;background:var(--wine-soft);color:var(--wine);display:grid;place-items:center;font-size:24px;margin:0 auto 10px;">
-        🧾
-      </div>
-      <h3 style="font-size:16px;margin-bottom:2px;">Bukti Setoran RILO</h3>
-      <span style="font-size:11px;color:var(--text-muted);">${tx.id}</span>
-    </div>
-
-    <div style="background:#faf7f8;border-radius:16px;padding:14px;border:1px solid var(--border-color);margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #f0e6eb;">
-        <span style="color:var(--text-muted);">Tanggal</span>
-        <strong>${formatDate(tx.date)}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #f0e6eb;">
-        <span style="color:var(--text-muted);">Material</span>
-        <strong>${tx.materialName}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #f0e6eb;">
-        <span style="color:var(--text-muted);">Berat</span>
-        <strong>${fmt(tx.weight)} kg</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #f0e6eb;">
-        <span style="color:var(--text-muted);">Metode</span>
-        <strong>${tx.method}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #f0e6eb;">
-        <span style="color:var(--text-muted);">Lokasi / Titik</span>
-        <strong style="text-align:right;max-width:180px;">${tx.location}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid #f0e6eb;">
-        <span style="color:var(--text-muted);">Poin Diperoleh</span>
-        <strong style="color:var(--wine);font-size:14px;">+${fmt(tx.pointsEarned)} pts</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;">
-        <span style="color:var(--text-muted);">Status</span>
-        <span class="status-badge ${isDone ? 'selesai' : 'menunggu'}">${tx.status}</span>
-      </div>
-    </div>
-
-    ${tx.notes ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:18px;background:#fff;padding:10px;border-radius:10px;border:1px solid var(--border-color);"><strong>Catatan:</strong> ${tx.notes}</div>` : ''}
-
-    <button class="btn-primary-mobile" onclick="closeAllSheets()">Tutup</button>
-  `;
-
-  openSheet("sheetTxDetail");
-};
-
-// Buka Modal Konfirmasi Redeem Reward
-function openRedeemSheet(reward) {
-  const content = document.getElementById("redeemSheetContent");
-
-  content.innerHTML = `
-    <div style="text-align:center;margin-bottom:16px;">
-      <div style="font-size:42px;margin-bottom:8px;">${reward.icon}</div>
+      <div style="font-size:46px;margin-bottom:8px;">${reward.icon}</div>
       <h3 style="font-size:16px;margin-bottom:4px;">${reward.title}</h3>
-      <p style="font-size:12px;color:var(--text-muted);">${reward.description}</p>
+      <p style="font-size:12px;color:var(--text-sub);">${reward.description}</p>
     </div>
 
-    <div style="background:var(--wine-softer);border:1.5px dashed #ddb0c0;border-radius:16px;padding:16px;text-align:center;margin-bottom:20px;">
-      <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Biaya Penukaran</span>
-      <div style="font-size:24px;font-weight:850;color:var(--wine);margin:4px 0;">${fmt(reward.pointsCost)} Poin</div>
-      <small style="font-size:11px;color:var(--text-muted);">Sisa poinmu saat ini: ${fmt(AppState.user.points)} pts</small>
+    <div style="background:var(--wine-soft);border:1px dashed var(--wine-border);border-radius:14px;padding:14px;text-align:center;margin-bottom:16px;">
+      <span style="font-size:11px;color:var(--text-sub);text-transform:uppercase;font-weight:700;">Biaya Penukaran</span>
+      <div style="font-size:24px;font-weight:850;color:var(--wine-primary);margin:4px 0;">${fmt(reward.pointsCost)} Poin</div>
+      <small style="font-size:11px;color:var(--text-sub);">Saldo setelah ditukar: <b>${fmt(AppState.user.points - reward.pointsCost)} pts</b></small>
     </div>
 
     <div style="display:flex;gap:10px;">
-      <button class="btn-secondary-mobile" onclick="closeAllSheets()">Batal</button>
-      <button class="btn-primary-mobile" id="confirmRedeemBtn">Konfirmasi Tukar</button>
+      <button class="btn-primary-action" style="background:var(--surface-alt);color:var(--text-main);" onclick="closeModalSheet()">Batal</button>
+      <button class="btn-primary-action" id="btnConfirmDeductPoints">Konfirmasi Tukar</button>
     </div>
   `;
 
-  openSheet("sheetRedeem");
+  openModalSheet();
 
-  document.getElementById("confirmRedeemBtn").onclick = () => {
-    // Kurangi poin
+  document.getElementById("btnConfirmDeductPoints").onclick = () => {
+    // 1. POTONG SALDO POIN SECARA REALTIME
     AppState.user.points -= reward.pointsCost;
 
-    // Hasilkan kode voucher unik
-    const voucherCode = `RILO-${reward.category.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // 2. SIMPAN KE DAFTAR VOUCHER SAYA
+    const code = `RILO-${reward.id}-${Math.floor(1000 + Math.random() * 9000)}`;
+    AppState.redemptions.unshift({
+      id: `RDM-${Date.now()}`,
+      date: new Date().toISOString().slice(0, 10),
+      rewardTitle: reward.title,
+      pointsSpent: reward.pointsCost,
+      code: code,
+      expiry: "30 Nov 2026",
+      status: "Aktif"
+    });
 
+    // 3. RENDER ULANG SEMUA SALDO & VIEW
+    renderAllViews();
+
+    // 4. TAMPILKAN HASIL TUKAR VOUCHER
     content.innerHTML = `
-      <div style="text-align:center;padding:10px 0;">
-        <div style="font-size:48px;margin-bottom:10px;">🎉</div>
-        <h3 style="font-size:17px;color:var(--wine);margin-bottom:6px;">Penukaran Berhasil!</h3>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:18px;">Kamu berhasil menukarkan ${reward.title}. Tunjukkan kode voucher ini kepada mitra terkait.</p>
+      <div style="text-align:center;padding:8px 0;">
+        <div style="font-size:44px;margin-bottom:6px;">🎉</div>
+        <h3 style="font-size:16px;color:var(--wine-primary);margin-bottom:4px;">Voucher Berhasil Diperoleh!</h3>
+        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">Saldo poin telah terpotong <b>${fmt(reward.pointsCost)} pts</b>.</p>
 
-        <div style="background:#f4f2f4;border-radius:14px;padding:14px;border:1.5px dashed #baa8b0;margin-bottom:20px;">
-          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;display:block;">Kode Voucher Simulasi</span>
-          <strong style="font-size:20px;letter-spacing:2px;color:var(--text-main);">${voucherCode}</strong>
+        <div style="background:var(--surface-alt);border-radius:14px;padding:14px;border:1.5px dashed var(--border-line);margin-bottom:18px;">
+          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;display:block;">Kode Voucher Kamu</span>
+          <strong style="font-size:20px;letter-spacing:2px;color:var(--text-main);">${code}</strong>
+          <small style="display:block;margin-top:4px;font-size:10px;color:var(--text-sub);">Berlaku s/d 30 Nov 2026</small>
         </div>
 
-        <button class="btn-primary-mobile" onclick="closeAllSheets(); renderAllViews();">Selesai</button>
+        <button class="btn-primary-action" onclick="closeModalSheet(); switchView('my-vouchers');">
+          Buka Voucher Saya
+        </button>
       </div>
     `;
 
     showToast("Voucher berhasil diperoleh!", "🎁");
   };
+};
+
+// 4. Tab Voucher Saya (Tersimpan)
+function renderMyVouchers() {
+  const container = document.getElementById("myVouchersContainer");
+  if (!container) return;
+
+  if (AppState.redemptions.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:16px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">Kamu belum memiliki voucher yang ditukar.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = AppState.redemptions.map((v) => `
+    <div style="background:#fff;border-radius:16px;border:1px solid var(--border-line);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-subtle);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <strong style="font-size:13px;">${v.rewardTitle}</strong>
+        <span class="badge-status-done">${v.status}</span>
+      </div>
+      <div style="background:var(--wine-soft);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:14px;letter-spacing:1.5px;font-weight:800;color:var(--wine-primary);">${v.code}</span>
+        <small style="font-size:10px;color:var(--text-sub);">S/D ${v.expiry || '30 Nov 2026'}</small>
+      </div>
+    </div>
+  `).join("");
 }
 
-// Buka Detail Panduan Edukasi
-window.openGuideDetail = function (guideId) {
+// 5. Struk Transaksi (Receipt Modal)
+window.openTxReceiptModal = function (txId) {
+  const tx = AppState.deposits.find((t) => t.id === txId);
+  if (!tx) return;
+
+  const content = document.getElementById("modalSheetDynamicContent");
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px;">
+      <div style="width:48px;height:48px;border-radius:14px;background:var(--wine-soft);color:var(--wine-primary);display:grid;place-items:center;font-size:22px;margin:0 auto 8px;">
+        🧾
+      </div>
+      <h3 style="font-size:16px;">Bukti Setoran Sampah</h3>
+      <span style="font-size:11px;color:var(--text-sub);">${tx.id}</span>
+    </div>
+
+    <div style="background:var(--surface-alt);border-radius:14px;padding:14px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
+        <span style="color:var(--text-sub);">Tanggal</span>
+        <strong>${formatDate(tx.date)}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
+        <span style="color:var(--text-sub);">Titik Setor</span>
+        <strong>${tx.qrBox}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
+        <span style="color:var(--text-sub);">Kategori</span>
+        <strong>${tx.mode}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
+        <span style="color:var(--text-sub);">Rincian</span>
+        <strong style="text-align:right;max-width:180px;">${tx.summary}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
+        <span style="color:var(--text-sub);">Poin Didapat</span>
+        <strong style="color:var(--wine-primary);font-size:14px;">+${fmt(tx.pointsEarned)} pts</strong>
+      </div>
+    </div>
+
+    <button class="btn-primary-action" onclick="closeModalSheet()">Tutup</button>
+  `;
+
+  openModalSheet();
+};
+
+// 6. Dampak Lingkungan
+function renderImpact() {
+  const user = AppState.user;
+  document.getElementById("impactWeightVal").textContent = `${fmt(user.totalWeight)} kg`;
+  document.getElementById("impactDepositsVal").textContent = `${user.completedDeposits}`;
+  document.getElementById("impactCo2Val").textContent = `${(user.totalWeight * 1.5).toFixed(1)} kg`;
+}
+
+// 7. Panduan Edukasi
+function renderGuides() {
+  const container = document.getElementById("guidesListContainer");
+  if (!container) return;
+
+  container.innerHTML = AppState.guides.map((g) => `
+    <div class="activity-card-item" onclick="openGuideModal('${g.id}')">
+      <div class="act-left">
+        <div class="act-icon">${g.icon}</div>
+        <div class="act-details">
+          <strong>${g.title}</strong>
+          <span>${g.short}</span>
+        </div>
+      </div>
+      <span style="font-size:14px;color:var(--text-muted);">›</span>
+    </div>
+  `).join("");
+}
+
+window.openGuideModal = function (guideId) {
   const guide = AppState.guides.find((g) => g.id === guideId);
   if (!guide) return;
 
-  const content = document.getElementById("guideSheetContent");
+  const content = document.getElementById("modalSheetDynamicContent");
   content.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="font-size:32px;width:52px;height:52px;border-radius:14px;background:var(--wine-soft);display:grid;place-items:center;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+      <div style="font-size:32px;width:48px;height:48px;border-radius:12px;background:var(--wine-soft);display:grid;place-items:center;">
         ${guide.icon}
       </div>
       <div>
         <h3 style="font-size:16px;">${guide.title}</h3>
-        <span style="font-size:11px;color:var(--wine);font-weight:700;">Panduan Pemilahan</span>
+        <span style="font-size:11px;color:var(--wine-primary);font-weight:700;">Panduan Daur Ulang</span>
       </div>
     </div>
-
-    <div style="font-size:13px;line-height:1.6;color:var(--text-main);background:#faf7f8;border-radius:16px;padding:16px;border:1px solid var(--border-color);margin-bottom:20px;">
+    <div style="font-size:13px;line-height:1.6;color:var(--text-main);background:var(--surface-alt);border-radius:14px;padding:14px;margin-bottom:16px;">
       ${guide.content}
     </div>
-
-    <button class="btn-primary-mobile" onclick="closeAllSheets()">Paham & Tutup</button>
+    <button class="btn-primary-action" onclick="closeModalSheet()">Mengerti</button>
   `;
 
-  openSheet("sheetGuide");
+  openModalSheet();
 };
 
-// Notifikasi Panel
-function openNotificationSheet() {
-  const content = document.getElementById("notifSheetContent");
-  content.innerHTML = `
-    <div style="margin-bottom: 14px;">
-      <div style="display:flex;gap:12px;padding:12px;background:#faf7f8;border-radius:14px;border:1px solid var(--border-color);margin-bottom:8px;">
-        <span style="font-size:20px;">🎉</span>
-        <div>
-          <strong style="font-size:12px;display:block;">Selamat Datang di Prototype RILO!</strong>
-          <p style="font-size:11px;color:var(--text-muted);margin-top:2px;">Aplikasi web mobile ini merupakan prototype front-end interaktif bank sampah terintegrasi.</p>
-        </div>
-      </div>
-      <div style="display:flex;gap:12px;padding:12px;background:#faf7f8;border-radius:14px;border:1px solid var(--border-color);">
-        <span style="font-size:20px;">🌱</span>
-        <div>
-          <strong style="font-size:12px;display:block;">Tantangan Bulan Ini Aktif</strong>
-          <p style="font-size:11px;color:var(--text-muted);margin-top:2px;">Capai target 10 kg bulan ini untuk membuka tier penghargaan baru.</p>
-        </div>
-      </div>
-    </div>
-    <button class="btn-primary-mobile" onclick="closeAllSheets()">Tutup</button>
-  `;
+// 8. Profil
+function setupProfileForm() {
+  const form = document.getElementById("formUpdateProfile");
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("editProfName").value.trim();
+      const email = document.getElementById("editProfEmail").value.trim();
+      const addr = document.getElementById("editProfAddress").value.trim();
 
-  openSheet("sheetNotif");
+      if (name) {
+        AppState.user.name = name;
+        AppState.user.avatar = name[0].toUpperCase();
+      }
+      if (email) AppState.user.email = email;
+      if (addr) AppState.user.address = addr;
+
+      renderAllViews();
+      showToast("Profil berhasil disimpan!", "✓");
+    });
+  }
 }
+
+function renderProfile() {
+  const user = AppState.user;
+  document.getElementById("profNameDisplay").textContent = user.name;
+  document.getElementById("profEmailDisplay").textContent = user.email;
+
+  const inName = document.getElementById("editProfName");
+  const inEmail = document.getElementById("editProfEmail");
+  const inAddr = document.getElementById("editProfAddress");
+
+  if (inName) inName.value = user.name;
+  if (inEmail) inEmail.value = user.email;
+  if (inAddr) inAddr.value = user.address;
+}
+
+// === MODAL SHEET ENGINE ===
+function openModalSheet() {
+  document.getElementById("modalBackdrop").classList.add("open");
+  document.getElementById("modalSheetContainer").classList.add("open");
+}
+
+window.closeModalSheet = function () {
+  document.getElementById("modalBackdrop").classList.remove("open");
+  document.getElementById("modalSheetContainer").classList.remove("open");
+};
+
+document.getElementById("modalBackdrop").addEventListener("click", closeModalSheet);
