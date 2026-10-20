@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#761a38" />
-  <meta name="description" content="RILO — Aplikasi Web Mobile Bank Sampah Terintegrasi." />
+  <meta name="description" content="RILO — Aplikasi Web Mobile Bank Sampah Terintegrasi Bintaro." />
   <title>RILO Mobile — Bank Sampah Terintegrasi</title>
   
   <!-- Leaflet Map CSS -->
@@ -17,128 +17,181 @@
   <!-- MOBILE SMARTPHONE VIEWPORT CONTAINER -->
   <div class="mobile-shell">
 
-    <!-- TOP LOCATION BAR (RUNTAHPEDIA SPEC) -->
+    <!-- ==================== 0. OVERLAY LOGIN & AUTENTIKASI (SEBELUM MASUK) ==================== -->
+    <div class="auth-overlay-screen" id="authOverlayScreen">
+      <div class="auth-brand-head">
+        <div class="auth-logo-badge">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/><path d="M11 19h8.2a1.8 1.8 0 0 0 1.565-.89 1.82 1.82 0 0 0 .016-1.79L17 9.5"/><path d="m14 14 3-4.5-3-4.5"/><path d="M17 5H9.5a1.8 1.8 0 0 0-1.567.89 1.82 1.82 0 0 0-.015 1.79L10 11"/></svg>
+        </div>
+        <h2 data-i18n="loginTitle">Masuk ke RILO</h2>
+        <p data-i18n="loginSub">Kelola setoran sampahmu dan kumpulkan poin setiap hari.</p>
+      </div>
+
+      <!-- Tab Switcher: Masuk vs Daftar -->
+      <div class="auth-tabs-toggle">
+        <button class="btn-auth-tab active" id="tabAuthSignIn" data-i18n="tabSignIn">Masuk</button>
+        <button class="btn-auth-tab" id="tabAuthSignUp" data-i18n="tabSignUp">Daftar Akun</button>
+      </div>
+
+      <!-- Tombol Google Sign In Resmi -->
+      <button class="btn-google-sign-in" id="btnGoogleSignInAction" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        <span data-i18n="btnGoogleLogin">Lanjutkan dengan Google</span>
+      </button>
+
+      <div class="auth-divider-line">
+        <span data-i18n="orText">atau masuk dengan email</span>
+      </div>
+
+      <!-- Form Email & Password -->
+      <form id="authCredentialsForm">
+        <div class="auth-form-group" id="authSignUpExtraFields" style="display:none;">
+          <label class="auth-form-label">Nama Lengkap</label>
+          <input type="text" id="authInputName" class="auth-input-field" placeholder="Contoh: Kaila Zanita" />
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label" data-i18n="labelEmail">Alamat Email</label>
+          <input type="email" id="authInputEmail" class="auth-input-field" placeholder="kaila@example.com" value="kaila.zanita@example.com" required />
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-form-label" data-i18n="labelPassword">Kata Sandi</label>
+          <input type="password" id="authInputPassword" class="auth-input-field" placeholder="••••••••" value="password123" required />
+        </div>
+        <button type="submit" class="btn-submit-auth">
+          <span id="authSubmitBtnText" data-i18n="btnEmailLogin">Masuk dengan Email</span>
+        </button>
+      </form>
+
+      <!-- Akses Demo Cepat (Guest) -->
+      <button type="button" class="btn-guest-demo" id="btnGuestDemoAction" data-i18n="btnGuestDemo">
+        Coba Demo Langsung (Tanpa Password)
+      </button>
+    </div>
+
+    <!-- ==================== TOP BAR LOKASI & LANGUAGE SWITCHER ==================== -->
     <div class="top-location-bar">
       <div class="location-chip">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span id="locationTagText">Margonda, Depok</span>
+        <span id="locationTagText">Bintaro, Tangerang Selatan</span>
       </div>
-      <div style="font-size:11px;color:var(--text-muted);font-weight:600;">
-        Drop Point: 120m
+
+      <!-- Language Switcher (ID | EN) -->
+      <div class="lang-switcher-pill">
+        <button class="lang-btn active" id="btnLangId" data-lang="id">ID</button>
+        <button class="lang-btn" id="btnLangEn" data-lang="en">EN</button>
       </div>
     </div>
 
-    <!-- TOP USER HEADER -->
+    <!-- ==================== TOP USER HEADER (AVATAR SQUIRCLE NON-LINGKARAN) ==================== -->
     <header class="top-user-row">
       <div>
         <div class="user-greeting" id="homeGreetingName">Halo, Kaila!</div>
-        <div class="user-subtext">Sudah pilah sampah hari ini?</div>
+        <div class="user-subtext" data-i18n="subGreeting">Sudah pilah sampah hari ini?</div>
       </div>
-      <div class="profile-avatar-btn" data-go="profile" title="Profil Pengguna">
+      <!-- Profil Non-Lingkaran (Squircle Modern) -->
+      <div class="profile-avatar-squircle" data-go="profile" title="Profil Pengguna">
         <span id="homeAvatarText">K</span>
       </div>
     </header>
 
-    <!-- SCROLLABLE CONTENT VIEWPORT -->
+    <!-- ==================== SCROLLABLE CONTENT VIEWPORT ==================== -->
     <main class="main-scroll-view" id="mainScrollView">
 
       <!-- ==================== 1. BERANDA (HOME VIEW) ==================== -->
       <section class="view-panel active" id="panel-home">
         
-        <!-- WALLET POINT CARD (HANYA VOUCHER, TANPA TOMBOL SETOR) -->
-        <div class="wallet-card">
-          <div class="wallet-meta-row">
-            <span class="wallet-title">Saldo RILO Poin</span>
-            <span class="level-badge" id="userLevelPill">Pahlawan Hijau</span>
+        <!-- COMPACT POINT STRIP CARD (MENYATU, RAMPING & TIDAK MAKAN TEMPAT) -->
+        <div class="point-compact-card">
+          <div class="pcc-left">
+            <div class="pcc-tier-row">
+              <span class="pcc-tier-badge" id="userLevelPill">Pahlawan Hijau</span>
+              <span class="pcc-rupiah" id="walletConversionRupiah">≈ Rp 12.400</span>
+            </div>
+            <div class="pcc-points-row">
+              <span class="pcc-number" id="walletPointsBigVal">1.240</span>
+              <span class="pcc-label">pts</span>
+            </div>
           </div>
-          <div class="wallet-balance-row">
-            <span class="balance-points-num" id="walletPointsBigVal">1.240</span>
-            <span class="balance-points-label">pts</span>
-          </div>
-          <div class="balance-conversion" id="walletConversionRupiah">≈ Rp 12.400</div>
 
-          <!-- Aksi Poin: Tukar Voucher & Voucher Saya -->
-          <div class="wallet-action-row">
-            <button class="btn-wallet-action" data-go="rewards">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
-              <span>Tukar Hadiah</span>
+          <!-- Aksi Poin: Tukar Hadiah & Voucher Saya -->
+          <div class="pcc-right-actions">
+            <button class="btn-point-compact" data-go="rewards">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
+              <span data-i18n="btnRedeemReward">Tukar</span>
             </button>
-            <button class="btn-wallet-action" data-go="my-vouchers">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-              <span>Voucher Saya</span>
+            <button class="btn-point-compact" data-go="my-vouchers">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+              <span data-i18n="btnMyVouchers">Voucher</span>
             </button>
           </div>
         </div>
 
-        <!-- PETA TITIK DROP BOX DI HOMEPAGE (RUNTAHPEDIA SPEC) -->
+        <!-- PETA TITIK DROP BOX BINTARO (TANPA TOMBOL SCAN DI DALAMNYA) -->
         <div class="map-preview-card">
           <div class="map-card-head">
             <strong>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
-              Titik Drop Box Terdekat
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+              <span data-i18n="mapCardTitle">Titik Drop Box Bintaro</span>
             </strong>
-            <button class="link-all" data-go="map-full">Buka Peta Penuh →</button>
+            <button class="link-all" data-go="map-full" data-i18n="mapFullLink">Buka Peta Penuh →</button>
           </div>
 
-          <!-- Peta Interaktif Leaflet -->
+          <!-- Peta Leaflet Berpusat di Bintaro -->
           <div class="map-canvas-container" id="homeDropMap"></div>
 
-          <!-- Info Terdekat & Tombol Setor -->
-          <div class="map-nearest-info">
-            <div class="mn-left">
-              <strong id="nearestDropBoxName">Smart Drop Box Kampus A</strong>
-              <span id="nearestDropBoxSub">Gedung Rektorat Lt. 1 • 120m</span>
+          <!-- Info Drop Box Terdekat Bintaro (Murni Informasi, Tanpa Tombol Scan) -->
+          <div class="map-nearest-info-clean">
+            <div class="mn-clean-left">
+              <strong id="nearestDropBoxName">Smart Drop Box Bintaro Xchange</strong>
+              <span id="nearestDropBoxSub">Mall Lt. LG • 150m dari lokasimu</span>
             </div>
-            <button class="btn-scan-map-chip" data-go="deposit">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/></svg>
-              Scan & Buka
-            </button>
+            <span class="mn-clean-status" id="nearestDropBoxStatus">Siap Terima</span>
           </div>
         </div>
 
         <!-- 4 MENU LAYANAN UTAMA RUNTAHPEDIA -->
-        <div class="services-section-title">Layanan Daur Ulang</div>
+        <div class="services-section-title" data-i18n="servicesTitle">Layanan Daur Ulang</div>
         <div class="services-grid-4">
           <button class="service-btn-card" data-go="deposit">
             <div class="service-icon-box">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
             </div>
-            <span class="service-label">Scan & Setor</span>
+            <span class="service-label" data-i18n="svcScan">Scan & Setor</span>
           </button>
 
           <button class="service-btn-card" data-go="map-full">
             <div class="service-icon-box">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
             </div>
-            <span class="service-label">Cari Drop Box</span>
+            <span class="service-label" data-i18n="svcFind">Cari Drop Box</span>
           </button>
 
           <button class="service-btn-card" data-go="rewards">
             <div class="service-icon-box">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
             </div>
-            <span class="service-label">Tukar Hadiah</span>
+            <span class="service-label" data-i18n="svcReward">Tukar Hadiah</span>
           </button>
 
           <button class="service-btn-card" data-go="impact">
             <div class="service-icon-box">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
             </div>
-            <span class="service-label">Dampak Hijau</span>
+            <span class="service-label" data-i18n="svcImpact">Dampak Hijau</span>
           </button>
         </div>
 
-        <!-- BANNER KAMPANYE (RUNTAHPEDIA STYLE) -->
+        <!-- BANNER KAMPANYE BINTARO -->
         <div class="campaign-card">
-          <span class="campaign-tag">TANTANGAN KAMPUS</span>
-          <h4>Pilah 10 Botol Hari Ini, Raih Bonus Poin!</h4>
-          <p>Kumpulkan kemasan minumanmu di Smart Drop Box terdekat dan tukarkan dengan voucher kopi favorit.</p>
+          <span class="campaign-tag" data-i18n="campaignTag">TANTANGAN BINTARO</span>
+          <h4 data-i18n="campaignTitle">Pilah 10 Botol Hari Ini, Raih Bonus Poin!</h4>
+          <p data-i18n="campaignDesc">Kumpulkan kemasan minumanmu di Smart Drop Box Bintaro Xchange dan dapatkan voucher kopi favorit.</p>
         </div>
 
         <!-- AKTIVITAS TERAKHIR -->
         <div class="section-head-row">
-          <h4>Aktivitas Terakhir</h4>
-          <button class="link-all" data-go="transactions">Lihat Semua →</button>
+          <h4 data-i18n="recentTitle">Aktivitas Terakhir</h4>
+          <button class="link-all" data-go="transactions" data-i18n="seeAll">Lihat Semua →</button>
         </div>
         <div class="activity-list-container" id="homeRecentActivityContainer">
           <!-- Render via app.js -->
@@ -155,8 +208,8 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <div>
-              <h3 style="font-size:16px;font-weight:800;">Scan QR Smart Drop Box</h3>
-              <span style="font-size:11px;color:var(--text-sub);">Arahkan ke QR Code pada pintu Smart Drop Box</span>
+              <h3 style="font-size:16px;font-weight:800;" data-i18n="scanTitle">Scan QR Drop Box</h3>
+              <span style="font-size:11px;color:var(--text-sub);" data-i18n="scanSub">Arahkan ke QR Code pada pintu Smart Drop Box</span>
             </div>
           </div>
 
@@ -168,12 +221,12 @@
               <div class="corner-line cl-bl"></div>
               <div class="corner-line cl-br"></div>
               <div class="laser-scanner"></div>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.3"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.3"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
             </div>
-            <p style="font-size:12px;color:rgba(255,255,255,0.75);">Mencari kode QR Drop Box di sekitar...</p>
+            <p style="font-size:12px;color:rgba(255,255,255,0.75);" data-i18n="scanSearching">Mencari kode QR Drop Box di sekitar...</p>
           </div>
 
-          <!-- CARD DETEKSI DROP BOX -->
+          <!-- DETEKSI TITIK DROP BOX BINTARO -->
           <div class="detected-hub-panel" id="qrDetectedHubCard">
             <!-- Render via app.js -->
           </div>
@@ -181,27 +234,26 @@
 
       </section>
 
-      <!-- ==================== 3. FLOW INPUT SETOR SAMPAH ==================== -->
+      <!-- ==================== 3. FLOW INPUT SETOR SAMPAH (SETELAH SCAN) ==================== -->
       <section class="view-panel" id="panel-deposit-input">
         
-        <!-- STATUS DROP BOX TERHUBUNG -->
         <div class="connected-hub-badge">
           <div class="chb-text">
-            <strong id="activeHubTitle">Smart Drop Box Kampus A</strong>
-            <span id="activeHubSubtitle">Gedung Rektorat Lt. 1 • Kapasitas Tersedia</span>
+            <strong id="activeHubTitle">Smart Drop Box Bintaro Xchange</strong>
+            <span id="activeHubSubtitle">Mall Lt. LG • Kapasitas Tersedia</span>
           </div>
           <button style="background:none;border:none;color:var(--rilo-wine);font-size:11px;font-weight:750;cursor:pointer;" data-go="deposit">Ganti Titik</button>
         </div>
 
         <!-- SEGMENTED TABS: PER PIECE VS PER KG -->
         <div class="segmented-pills-wrap">
-          <button class="seg-pill-btn active" id="pillModePiece">Satuan per Ukuran (Per Piece)</button>
-          <button class="seg-pill-btn" id="pillModeKg">Timbangan Kiloan (Per Kg)</button>
+          <button class="seg-pill-btn active" id="pillModePiece" data-i18n="tabPiece">Satuan per Ukuran (Per Piece)</button>
+          <button class="seg-pill-btn" id="pillModeKg" data-i18n="tabKg">Timbangan Kiloan (Per Kg)</button>
         </div>
 
         <!-- PANEL PER PIECE (BOTOL ML, KALENG ML, TUTUP PCS, KACA ML, KARTON ML) -->
         <div id="panelPieceItems">
-          <!-- Render via app.js (SVG clean icons & stepper) -->
+          <!-- Render via app.js -->
         </div>
 
         <!-- PANEL PER KG (KILOAN) -->
@@ -209,13 +261,13 @@
           <!-- Render via app.js -->
         </div>
 
-        <!-- CHECKOUT BAR ESTIMASI POIN -->
+        <!-- BOTTOM CHECKOUT SUMMARY BAR -->
         <div class="bottom-deposit-checkout">
           <div class="bdc-labels">
             <span id="checkoutTotalSummaryDisplay">0 item terpilih</span>
             <strong id="checkoutTotalPointsDisplay">+0 pts</strong>
           </div>
-          <button class="btn-confirm-deposit-cta" id="btnConfirmDepositAction" disabled>
+          <button class="btn-confirm-deposit-cta" id="btnConfirmDepositAction" disabled data-i18n="btnConfirmDeposit">
             Konfirmasi & Setor
           </button>
         </div>
@@ -225,9 +277,9 @@
       <!-- ==================== 4. RIWAYAT TRANSAKSI ==================== -->
       <section class="view-panel" id="panel-transactions">
         <div style="margin-bottom:14px;">
-          <h3 style="font-size:18px;font-weight:800;color:var(--rilo-wine-dark);">Riwayat Setoran</h3>
-          <p style="font-size:12px;color:var(--text-sub);margin-top:2px;">
-            Semua catatan sampah yang telah kamu setorkan ke RILO.
+          <h3 style="font-size:18px;font-weight:800;color:var(--rilo-wine-dark);" data-i18n="historyTitle">Riwayat Setoran</h3>
+          <p style="font-size:12px;color:var(--text-sub);margin-top:2px;" data-i18n="historySub">
+            Catatan sampah yang telah kamu setorkan ke RILO.
           </p>
         </div>
 
@@ -239,17 +291,19 @@
       <!-- ==================== 5. KATALOG REWARD & HADIAH ==================== -->
       <section class="view-panel" id="panel-rewards">
         
-        <div class="wallet-card" style="margin-bottom:16px;">
-          <span class="wallet-title">Saldo Poin Kamu</span>
-          <div class="wallet-balance-row" style="margin:4px 0 0;">
-            <span class="balance-points-num" id="rewardsPointsBalanceDisplay">1.240 pts</span>
+        <div class="point-compact-card" style="margin-bottom:16px;">
+          <div class="pcc-left">
+            <span class="pcc-label" data-i18n="walletTitle">Saldo RILO Poin</span>
+            <div class="pcc-points-row">
+              <span class="pcc-number" id="rewardsPointsBalanceDisplay">1.240 pts</span>
+            </div>
           </div>
+          <button class="btn-point-compact" data-go="my-vouchers" data-i18n="btnMyVouchers">
+            Voucher Saya →
+          </button>
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div class="services-section-title" style="margin:0;">Katalog Hadiah & Voucher</div>
-          <button class="link-all" data-go="my-vouchers">Voucher Saya (1) →</button>
-        </div>
+        <div class="services-section-title" data-i18n="rewardCatalogTitle">Katalog Hadiah & Voucher</div>
 
         <div id="rewardsCardsContainer">
           <!-- Render via app.js -->
@@ -263,9 +317,9 @@
           <button class="btn-back-circle" data-go="rewards">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
           </button>
-          <h3 style="font-size:16px;font-weight:800;">Voucher Saya</h3>
+          <h3 style="font-size:16px;font-weight:800;" data-i18n="myVouchersTitle">Voucher Saya</h3>
         </div>
-        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">
+        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;" data-i18n="myVouchersSub">
           Tunjukkan kode voucher berikut kepada kasir mitra untuk menggunakan potongan harga.
         </p>
 
@@ -274,24 +328,24 @@
         </div>
       </section>
 
-      <!-- ==================== 7. PETA LENGKAP DROP POINT ==================== -->
+      <!-- ==================== 7. PETA LENGKAP DROP POINT BINTARO ==================== -->
       <section class="view-panel" id="panel-map-full">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <button class="btn-back-circle" data-go="home">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <div>
-            <h3 style="font-size:16px;font-weight:800;">Peta Smart Drop Box</h3>
-            <span style="font-size:11px;color:var(--text-sub);">Lokasi tempat sampah & hub RILO di sekitarmu</span>
+            <h3 style="font-size:16px;font-weight:800;" data-i18n="fullMapTitle">Peta Smart Drop Box</h3>
+            <span style="font-size:11px;color:var(--text-sub);" data-i18n="fullMapSub">Lokasi tempat sampah & hub RILO di kawasan Bintaro</span>
           </div>
         </div>
 
-        <!-- Full Map Container -->
-        <div style="height:260px;width:100%;border-radius:18px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border-line);" id="fullDropMapContainer"></div>
+        <!-- Full Map Container Bintaro -->
+        <div style="height:250px;width:100%;border-radius:14px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border-line);" id="fullDropMapContainer"></div>
 
-        <div class="services-section-title">Daftar Titik Drop Box</div>
+        <div class="services-section-title">Titik Drop Box Bintaro</div>
         <div class="activity-list-container" id="fullMapListLocations">
-          <!-- Render via app.js -->
+          <!-- Render via app.js (Murni Informasi tanpa scan di dalam list) -->
         </div>
       </section>
 
@@ -300,16 +354,16 @@
         
         <div class="clean-item-card" style="margin-bottom:16px;cursor:default;">
           <div class="cic-left">
-            <div class="profile-avatar-btn" style="width:44px;height:44px;font-size:17px;">K</div>
+            <div class="profile-avatar-squircle" style="width:42px;height:42px;font-size:16px;">K</div>
             <div>
               <strong style="font-size:14px;" id="profileDisplayNameText">Kaila Zanita</strong>
               <span id="profileDisplayEmailText">kaila.zanita@example.com</span>
             </div>
           </div>
-          <span class="level-badge">Pahlawan Hijau</span>
+          <span class="badge-tag-status">Pahlawan Hijau</span>
         </div>
 
-        <div class="services-section-title">Fitur & Eksplorasi</div>
+        <div class="services-section-title" data-i18n="servicesTitle">Fitur & Eksplorasi</div>
         <div class="activity-list-container">
           <div class="clean-item-card" data-go="map-full">
             <div class="cic-left">
@@ -317,8 +371,8 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
               </div>
               <div class="cic-text">
-                <strong>Peta Drop Point RILO</strong>
-                <span>Cek kapasitas & lokasi smart bin terdekat</span>
+                <strong data-i18n="fullMapTitle">Peta Drop Point Bintaro</strong>
+                <span>Cek lokasi smart drop box & hub terdekat</span>
               </div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
@@ -330,7 +384,7 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
               </div>
               <div class="cic-text">
-                <strong>Dampak Lingkungan Saya</strong>
+                <strong data-i18n="impactTitle">Dampak Lingkungan Saya</strong>
                 <span>Jejak karbon & total material terselamatkan</span>
               </div>
             </div>
@@ -343,7 +397,7 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
               </div>
               <div class="cic-text">
-                <strong>Voucher Saya</strong>
+                <strong data-i18n="myVouchersTitle">Voucher Saya</strong>
                 <span>Daftar kupon yang telah ditukarkan</span>
               </div>
             </div>
@@ -369,7 +423,7 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
               <div class="cic-text">
-                <strong>Pengaturan Profil</strong>
+                <strong data-i18n="profileTitle">Pengaturan Profil</strong>
                 <span>Ubah nama dan alamat utama</span>
               </div>
             </div>
@@ -382,16 +436,21 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               </div>
               <div class="cic-text">
-                <strong style="color:var(--rilo-wine);">Reset Data Demo</strong>
-                <span>Kembalikan data ke awal simulasi</span>
+                <strong style="color:var(--rilo-wine);" data-i18n="btnResetDemo">Reset Data Demo</strong>
+                <span data-i18n="btnResetDemoSub">Kembalikan data ke awal simulasi</span>
               </div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
           </div>
+
+          <!-- Tombol Logout Akun -->
+          <button class="btn-solid-wine" id="btnLogoutAppAction" style="background:var(--surface-subtle);color:#e11d48;border:1px solid #fecdd3;box-shadow:none;margin-top:6px;" data-i18n="btnLogout">
+            Keluar Akun
+          </button>
         </div>
 
-        <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:24px;">
-          RILO Mobile Prototype • Design v2.0
+        <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:20px;">
+          RILO Mobile Prototype • Bintaro Edition v2.1
         </div>
 
       </section>
@@ -402,24 +461,24 @@
           <button class="btn-back-circle" data-go="home">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
           </button>
-          <h3 style="font-size:16px;font-weight:800;">Dampak Daur Ulang</h3>
+          <h3 style="font-size:16px;font-weight:800;" data-i18n="impactTitle">Dampak Daur Ulang</h3>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
           <div class="clean-item-card" style="flex-direction:column;align-items:flex-start;">
-            <span style="font-size:11px;color:var(--text-sub);">Total Material</span>
+            <span style="font-size:11px;color:var(--text-sub);" data-i18n="impactMat">Total Material</span>
             <strong style="font-size:22px;color:var(--rilo-wine);margin-top:4px;" id="impactWeightTotal">18,4 kg</strong>
           </div>
           <div class="clean-item-card" style="flex-direction:column;align-items:flex-start;">
-            <span style="font-size:11px;color:var(--text-sub);">Frekuensi Setoran</span>
+            <span style="font-size:11px;color:var(--text-sub);" data-i18n="impactFreq">Frekuensi Setoran</span>
             <strong style="font-size:22px;color:var(--text-main);margin-top:4px;" id="impactDepositsFreq">42x</strong>
           </div>
         </div>
 
-        <div class="wallet-card">
-          <span class="wallet-title">Estimasi Emisi CO2 Dicegah</span>
-          <div style="font-size:24px;font-weight:850;color:var(--eco-emerald);margin:6px 0;" id="impactCo2Total">27,6 kg</div>
-          <p style="font-size:11px;color:var(--text-sub);line-height:1.4;">
+        <div class="point-compact-card" style="flex-direction:column;align-items:flex-start;padding:14px;">
+          <span class="pcc-label" data-i18n="impactCo2">Estimasi Emisi CO2 Dicegah</span>
+          <div style="font-size:24px;font-weight:850;color:var(--eco-emerald);margin:4px 0;" id="impactCo2Total">27,6 kg</div>
+          <p style="font-size:11px;color:var(--text-sub);line-height:1.4;" data-i18n="impactCo2Sub">
             Setara dengan menanam 1,8 pohon muda yang menyerap karbon dioksida selama satu tahun penuh.
           </p>
         </div>
@@ -444,38 +503,38 @@
           <button class="btn-back-circle" data-go="more">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
           </button>
-          <h3 style="font-size:16px;font-weight:800;">Pengaturan Profil</h3>
+          <h3 style="font-size:16px;font-weight:800;" data-i18n="profileTitle">Pengaturan Profil</h3>
         </div>
 
-        <form id="formUpdateProfileData" style="background:#fff;border-radius:18px;border:1px solid var(--border-line);padding:16px;">
+        <form id="formUpdateProfileData" style="background:#fff;border-radius:14px;border:1px solid var(--border-line);padding:16px;">
           <div style="margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Nama Lengkap</label>
+            <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;">Nama Lengkap</label>
             <input type="text" id="profileInputName" class="input-kg-val" style="width:100%;" required />
           </div>
           <div style="margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Email</label>
+            <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;">Email</label>
             <input type="email" id="profileInputEmail" class="input-kg-val" style="width:100%;" required />
           </div>
-          <div style="margin-bottom:16px;">
-            <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Alamat Utama</label>
+          <div style="margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;">Alamat Utama</label>
             <textarea id="profileInputAddress" class="input-kg-val" style="width:100%;height:60px;" required></textarea>
           </div>
-          <button type="submit" class="btn-solid-wine">Simpan Profil</button>
+          <button type="submit" class="btn-solid-wine" data-i18n="btnSaveProfile">Simpan Profil</button>
         </form>
       </section>
 
     </main>
 
-    <!-- RUNTAHPEDIA STYLE BOTTOM NAVIGATION BAR (5 SLOTS DOCK) -->
+    <!-- ==================== RUNTAHPEDIA STYLE BOTTOM NAVBAR (DOCK) ==================== -->
     <nav class="bottom-navbar-dock">
       <button class="bnd-item active" data-nav="home">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Beranda</span>
+        <span data-i18n="navHome">Beranda</span>
       </button>
 
       <button class="bnd-item" data-nav="transactions">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span>Riwayat</span>
+        <span data-i18n="navHistory">Riwayat</span>
       </button>
 
       <!-- FAB SCAN & SETOR TENGAH -->
@@ -483,17 +542,17 @@
         <div class="bnd-fab-button">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
         </div>
-        <span>Setor</span>
+        <span data-i18n="navDeposit">Setor</span>
       </div>
 
       <button class="bnd-item" data-nav="rewards">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
-        <span>Hadiah</span>
+        <span data-i18n="navReward">Hadiah</span>
       </button>
 
       <button class="bnd-item" data-nav="more">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        <span>Lainnya</span>
+        <span data-i18n="navMore">Lainnya</span>
       </button>
     </nav>
 
@@ -520,7 +579,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
   <script src="js/icons.js"></script>
-  <!-- DATA LAYER -->
+  <!-- DATA LAYER & I18N -->
   <script src="js/data.js"></script>
   <!-- APP ENGINE -->
   <script src="js/app.js"></script>

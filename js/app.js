@@ -1,6 +1,7 @@
 /**
- * RILO Mobile App - Interactive Engine
- * Terintegrasi dengan Leaflet Map Drop Point dan Clean SVG Icons (RuntahPedia Style)
+ * RILO Mobile App - Interactive Engine (Bintaro Edition)
+ * Mendukung Autentikasi (Google/Email), Multi-Bahasa (ID/EN),
+ * Peta Bintaro tanpa tombol scan ganda, dan Point Card Compact.
  */
 
 let currentDepositSession = {
@@ -18,13 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initApp() {
+  setupAuth();
+  setupLanguage();
   setupNavigation();
   setupQrScanner();
   setupDepositModeSwitcher();
   setupDepositItems();
   setupProfileForm();
   renderAllViews();
-  setTimeout(initHomeMap, 300);
+  setTimeout(initBintaroHomeMap, 300);
 }
 
 // Format Angka Ribuan
@@ -33,7 +36,8 @@ const fmt = (n) => new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).
 // Format Tanggal
 function formatDate(dStr) {
   try {
-    return new Date(dStr + "T12:00:00").toLocaleDateString("id-ID", {
+    const lang = AppState.currentLang === "en" ? "en-US" : "id-ID";
+    return new Date(dStr + "T12:00:00").toLocaleDateString(lang, {
       day: "numeric",
       month: "short",
       year: "numeric"
@@ -41,6 +45,13 @@ function formatDate(dStr) {
   } catch (e) {
     return dStr;
   }
+}
+
+// Helper I18n Terjemahan
+function t(key) {
+  const lang = AppState.currentLang || "id";
+  const dict = AppState.translations[lang] || AppState.translations.id;
+  return dict[key] || key;
 }
 
 // === TOAST NOTIFICATION ===
@@ -57,6 +68,126 @@ function showToast(message, isSuccess = true) {
   toastTimer = setTimeout(() => {
     toast.classList.remove("visible");
   }, 3200);
+}
+
+// === 1. FITUR AUTENTIKASI (GOOGLE & EMAIL SIGN-IN) ===
+let authMode = "signin"; // 'signin' atau 'signup'
+
+function setupAuth() {
+  const authOverlay = document.getElementById("authOverlayScreen");
+  const tabSignIn = document.getElementById("tabAuthSignIn");
+  const tabSignUp = document.getElementById("tabAuthSignUp");
+  const authForm = document.getElementById("authCredentialsForm");
+  const btnGoogle = document.getElementById("btnGoogleSignInAction");
+  const btnGuest = document.getElementById("btnGuestDemoAction");
+
+  // Tab switcher SignIn vs SignUp
+  if (tabSignIn && tabSignUp) {
+    tabSignIn.addEventListener("click", () => {
+      authMode = "signin";
+      tabSignIn.classList.add("active");
+      tabSignUp.classList.remove("active");
+      document.getElementById("authSubmitBtnText").textContent = t("btnEmailLogin");
+      document.getElementById("authSignUpExtraFields").style.display = "none";
+    });
+
+    tabSignUp.addEventListener("click", () => {
+      authMode = "signup";
+      tabSignUp.classList.add("active");
+      tabSignIn.classList.remove("active");
+      document.getElementById("authSubmitBtnText").textContent = t("tabSignUp");
+      document.getElementById("authSignUpExtraFields").style.display = "block";
+    });
+  }
+
+  // Google Sign-In Action
+  if (btnGoogle) {
+    btnGoogle.addEventListener("click", () => {
+      AppState.auth.isLoggedIn = true;
+      AppState.auth.loginMethod = "google";
+      authOverlay.classList.add("hidden");
+      showToast(AppState.currentLang === "en" ? "Signed in with Google as Kaila Zanita" : "Berhasil masuk dengan Google!", true);
+      setTimeout(initBintaroHomeMap, 300);
+    });
+  }
+
+  // Email Submit Action
+  if (authForm) {
+    authForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("authInputEmail").value.trim();
+      const name = document.getElementById("authInputName") ? document.getElementById("authInputName").value.trim() : "";
+
+      if (authMode === "signup" && name) {
+        AppState.user.name = name;
+        AppState.user.avatar = name[0].toUpperCase();
+      }
+      if (email) AppState.user.email = email;
+
+      AppState.auth.isLoggedIn = true;
+      AppState.auth.loginMethod = "email";
+      authOverlay.classList.add("hidden");
+
+      showToast(AppState.currentLang === "en" ? "Welcome to RILO Bintaro!" : "Selamat datang di RILO Bintaro!", true);
+      renderAllViews();
+      setTimeout(initBintaroHomeMap, 300);
+    });
+  }
+
+  // Guest Demo Action (One Click)
+  if (btnGuest) {
+    btnGuest.addEventListener("click", () => {
+      AppState.auth.isLoggedIn = true;
+      AppState.auth.loginMethod = "guest";
+      authOverlay.classList.add("hidden");
+      showToast(AppState.currentLang === "en" ? "Demo Mode Activated" : "Mode Demo Aktif", true);
+      setTimeout(initBintaroHomeMap, 300);
+    });
+  }
+
+  // Tombol Logout di Tab Profil
+  const btnLogout = document.getElementById("btnLogoutAppAction");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", () => {
+      if (confirm(AppState.currentLang === "en" ? "Are you sure you want to sign out?" : "Apakah kamu yakin ingin keluar dari akun?")) {
+        AppState.auth.isLoggedIn = false;
+        authOverlay.classList.remove("hidden");
+        switchView("home");
+      }
+    });
+  }
+}
+
+// === 2. FITUR MULTI-BAHASA (ID & EN) ===
+function setupLanguage() {
+  const btnLangId = document.getElementById("btnLangId");
+  const btnLangEn = document.getElementById("btnLangEn");
+
+  if (btnLangId && btnLangEn) {
+    btnLangId.addEventListener("click", () => setLanguage("id"));
+    btnLangEn.addEventListener("click", () => setLanguage("en"));
+  }
+}
+
+function setLanguage(lang) {
+  AppState.currentLang = lang;
+
+  document.querySelectorAll(".lang-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.lang === lang);
+  });
+
+  // Re-render semua komponen dengan bahasa yang dipilih
+  applyLanguageTranslations();
+  renderAllViews();
+  setupDepositItems();
+  showToast(lang === "en" ? "Language changed to English" : "Bahasa diubah ke Bahasa Indonesia", true);
+}
+
+function applyLanguageTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
 }
 
 // === ROUTER & NAVIGATION ===
@@ -83,7 +214,6 @@ function switchView(viewName) {
     }
   });
 
-  // Scroll to top
   const scrollArea = document.getElementById("mainScrollView");
   if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -91,7 +221,7 @@ function switchView(viewName) {
     setTimeout(() => { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 200);
   }
   if (viewName === "map-full") {
-    setTimeout(initFullMap, 200);
+    setTimeout(initFullBintaroMap, 200);
   }
   if (viewName === "transactions") renderTransactions();
   if (viewName === "rewards") renderRewards();
@@ -126,34 +256,33 @@ function setupNavigation() {
   const btnReset = document.getElementById("btnResetDemo");
   if (btnReset) {
     btnReset.addEventListener("click", () => {
-      if (confirm("Kembalikan data demo ke nilai awal? Semua saldo poin dan transaksi sesi ini akan direset.")) {
+      if (confirm(AppState.currentLang === "en" ? "Restore demo sample data to initial state?" : "Kembalikan data demo ke nilai awal? Semua saldo poin dan transaksi sesi ini akan direset.")) {
         resetAppState();
         renderAllViews();
-        showToast("Data demo dikembalikan ke awal.", true);
+        showToast(AppState.currentLang === "en" ? "Demo data restored." : "Data demo dikembalikan ke awal.", true);
         switchView("home");
       }
     });
   }
 }
 
-// === LEAFLET MAP INTEGRATION (DROP POINT FINDER) ===
-function initHomeMap() {
+// === 3. PETA DROP POINT BINTARO (TANPA TOMBOL SCAN DI DALAM MAP) ===
+function initBintaroHomeMap() {
   const mapEl = document.getElementById("homeDropMap");
   if (!mapEl || homeMapInstance) return;
 
   if (typeof L === "undefined") {
-    // Fallback jika tanpa internet
     mapEl.innerHTML = `
       <div style="height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:#64748b;font-size:12px;gap:8px;">
-        ${ICONS.mapLocation} <span>Peta Drop Point: Depok & Kampus UI</span>
+        ${ICONS.mapLocation} <span>Peta Drop Point: Bintaro Jaya</span>
       </div>
     `;
     return;
   }
 
-  // Koordinat Margonda Depok & Kampus
+  // Koordinat Bintaro Jaya Sektor 7 & Bintaro Xchange
   homeMapInstance = L.map("homeDropMap", {
-    center: [-6.3638, 106.8295],
+    center: [-6.2840, 106.7275],
     zoom: 14,
     zoomControl: false,
     attributionControl: false
@@ -163,34 +292,35 @@ function initHomeMap() {
     maxZoom: 18
   }).addTo(homeMapInstance);
 
-  // Tambahkan markers titik Drop Box
+  // Tambahkan markers titik Drop Box di Bintaro
   AppState.qrLocations.forEach((box) => {
     const customIcon = L.divIcon({
       className: "custom-leaflet-marker",
       html: `<div class="rilo-map-marker" title="${box.name}">R</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+      iconSize: [26, 26],
+      iconAnchor: [13, 13]
     });
 
     const marker = L.marker([box.lat, box.lng], { icon: customIcon }).addTo(homeMapInstance);
+    // Popup murni informatif tanpa tombol scan
     marker.bindPopup(`
       <div style="font-family:inherit;font-size:12px;padding:2px;">
         <strong style="color:var(--rilo-wine);">${box.name}</strong><br>
         <span style="color:#64748b;">${box.location} • ${box.distance}</span><br>
-        <button style="margin-top:6px;background:var(--rilo-wine);color:#fff;border:none;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;" onclick="selectBoxAndStartDeposit('${box.id}')">Scan di Sini</button>
+        <small style="color:#15803d;font-weight:700;">${AppState.currentLang === "en" ? box.slotsAvailableEn : box.slotsAvailable}</small>
       </div>
     `);
   });
 }
 
-function initFullMap() {
+function initFullBintaroMap() {
   const fullEl = document.getElementById("fullDropMapContainer");
   if (!fullEl || fullMapInstance) return;
 
   if (typeof L === "undefined") return;
 
   fullMapInstance = L.map("fullDropMapContainer", {
-    center: [-6.3638, 106.8295],
+    center: [-6.2840, 106.7275],
     zoom: 14,
     zoomControl: true,
     attributionControl: false
@@ -204,8 +334,8 @@ function initFullMap() {
     const customIcon = L.divIcon({
       className: "custom-leaflet-marker",
       html: `<div class="rilo-map-marker">R</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+      iconSize: [26, 26],
+      iconAnchor: [13, 13]
     });
 
     const marker = L.marker([box.lat, box.lng], { icon: customIcon }).addTo(fullMapInstance);
@@ -213,8 +343,7 @@ function initFullMap() {
       <div style="font-family:inherit;font-size:12px;padding:2px;">
         <strong style="color:var(--rilo-wine);">${box.name}</strong><br>
         <span style="color:#64748b;">${box.location}</span><br>
-        <small style="color:#15803d;font-weight:700;">${box.slotsAvailable}</small><br>
-        <button style="margin-top:6px;background:var(--rilo-wine);color:#fff;border:none;padding:5px 10px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;" onclick="selectBoxAndStartDeposit('${box.id}')">Scan & Buka Drop Box</button>
+        <small style="color:#15803d;font-weight:700;">${AppState.currentLang === "en" ? box.slotsAvailableEn : box.slotsAvailable}</small>
       </div>
     `);
   });
@@ -226,29 +355,23 @@ function renderFullMapBoxList() {
   const container = document.getElementById("fullMapListLocations");
   if (!container) return;
 
+  const isEn = AppState.currentLang === "en";
+
   container.innerHTML = AppState.qrLocations.map((b) => `
-    <div class="clean-item-card" onclick="selectBoxAndStartDeposit('${b.id}')">
+    <div class="clean-item-card">
       <div class="cic-left">
         <div class="cic-icon-wrap" style="color:var(--rilo-wine);">${ICONS.pin}</div>
         <div class="cic-text">
           <strong>${b.name}</strong>
-          <span>${b.distance} • ${b.slotsAvailable}</span>
+          <span>${b.location} • ${b.distance}</span>
         </div>
       </div>
-      <button class="btn-scan-map-chip">Setor</button>
+      <span class="badge-tag-status">${isEn ? b.statusEn : b.status}</span>
     </div>
   `).join("");
 }
 
-window.selectBoxAndStartDeposit = function (boxId) {
-  const box = AppState.qrLocations.find((b) => b.id === boxId);
-  if (box) {
-    currentDepositSession.selectedBox = box;
-    openQrScanFlow();
-  }
-};
-
-// === FLOW 1: SCAN QR DROP BOX ===
+// === FLOW SCAN QR DROP BOX ===
 function openQrScanFlow() {
   if (!currentDepositSession.selectedBox) {
     currentDepositSession.selectedBox = AppState.qrLocations[0];
@@ -262,30 +385,31 @@ function renderQrDetectedBox() {
   if (!container) return;
 
   const box = currentDepositSession.selectedBox || AppState.qrLocations[0];
+  const isEn = AppState.currentLang === "en";
 
   container.innerHTML = `
     <div class="dhp-head">
       <strong>${box.name}</strong>
-      <span style="font-size:11px;font-weight:700;color:var(--eco-emerald);">● ${box.status}</span>
+      <span style="font-size:11px;font-weight:700;color:var(--eco-emerald);">● ${isEn ? box.statusEn : box.status}</span>
     </div>
     <div class="dhp-desc">
       ${box.location} • ${box.distance}<br>
-      <span style="color:var(--rilo-wine);font-weight:700;">${box.slotsAvailable}</span> • Jam Buka: ${box.operatingHours}
+      <span style="color:var(--rilo-wine);font-weight:700;">${isEn ? box.slotsAvailableEn : box.slotsAvailable}</span> • ${box.operatingHours}
     </div>
     <div style="margin-bottom:12px;">
       <select id="selectQrBoxDropdown" class="input-kg-val" style="font-size:12px;padding:6px 10px;" onchange="changeQrBoxTarget(this.value)">
-        ${AppState.qrLocations.map((b) => `<option value="${b.id}" ${b.id === box.id ? 'selected' : ''}>Pilih Titik: ${b.name} (${b.distance})</option>`).join("")}
+        ${AppState.qrLocations.map((b) => `<option value="${b.id}" ${b.id === box.id ? 'selected' : ''}>${b.name} (${b.distance})</option>`).join("")}
       </select>
     </div>
     <button class="btn-solid-wine" id="btnConfirmQrScanAction">
-      <span>${ICONS.scanQr}</span> Hubungkan Drop Box & Buka Pintu
+      <span>${ICONS.scanQr}</span> ${t("btnConnectBox")}
     </button>
   `;
 
   document.getElementById("btnConfirmQrScanAction").onclick = () => {
-    showToast(`Terhubung ke ${box.name}!`, true);
+    showToast(`${t("btnConnectBox")} (${box.name})`, true);
     document.getElementById("activeHubTitle").textContent = box.name;
-    document.getElementById("activeHubSubtitle").textContent = `${box.location} • Kapasitas Tersedia`;
+    document.getElementById("activeHubSubtitle").textContent = `${box.location} • ${isEn ? box.slotsAvailableEn : box.slotsAvailable}`;
 
     setTimeout(() => {
       switchView("deposit-input");
@@ -305,7 +429,7 @@ function setupQrScanner() {
   // Handled in renderQrDetectedBox
 }
 
-// === FLOW 2: INPUT SETORAN SAMPAH ===
+// === FLOW INPUT SETORAN SAMPAH ===
 function setupDepositModeSwitcher() {
   const pillPiece = document.getElementById("pillModePiece");
   const pillKg = document.getElementById("pillModeKg");
@@ -334,31 +458,35 @@ function setupDepositModeSwitcher() {
 }
 
 function setupDepositItems() {
-  // 1. Kategori Per Piece (Satuan per Ukuran ml / pcs)
+  const isEn = AppState.currentLang === "en";
+
+  // 1. Kategori Per Piece
   const pieceContainer = document.getElementById("panelPieceItems");
   if (pieceContainer) {
     const categories = [
-      "Botol Plastik PET",
-      "Kaleng Minuman",
-      "Tutup Botol",
-      "Botol Kaca",
-      "Kemasan Karton Minuman"
+      { idKey: "Botol Plastik PET", enKey: "PET Plastic Bottles" },
+      { idKey: "Kaleng Minuman", enKey: "Beverage Cans" },
+      { idKey: "Tutup Botol", enKey: "Bottle Caps" },
+      { idKey: "Botol Kaca", enKey: "Glass Bottles" },
+      { idKey: "Kemasan Karton Minuman", enKey: "Beverage Cartons" }
     ];
 
     let html = "";
     categories.forEach((cat) => {
-      const itemsInCat = AppState.itemsPerPiece.filter((i) => i.category === cat);
-      html += `<div class="group-title-bar">${cat}</div>`;
+      const itemsInCat = AppState.itemsPerPiece.filter((i) => i.category === cat.idKey);
+      html += `<div class="group-title-bar">${isEn ? cat.enKey : cat.idKey}</div>`;
       itemsInCat.forEach((item) => {
         const count = currentDepositSession.pieceCounts[item.id] || 0;
         const iconSvg = getMaterialIcon(item.iconType);
+        const titleText = isEn ? item.labelEn : item.label;
+        const unitText = isEn ? item.unitLabelEn : item.unitLabel;
         html += `
           <div class="piece-stepper-card">
             <div class="psc-left">
               <div class="psc-icon">${iconSvg}</div>
               <div class="psc-info">
-                <strong>${item.label}</strong>
-                <span>+${item.pointsPerUnit} poin / ${item.unitLabel}</span>
+                <strong>${titleText}</strong>
+                <span>+${item.pointsPerUnit} pts / ${unitText}</span>
               </div>
             </div>
             <div class="counter-stepper">
@@ -374,19 +502,21 @@ function setupDepositItems() {
     pieceContainer.innerHTML = html;
   }
 
-  // 2. Kategori Per Kg (Kiloan)
+  // 2. Kategori Per Kg
   const kgContainer = document.getElementById("panelKgItems");
   if (kgContainer) {
     kgContainer.innerHTML = AppState.itemsPerKg.map((item) => {
       const w = currentDepositSession.kgWeights[item.id] || 0;
       const iconSvg = getMaterialIcon(item.iconType);
+      const titleText = isEn ? item.labelEn : item.label;
+      const descText = isEn ? item.descEn : item.desc;
       return `
         <div class="kg-material-card">
           <div class="kmc-head">
-            <strong>${iconSvg} ${item.label}</strong>
-            <span class="kmc-rate">${item.rate} poin / kg</span>
+            <strong>${iconSvg} ${titleText}</strong>
+            <span class="kmc-rate">${item.rate} pts / kg</span>
           </div>
-          <div class="kmc-desc">${item.desc}</div>
+          <div class="kmc-desc">${descText}</div>
           <div class="kmc-input-row">
             <input type="number" 
                    class="input-kg-val" 
@@ -462,9 +592,9 @@ function calculateDepositTotal() {
 
   if (estSubEl) {
     if (currentDepositSession.activeMode === "piece") {
-      estSubEl.textContent = `${totalCount} item terpilih`;
+      estSubEl.textContent = `${totalCount} ${t("itemsSelected")}`;
     } else {
-      estSubEl.textContent = `${fmt(totalWeight)} kg tercatat`;
+      estSubEl.textContent = `${fmt(totalWeight)} ${t("kgRecorded")}`;
     }
   }
 
@@ -478,6 +608,7 @@ function submitFinalDeposit() {
   let summaryText = "";
   let totalPoints = 0;
   let totalWeight = 0;
+  const isEn = AppState.currentLang === "en";
 
   if (currentDepositSession.activeMode === "piece") {
     const summaryItems = [];
@@ -485,7 +616,7 @@ function submitFinalDeposit() {
       const qty = currentDepositSession.pieceCounts[item.id] || 0;
       if (qty > 0) {
         totalPoints += qty * item.pointsPerUnit;
-        summaryItems.push(`${qty}x ${item.label}`);
+        summaryItems.push(`${qty}x ${isEn ? item.labelEn : item.label}`);
         totalWeight += qty * 0.04;
       }
     });
@@ -497,27 +628,29 @@ function submitFinalDeposit() {
       if (w > 0) {
         totalPoints += Math.round(w * item.rate);
         totalWeight += w;
-        summaryItems.push(`${fmt(w)} kg ${item.label.split(" ")[0]}`);
+        summaryItems.push(`${fmt(w)} kg ${isEn ? item.labelEn.split(" ")[0] : item.label.split(" ")[0]}`);
       }
     });
     summaryText = summaryItems.join(", ");
   }
 
   if (totalPoints <= 0) {
-    showToast("Pilih minimal 1 jenis sampah untuk disetor.", false);
+    showToast(isEn ? "Select at least 1 item to deposit." : "Pilih minimal 1 jenis sampah untuk disetor.", false);
     return;
   }
 
   const newTx = {
     id: `DEP-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(100 + Math.random() * 900)}`,
     date: new Date().toISOString().slice(0, 10),
-    time: "Baru saja",
+    time: isEn ? "Just now" : "Baru saja",
     qrBox: box.name,
     mode: currentDepositSession.activeMode === "piece" ? "Satuan (Per Piece)" : "Kiloan (Per Kg)",
+    modeEn: currentDepositSession.activeMode === "piece" ? "By Piece" : "By Kg",
     summary: summaryText,
     weightApprox: parseFloat(totalWeight.toFixed(1)) || 0.5,
     pointsEarned: totalPoints,
-    status: "Selesai"
+    status: "Selesai",
+    statusEn: "Completed"
   };
 
   AppState.deposits.unshift(newTx);
@@ -531,7 +664,7 @@ function submitFinalDeposit() {
   setupDepositItems();
 
   renderAllViews();
-  showToast(`Setoran berhasil! +${fmt(totalPoints)} poin diperoleh.`, true);
+  showToast(isEn ? `Deposit recorded! +${fmt(totalPoints)} pts earned.` : `Setoran berhasil! +${fmt(totalPoints)} poin diperoleh.`, true);
 
   setTimeout(() => {
     switchView("transactions");
@@ -540,6 +673,7 @@ function submitFinalDeposit() {
 
 // === RENDER UTAMA SEMUA VIEW ===
 function renderAllViews() {
+  applyLanguageTranslations();
   renderHome();
   renderTransactions();
   renderRewards();
@@ -551,27 +685,30 @@ function renderAllViews() {
 // 1. Beranda (Home)
 function renderHome() {
   const user = AppState.user;
+  const isEn = AppState.currentLang === "en";
 
-  document.getElementById("locationTagText").textContent = user.locationTag || "Margonda, Depok";
-  document.getElementById("homeGreetingName").textContent = `Halo, ${user.name.split(" ")[0]}!`;
-  document.getElementById("userLevelPill").textContent = user.levelName;
+  document.getElementById("locationTagText").textContent = user.locationTag;
+  document.getElementById("homeGreetingName").textContent = isEn ? `Hello, ${user.name.split(" ")[0]}!` : `Halo, ${user.name.split(" ")[0]}!`;
+  document.getElementById("userLevelPill").textContent = isEn ? user.levelNameEn : user.levelName;
   document.getElementById("homeAvatarText").textContent = user.avatar || user.name[0];
 
+  // Point Compact Strip Card
   document.getElementById("walletPointsBigVal").textContent = fmt(user.points);
   const rupiahVal = Math.round(user.points * 10);
   document.getElementById("walletConversionRupiah").textContent = `≈ Rp ${fmt(rupiahVal)}`;
 
-  // Nearest Drop Box Card di bawah map
+  // Nearest Drop Box Info (Bintaro Xchange)
   const nearestBox = AppState.qrLocations[0];
   document.getElementById("nearestDropBoxName").textContent = nearestBox.name;
   document.getElementById("nearestDropBoxSub").textContent = `${nearestBox.location} • ${nearestBox.distance}`;
+  document.getElementById("nearestDropBoxStatus").textContent = isEn ? nearestBox.statusEn : nearestBox.status;
 
   // 3 Aktivitas Terakhir
   const recentList = document.getElementById("homeRecentActivityContainer");
   if (recentList) {
     const list = AppState.deposits.slice(0, 3);
     if (list.length === 0) {
-      recentList.innerHTML = `<div style="text-align:center;padding:16px;font-size:12px;color:var(--text-sub);">Belum ada riwayat setoran.</div>`;
+      recentList.innerHTML = `<div style="text-align:center;padding:16px;font-size:12px;color:var(--text-sub);">${isEn ? 'No recent deposits.' : 'Belum ada riwayat setoran.'}</div>`;
     } else {
       recentList.innerHTML = list.map((tx) => `
         <div class="clean-item-card" onclick="openTxReceiptModal('${tx.id}')">
@@ -584,7 +721,7 @@ function renderHome() {
           </div>
           <div class="cic-right">
             <div class="cic-points">+${fmt(tx.pointsEarned)} pts</div>
-            <span class="badge-tag-status">Selesai</span>
+            <span class="badge-tag-status">${isEn ? tx.statusEn : tx.status}</span>
           </div>
         </div>
       `).join("");
@@ -596,11 +733,12 @@ function renderHome() {
 function renderTransactions() {
   const container = document.getElementById("transactionsFullListContainer");
   if (!container) return;
+  const isEn = AppState.currentLang === "en";
 
   if (AppState.deposits.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:16px;border:1px solid var(--border-line);">
-        <p style="font-size:12px;color:var(--text-sub);">Belum ada catatan setoran sampah.</p>
+      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:14px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No recorded deposits yet.' : 'Belum ada catatan setoran sampah.'}</p>
       </div>
     `;
     return;
@@ -617,16 +755,17 @@ function renderTransactions() {
       </div>
       <div class="cic-right">
         <div class="cic-points">+${fmt(tx.pointsEarned)} pts</div>
-        <span class="badge-tag-status">Selesai</span>
+        <span class="badge-tag-status">${isEn ? tx.statusEn : tx.status}</span>
       </div>
     </div>
   `).join("");
 }
 
-// 3. Rewards & Penukaran (Poin Berkurang Pasti)
+// 3. Rewards & Penukaran (Poin Pasti Berkurang)
 function renderRewards() {
   const container = document.getElementById("rewardsCardsContainer");
   const balanceEl = document.getElementById("rewardsPointsBalanceDisplay");
+  const isEn = AppState.currentLang === "en";
 
   if (balanceEl) balanceEl.textContent = `${fmt(AppState.user.points)} pts`;
 
@@ -634,19 +773,23 @@ function renderRewards() {
 
   container.innerHTML = AppState.rewards.map((r) => {
     const canAfford = AppState.user.points >= r.pointsCost;
+    const titleText = isEn ? r.titleEn : r.title;
+    const descText = isEn ? r.descriptionEn : r.description;
+    const btnText = isEn ? "Redeem" : "Tukar";
+
     return `
       <div class="voucher-coupon-card">
         <div class="vcc-badge-box">${ICONS.gift}</div>
         <div class="vcc-body">
           <span class="vcc-partner">${r.partner}</span>
-          <strong>${r.title}</strong>
-          <p>${r.description}</p>
+          <strong>${titleText}</strong>
+          <p>${descText}</p>
           <span class="vcc-cost">${fmt(r.pointsCost)} Poin</span>
         </div>
         <button class="btn-redeem-action" 
                 onclick="promptVoucherRedeem('${r.id}')"
                 style="background: ${canAfford ? 'var(--rilo-wine)' : 'var(--text-muted)'}">
-          Tukar
+          ${btnText}
         </button>
       </div>
     `;
@@ -656,33 +799,36 @@ function renderRewards() {
 window.promptVoucherRedeem = function (rewardId) {
   const reward = AppState.rewards.find((r) => r.id === rewardId);
   if (!reward) return;
+  const isEn = AppState.currentLang === "en";
 
   if (AppState.user.points < reward.pointsCost) {
-    showToast(`Poin belum mencukupi. Butuh ${fmt(reward.pointsCost - AppState.user.points)} poin lagi.`, false);
+    showToast(isEn ? `Insufficient points. You need ${fmt(reward.pointsCost - AppState.user.points)} more pts.` : `Poin belum mencukupi. Butuh ${fmt(reward.pointsCost - AppState.user.points)} poin lagi.`, false);
     return;
   }
 
   const content = document.getElementById("modalSheetDynamicBox");
+  const titleText = isEn ? reward.titleEn : reward.title;
+  const descText = isEn ? reward.descriptionEn : reward.description;
 
   content.innerHTML = `
     <div style="text-align:center;margin-bottom:16px;">
-      <div style="width:54px;height:54px;border-radius:16px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;margin:0 auto 10px;">
+      <div style="width:50px;height:50px;border-radius:12px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;margin:0 auto 10px;">
         ${ICONS.gift}
       </div>
       <span style="font-size:11px;font-weight:750;color:var(--text-muted);text-transform:uppercase;">${reward.partner}</span>
-      <h3 style="font-size:16px;margin:2px 0 4px;">${reward.title}</h3>
-      <p style="font-size:12px;color:var(--text-sub);">${reward.description}</p>
+      <h3 style="font-size:16px;margin:2px 0 4px;">${titleText}</h3>
+      <p style="font-size:12px;color:var(--text-sub);">${descText}</p>
     </div>
 
-    <div style="background:var(--rilo-wine-soft);border:1px dashed var(--rilo-wine-border);border-radius:14px;padding:14px;text-align:center;margin-bottom:18px;">
-      <span style="font-size:11px;color:var(--text-sub);text-transform:uppercase;font-weight:700;">Biaya Penukaran</span>
-      <div style="font-size:24px;font-weight:850;color:var(--rilo-wine);margin:4px 0;">${fmt(reward.pointsCost)} Poin</div>
-      <small style="font-size:11px;color:var(--text-sub);">Sisa saldo setelah ditukar: <b>${fmt(AppState.user.points - reward.pointsCost)} pts</b></small>
+    <div style="background:var(--rilo-wine-soft);border:1px dashed var(--rilo-wine-border);border-radius:12px;padding:12px;text-align:center;margin-bottom:16px;">
+      <span style="font-size:10px;color:var(--text-sub);text-transform:uppercase;font-weight:700;">${isEn ? 'Points Cost' : 'Biaya Penukaran'}</span>
+      <div style="font-size:22px;font-weight:850;color:var(--rilo-wine);margin:2px 0;">${fmt(reward.pointsCost)} Poin</div>
+      <small style="font-size:11px;color:var(--text-sub);">${isEn ? 'Remaining balance' : 'Sisa saldo'}: <b>${fmt(AppState.user.points - reward.pointsCost)} pts</b></small>
     </div>
 
     <div style="display:flex;gap:10px;">
-      <button class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">Batal</button>
-      <button class="btn-solid-wine" id="btnConfirmDeductPointsAction">Konfirmasi Tukar</button>
+      <button class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">${isEn ? 'Cancel' : 'Batal'}</button>
+      <button class="btn-solid-wine" id="btnConfirmDeductPointsAction">${isEn ? 'Confirm Redeem' : 'Konfirmasi Tukar'}</button>
     </div>
   `;
 
@@ -692,44 +838,46 @@ window.promptVoucherRedeem = function (rewardId) {
     // 1. KURANGI SALDO POIN
     AppState.user.points -= reward.pointsCost;
 
-    // 2. TERBITKAN VOUCHER KE VOUCHER SAYA
+    // 2. SIMPAN VOUCHER
     const code = `RILO-${reward.id}-${Math.floor(1000 + Math.random() * 9000)}`;
     AppState.redemptions.unshift({
       id: `RDM-${Date.now()}`,
       date: new Date().toISOString().slice(0, 10),
       partner: reward.partner,
       rewardTitle: reward.title,
+      rewardTitleEn: reward.titleEn,
       pointsSpent: reward.pointsCost,
       code: code,
       expiry: "30 Nov 2026",
-      status: "Tersedia"
+      status: "Tersedia",
+      statusEn: "Available"
     });
 
-    // 3. UPDATE TAMPILAN SALDO SECARA MENYELURUH
+    // 3. UPDATE TAMPILAN
     renderAllViews();
 
-    // 4. TAMPILKAN HASIL DENGAN BARCODE KUPON
+    // 4. BUKTI KUPON VOUCHER
     content.innerHTML = `
       <div style="text-align:center;padding:6px 0;">
-        <div style="width:48px;height:48px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
           ${ICONS.check}
         </div>
-        <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">Voucher Berhasil Ditukar!</h3>
-        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">Saldo poin telah terpotong <b>${fmt(reward.pointsCost)} pts</b>.</p>
+        <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">${isEn ? 'Voucher Redeemed!' : 'Voucher Berhasil Ditukar!'}</h3>
+        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">${isEn ? `Points deducted: ${fmt(reward.pointsCost)} pts` : `Saldo poin terpotong ${fmt(reward.pointsCost)} pts`}</p>
 
-        <div style="background:#f8fafc;border-radius:14px;padding:16px;border:1.5px dashed #cbd5e1;margin-bottom:18px;">
-          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;display:block;">Kode Kupon</span>
-          <strong style="font-size:20px;letter-spacing:2px;color:var(--text-main);display:block;margin:4px 0;">${code}</strong>
-          <small style="font-size:11px;color:var(--text-sub);">Masa berlaku s/d 30 November 2026</small>
+        <div style="background:#f8fafc;border-radius:12px;padding:14px;border:1.5px dashed #cbd5e1;margin-bottom:16px;">
+          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;display:block;">${isEn ? 'VOUCHER CODE' : 'KODE KUPON'}</span>
+          <strong style="font-size:18px;letter-spacing:2px;color:var(--text-main);display:block;margin:3px 0;">${code}</strong>
+          <small style="font-size:10px;color:var(--text-sub);">${isEn ? 'Valid until Nov 30, 2026' : 'Masa berlaku s/d 30 November 2026'}</small>
         </div>
 
         <button class="btn-solid-wine" onclick="closeModalSheet(); switchView('my-vouchers');">
-          Buka Voucher Saya
+          ${t("btnMyVouchers")}
         </button>
       </div>
     `;
 
-    showToast("Voucher berhasil diperoleh!", true);
+    showToast(isEn ? "Voucher successfully claimed!" : "Voucher berhasil diperoleh!", true);
   };
 };
 
@@ -737,24 +885,25 @@ window.promptVoucherRedeem = function (rewardId) {
 function renderMyVouchers() {
   const container = document.getElementById("myVouchersListContainer");
   if (!container) return;
+  const isEn = AppState.currentLang === "en";
 
   if (AppState.redemptions.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:16px;border:1px solid var(--border-line);">
-        <p style="font-size:12px;color:var(--text-sub);">Belum ada voucher yang ditukarkan.</p>
+      <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:14px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No vouchers redeemed yet.' : 'Belum ada voucher yang ditukarkan.'}</p>
       </div>
     `;
     return;
   }
 
   container.innerHTML = AppState.redemptions.map((v) => `
-    <div style="background:#fff;border-radius:16px;border:1px solid var(--border-line);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:11px;color:var(--text-muted);font-weight:700;">${v.partner || 'Mitra RILO'}</span>
-        <span class="badge-tag-status">${v.status}</span>
+    <div style="background:#fff;border-radius:14px;border:1px solid var(--border-line);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:11px;color:var(--text-muted);font-weight:700;">${v.partner}</span>
+        <span class="badge-tag-status">${isEn ? v.statusEn : v.status}</span>
       </div>
-      <strong style="font-size:13px;display:block;margin-bottom:8px;">${v.rewardTitle}</strong>
-      <div style="background:var(--rilo-wine-soft);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+      <strong style="font-size:13px;display:block;margin-bottom:8px;">${isEn ? v.rewardTitleEn : v.rewardTitle}</strong>
+      <div style="background:var(--rilo-wine-soft);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:14px;letter-spacing:1.5px;font-weight:800;color:var(--rilo-wine);">${v.code}</span>
         <small style="font-size:10px;color:var(--text-sub);">Exp: ${v.expiry}</small>
       </div>
@@ -766,41 +915,42 @@ function renderMyVouchers() {
 window.openTxReceiptModal = function (txId) {
   const tx = AppState.deposits.find((t) => t.id === txId);
   if (!tx) return;
+  const isEn = AppState.currentLang === "en";
 
   const content = document.getElementById("modalSheetDynamicBox");
   content.innerHTML = `
     <div style="text-align:center;margin-bottom:14px;">
-      <div style="width:48px;height:48px;border-radius:14px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;margin:0 auto 8px;">
+      <div style="width:46px;height:46px;border-radius:12px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;margin:0 auto 8px;">
         ${ICONS.history}
       </div>
-      <h3 style="font-size:16px;">Struk Setoran RILO</h3>
+      <h3 style="font-size:16px;">${isEn ? 'Deposit Receipt' : 'Struk Setoran RILO'}</h3>
       <span style="font-size:11px;color:var(--text-sub);">${tx.id}</span>
     </div>
 
-    <div style="background:var(--surface-subtle);border-radius:14px;padding:14px;margin-bottom:16px;">
+    <div style="background:var(--surface-subtle);border-radius:12px;padding:12px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">Tanggal</span>
+        <span style="color:var(--text-sub);">${isEn ? 'Date' : 'Tanggal'}</span>
         <strong>${formatDate(tx.date)}</strong>
       </div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">Titik Setor</span>
+        <span style="color:var(--text-sub);">${isEn ? 'Drop Box Station' : 'Titik Setor'}</span>
         <strong>${tx.qrBox}</strong>
       </div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">Kategori</span>
-        <strong>${tx.mode}</strong>
+        <span style="color:var(--text-sub);">${isEn ? 'Mode' : 'Kategori'}</span>
+        <strong>${isEn ? tx.modeEn : tx.mode}</strong>
       </div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">Rincian</span>
+        <span style="color:var(--text-sub);">${isEn ? 'Summary' : 'Rincian'}</span>
         <strong style="text-align:right;max-width:180px;">${tx.summary}</strong>
       </div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
-        <span style="color:var(--text-sub);">Poin Didapat</span>
-        <strong style="color:var(--rilo-wine);font-size:14px;">+${fmt(tx.pointsEarned)} pts</strong>
+        <span style="color:var(--text-sub);">${isEn ? 'Points Earned' : 'Poin Didapat'}</span>
+        <strong style="color:var(--rilo-wine);font-size:13px;">+${fmt(tx.pointsEarned)} pts</strong>
       </div>
     </div>
 
-    <button class="btn-solid-wine" onclick="closeModalSheet()">Tutup</button>
+    <button class="btn-solid-wine" onclick="closeModalSheet()">${isEn ? 'Close' : 'Tutup'}</button>
   `;
 
   openModalSheet();
@@ -818,40 +968,48 @@ function renderImpact() {
 function renderGuides() {
   const container = document.getElementById("guidesArticlesList");
   if (!container) return;
+  const isEn = AppState.currentLang === "en";
 
-  container.innerHTML = AppState.guides.map((g) => `
-    <div class="clean-item-card" onclick="openGuideModal('${g.id}')">
-      <div class="cic-left">
-        <div class="cic-icon-wrap">${ICONS.leafImpact}</div>
-        <div class="cic-text">
-          <strong>${g.title}</strong>
-          <span>${g.tag} • ${g.readTime}</span>
+  container.innerHTML = AppState.guides.map((g) => {
+    const titleText = isEn ? g.titleEn : g.title;
+    const tagText = isEn ? g.tagEn : g.tag;
+    const timeText = isEn ? g.readTimeEn : g.readTime;
+
+    return `
+      <div class="clean-item-card" onclick="openGuideModal('${g.id}')">
+        <div class="cic-left">
+          <div class="cic-icon-wrap">${ICONS.leafImpact}</div>
+          <div class="cic-text">
+            <strong>${titleText}</strong>
+            <span>${tagText} • ${timeText}</span>
+          </div>
         </div>
+        <span style="color:var(--text-muted);">${ICONS.chevronRight}</span>
       </div>
-      <span style="color:var(--text-muted);">${ICONS.chevronRight}</span>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 window.openGuideModal = function (guideId) {
   const guide = AppState.guides.find((g) => g.id === guideId);
   if (!guide) return;
+  const isEn = AppState.currentLang === "en";
 
   const content = document.getElementById("modalSheetDynamicBox");
   content.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-      <div style="width:44px;height:44px;border-radius:12px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;">
         ${ICONS.leafImpact}
       </div>
       <div>
-        <h3 style="font-size:15px;">${guide.title}</h3>
-        <span style="font-size:11px;color:var(--rilo-wine);font-weight:700;">${guide.tag}</span>
+        <h3 style="font-size:15px;">${isEn ? guide.titleEn : guide.title}</h3>
+        <span style="font-size:11px;color:var(--rilo-wine);font-weight:700;">${isEn ? guide.tagEn : guide.tag}</span>
       </div>
     </div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text-main);background:var(--surface-subtle);border-radius:14px;padding:14px;margin-bottom:16px;">
-      ${guide.content}
+    <div style="font-size:12px;line-height:1.6;color:var(--text-main);background:var(--surface-subtle);border-radius:12px;padding:12px;margin-bottom:14px;">
+      ${isEn ? guide.contentEn : guide.content}
     </div>
-    <button class="btn-solid-wine" onclick="closeModalSheet()">Paham</button>
+    <button class="btn-solid-wine" onclick="closeModalSheet()">${isEn ? 'Understood' : 'Paham'}</button>
   `;
 
   openModalSheet();
@@ -875,7 +1033,7 @@ function setupProfileForm() {
       if (addr) AppState.user.address = addr;
 
       renderAllViews();
-      showToast("Profil berhasil disimpan!", true);
+      showToast(AppState.currentLang === "en" ? "Profile updated successfully!" : "Profil berhasil disimpan!", true);
     });
   }
 }
