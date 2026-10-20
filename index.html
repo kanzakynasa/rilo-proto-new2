@@ -1,182 +1,559 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="RILO — prototype bank sampah terintegrasi." />
-<title>RILO — Bank Sampah Terintegrasi</title>
-<style>
-:root{
-  --wine:#7a1f3d;--wine-dark:#54152b;--wine-soft:#f5e8ed;
-  --bg:#f7f5f2;--surface:#fff;--text:#262226;--muted:#777078;
-  --line:#ece7e8;--green:#34765a;--green-soft:#e8f4ed;--amber:#98631d;
-  --shadow:0 8px 28px rgba(43,20,29,.06);--radius:18px;
-}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select,textarea{font:inherit} button{cursor:pointer}
-.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
-.sidebar{background:#fff;border-right:1px solid var(--line);padding:28px 16px;display:flex;flex-direction:column;gap:28px}
-.brand{display:flex;align-items:center;gap:10px;padding:0 12px}.brand-mark{height:40px;width:40px;border-radius:13px;background:var(--wine);color:white;display:grid;place-items:center;font-weight:800;font-size:20px}.brand-name{font-size:23px;font-weight:800;letter-spacing:1.5px}.brand-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.nav-label{font-size:10px;font-weight:800;letter-spacing:1.5px;color:#a49ca0;padding:0 14px;margin-bottom:8px}
-.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;text-align:left;padding:12px 14px;border-radius:12px;color:#625a60;display:flex;align-items:center;gap:12px;font-size:14px}.nav button.active,.nav button:hover{background:var(--wine-soft);color:var(--wine);font-weight:700}.nav .ico{width:20px;text-align:center;font-size:17px}
-.sidebar-note{margin-top:auto;background:#fbf5f7;border:1px solid #f0e0e6;border-radius:16px;padding:16px;font-size:12px;color:#68525b;line-height:1.5}.sidebar-note strong{display:block;color:var(--wine);font-size:13px;margin-bottom:5px}
-.main{min-width:0}.topbar{height:82px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 36px;position:sticky;top:0;z-index:5;backdrop-filter:blur(10px)}.top-title{font-weight:750;font-size:16px}.top-sub{font-size:12px;color:var(--muted);margin-top:4px}.profile{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;background:var(--wine-soft);color:var(--wine);display:grid;place-items:center;font-weight:800}.profile small{display:block;color:var(--muted);margin-top:3px}
-.content{padding:30px 36px 50px;max-width:1440px;margin:auto}.page{display:none}.page.active{display:block}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.6px;font-weight:800;color:var(--wine);margin-bottom:10px}.heading-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}h1{font-size:30px;letter-spacing:-.8px;margin:0 0 8px}h2{font-size:17px;margin:0}p{color:var(--muted);line-height:1.55;margin:0}.heading-row p{font-size:14px}
-.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:700;font-size:13px;transition:.15s}.btn-primary{background:var(--wine);color:#fff}.btn-primary:hover{background:var(--wine-dark);transform:translateY(-1px)}.btn-light{background:var(--wine-soft);color:var(--wine)}.btn-outline{background:#fff;border:1px solid var(--line);color:var(--text)}.btn-danger{background:#fff0f1;color:#a43b47}
-.grid{display:grid;gap:18px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);min-width:0}.stat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;color:var(--muted);font-size:13px}.stat-icon{width:36px;height:36px;border-radius:11px;background:var(--wine-soft);display:grid;place-items:center;font-size:17px}.stat-value{font-size:28px;font-weight:800;letter-spacing:-.8px}.stat-foot{font-size:12px;color:var(--muted);margin-top:6px}.wine-card{background:linear-gradient(125deg,var(--wine),#963754);color:white;border-radius:var(--radius);padding:26px;position:relative;overflow:hidden;box-shadow:0 14px 30px #7a1f3d25}.wine-card:after{content:"";position:absolute;width:210px;height:210px;border:1px solid #ffffff25;border-radius:50%;right:-65px;top:-80px;box-shadow:0 0 0 25px #ffffff08,0 0 0 50px #ffffff06}.wine-card .label{font-size:12px;color:#f4dfe6}.points{font-size:38px;font-weight:850;letter-spacing:-1px;margin:12px 0 4px}.wine-card p{color:#f4dfe6;font-size:12px}.wine-card .btn{margin-top:20px;background:white;color:var(--wine);position:relative;z-index:1}
-.home-grid{grid-template-columns:1.2fr .8fr;margin-bottom:20px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}.section-head p{font-size:12px;margin-top:5px}.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.action{padding:17px 12px;border:1px solid var(--line);border-radius:14px;background:white;text-align:left}.action:hover{border-color:#d8b3c0;background:#fffafb}.action-icon{font-size:21px;margin-bottom:12px}.action strong{display:block;font-size:13px;margin-bottom:5px}.action span{font-size:11px;color:var(--muted)}
-.progress{height:8px;background:#f0ecee;border-radius:99px;overflow:hidden;margin:13px 0 9px}.progress span{height:100%;display:block;background:var(--wine);border-radius:99px;width:0;transition:width .3s}.progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.data-table{width:100%;border-collapse:collapse;font-size:13px;min-width:650px}.data-table th{text-align:left;color:var(--muted);font-weight:650;background:#faf9f8;padding:14px 16px;font-size:11px;text-transform:uppercase;letter-spacing:.7px}.data-table td{padding:15px 16px;border-top:1px solid var(--line)}.data-table tbody tr:hover{background:#fdfbfc}.pill{display:inline-flex;align-items:center;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:700;background:var(--green-soft);color:var(--green)}.pill.pending{background:#fff3dc;color:var(--amber)}.pill.cancelled{background:#fbe9ea;color:#a43b47}
-.form-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:18px;align-items:start}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:750}.field input,.field select,.field textarea{width:100%;border:1px solid #e4dfe1;border-radius:11px;padding:12px 13px;background:#fff;outline:none;color:var(--text)}.field input:focus,.field select:focus,.field textarea:focus{border-color:#b96a84;box-shadow:0 0 0 3px #7a1f3d12}.hint{font-size:11px;color:var(--muted)}.form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.estimate{background:#fcf8fa;border:1px solid #f0e0e6;border-radius:15px;padding:19px;margin:18px 0}.estimate .big{font-size:28px;font-weight:850;color:var(--wine);margin:6px 0}.estimate small{color:var(--muted)}.summary-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;gap:12px}.summary-row:last-child{border:0}.summary-row span{color:var(--muted)}.empty{text-align:center;padding:38px 20px;color:var(--muted)}.empty div{font-size:28px;margin-bottom:12px}.reward-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.reward-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:white}.reward-art{height:120px;background:linear-gradient(135deg,#f4e5eb,#fbf7f8);display:grid;place-items:center;font-size:42px}.reward-body{padding:17px}.reward-body strong{font-size:14px;display:block}.reward-body p{font-size:12px;margin:7px 0 13px}.reward-cost{font-weight:800;color:var(--wine);font-size:13px;margin-bottom:12px}.impact-grid{grid-template-columns:repeat(3,1fr)}.bar-row{display:grid;grid-template-columns:100px 1fr 50px;align-items:center;gap:12px;margin:17px 0;font-size:12px}.bar{height:9px;background:#f0ecee;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--wine);border-radius:99px}.learn-grid{grid-template-columns:repeat(3,1fr)}.learn-card{border:1px solid var(--line);border-radius:16px;padding:19px;background:white}.learn-art{height:100px;background:#faf0f3;border-radius:12px;display:grid;place-items:center;font-size:34px;margin-bottom:15px}.learn-card h3{font-size:15px;margin:0 0 8px}.learn-card p{font-size:12px;margin-bottom:15px}.community-banner{background:#f7eaf0;border-radius:16px;padding:23px;display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:18px}.community-banner h2{font-size:21px;margin-bottom:8px}.community-banner .big{font-size:27px;font-weight:850;color:var(--wine)}.notice{padding:13px 15px;border-radius:12px;background:#fff7e8;color:#7e5a20;font-size:12px;line-height:1.5;margin-bottom:18px}.toast{position:fixed;right:24px;bottom:24px;background:#292228;color:white;padding:14px 18px;border-radius:12px;box-shadow:var(--shadow);font-size:13px;z-index:20;opacity:0;transform:translateY(12px);pointer-events:none;transition:.25s;max-width:340px}.toast.show{opacity:1;transform:translateY(0)}.mobile-menu{display:none}
-@media(max-width:1100px){.app{grid-template-columns:210px 1fr}.content{padding:24px}.topbar{padding:0 24px}.stats{grid-template-columns:repeat(2,1fr)}.home-grid{grid-template-columns:1fr}.reward-grid,.learn-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){.app{display:block}.sidebar{position:fixed;left:-270px;top:0;bottom:0;width:248px;z-index:15;transition:left .2s;box-shadow:var(--shadow)}.sidebar.open{left:0}.mobile-menu{display:inline-flex}.topbar{height:72px;padding:0 16px}.content{padding:22px 16px 38px}.heading-row{flex-direction:column}h1{font-size:26px}.stats{gap:10px}.card{padding:17px}.stat-value{font-size:24px}.form-layout{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.quick-actions{grid-template-columns:1fr}.reward-grid,.learn-grid,.impact-grid{grid-template-columns:1fr}.community-banner{align-items:flex-start;flex-direction:column}.profile .profile-copy{display:none}.top-sub{display:none}.topbar .top-title{font-size:14px}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#7a1f3d" />
+  <meta name="description" content="RILO — Aplikasi Web Mobile Bank Sampah Terintegrasi." />
+  <title>RILO — Bank Sampah Terintegrasi (Mobile App)</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="brand-mark">R</div><div><div class="brand-name">RILO</div><div class="brand-sub">Waste, returned with value.</div></div></div>
-    <div><div class="nav-label">WORKSPACE</div><nav class="nav" id="nav">
-      <button class="active" data-page="home"><span class="ico">⌂</span>Ringkasan</button>
-      <button data-page="deposit"><span class="ico">＋</span>Setor Sampah</button>
-      <button data-page="transactions"><span class="ico">↔</span>Riwayat Transaksi</button>
-      <button data-page="rewards"><span class="ico">◇</span>RILO Points & Reward</button>
-      <button data-page="impact"><span class="ico">↗</span>Dampak Saya</button>
-      <button data-page="learn"><span class="ico">▤</span>RILO Learn</button>
-      <button data-page="community"><span class="ico">◎</span>Komunitas</button>
-      <button data-page="profile"><span class="ico">○</span>Profil</button>
-    </nav></div>
-    <div class="sidebar-note"><strong>Prototype mode</strong>Data hanya tersimpan sementara di browser selama halaman ini terbuka. Refresh halaman akan mengembalikan data contoh.</div>
-  </aside>
-  <main class="main">
-    <header class="topbar">
-      <div style="display:flex;align-items:center;gap:12px"><button class="btn btn-outline mobile-menu" id="menuBtn" aria-label="Buka menu">☰</button><div><div class="top-title" id="topTitle">Ringkasan</div><div class="top-sub">Bank sampah terintegrasi · Prototype MVP</div></div></div>
-      <div class="profile"><div class="avatar">K</div><div class="profile-copy"><strong style="font-size:13px">Kaila</strong><small>Anggota RILO</small></div></div>
-    </header>
-    <div class="content">
-      <section class="page active" id="page-home">
-        <div class="heading-row"><div><div class="eyebrow">RILO MEMBER SPACE</div><h1>Halo, Kaila 👋</h1><p>Setiap setoran kecil membawa material kembali ke siklusnya.</p></div><button class="btn btn-primary" data-go="deposit">＋ Setor Sampah</button></div>
-        <div class="grid stats">
-          <div class="card"><div class="stat-top"><span>Total RILO Points</span><span class="stat-icon">◇</span></div><div class="stat-value" id="statPoints">1.240</div><div class="stat-foot">Poin tersedia untuk ditukar</div></div>
-          <div class="card"><div class="stat-top"><span>Sampah Disetor</span><span class="stat-icon">♻</span></div><div class="stat-value" id="statWeight">18,4 kg</div><div class="stat-foot">Total material tercatat</div></div>
-          <div class="card"><div class="stat-top"><span>Total Setoran</span><span class="stat-icon">↗</span></div><div class="stat-value" id="statDeposits">42</div><div class="stat-foot">Transaksi berhasil</div></div>
-          <div class="card"><div class="stat-top"><span>Kontribusi Komunitas</span><span class="stat-icon">◎</span></div><div class="stat-value">3</div><div class="stat-foot">Kegiatan yang diikuti</div></div>
-        </div>
-        <div class="grid home-grid">
-          <div class="wine-card"><div class="label">SALDO POIN RILO</div><div class="points" id="heroPoints">1.240 <span style="font-size:14px;font-weight:600;letter-spacing:0">pts</span></div><p id="nextReward">Kumpulkan 260 poin lagi untuk reward berikutnya.</p><button class="btn" data-go="rewards">Lihat Reward →</button></div>
-          <div class="card"><div class="section-head"><div><h2>Target bulan ini</h2><p>Bangun kebiasaan setor secara rutin.</p></div><span class="stat-icon">🎯</span></div><div style="display:flex;align-items:baseline;gap:7px"><strong style="font-size:25px" id="monthlyWeight">8,4 kg</strong><span style="font-size:12px;color:var(--muted)">dari 10 kg</span></div><div class="progress"><span id="monthlyBar" style="width:84%"></span></div><div class="progress-meta"><span>Progres bulanan</span><strong id="monthlyPercent">84%</strong></div></div>
-        </div>
-        <div class="card" style="margin-bottom:20px"><div class="section-head"><div><h2>Apa yang ingin kamu lakukan?</h2><p>Pilih langkah berikutnya.</p></div></div><div class="quick-actions">
-          <button class="action" data-go="deposit"><div class="action-icon">♻️</div><strong>Setor Sampah</strong><span>Catat setoran baru</span></button>
-          <button class="action" data-go="transactions"><div class="action-icon">🧾</div><strong>Lihat Transaksi</strong><span>Pantau status setoran</span></button>
-          <button class="action" data-go="learn"><div class="action-icon">📚</div><strong>Belajar Memilah</strong><span>Kenali material diterima</span></button>
-        </div></div>
-        <div class="card"><div class="section-head"><div><h2>Aktivitas terbaru</h2><p>Transaksi terakhir di akunmu.</p></div><button class="btn btn-light" data-go="transactions">Lihat semua</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Tanggal</th><th>Material</th><th>Berat</th><th>Poin</th><th>Status</th></tr></thead><tbody id="recentRows"></tbody></table></div></div>
-      </section>
 
-      <section class="page" id="page-deposit">
-        <div class="heading-row"><div><div class="eyebrow">WASTE DEPOSIT</div><h1>Setor sampah</h1><p>Catat sampah yang ingin kamu setorkan ke RILO.</p></div></div>
-        <div class="notice">Ini prototype demonstrasi. Nilai poin, jenis material, dan status setoran hanya simulasi, bukan harga resmi.</div>
-        <div class="form-layout">
-          <div class="card"><div class="section-head"><div><h2>Detail setoran</h2><p>Isi informasi material yang akan disetor.</p></div></div>
-            <form id="depositForm"><div class="form-grid">
-              <div class="field full"><label for="material">Jenis material</label><select id="material" required><option value="Plastik PET">Botol plastik (PET)</option><option value="Plastik campuran">Plastik campuran</option><option value="Kertas">Kertas</option><option value="Kardus">Kardus</option><option value="Logam">Kaleng & logam</option><option value="Kaca">Kaca</option></select><span class="hint">Material yang diterima dapat berbeda di setiap titik RILO.</span></div>
-              <div class="field"><label for="weight">Berat perkiraan (kg)</label><input id="weight" type="number" min="0.1" max="1000" step="0.1" value="1.0" required /></div>
-              <div class="field"><label for="condition">Kondisi material</label><select id="condition"><option>Bersih dan kering</option><option>Perlu dibersihkan</option><option>Campuran</option></select></div>
-              <div class="field full"><label for="method">Metode setoran</label><select id="method"><option value="Drop-off">Antar ke RILO Point</option><option value="Pickup">Jemput oleh RILO</option></select></div>
-              <div class="field full"><label for="location">RILO Point / alamat penjemputan</label><input id="location" placeholder="Contoh: RILO Point Kampus" value="RILO Point Kampus" required /></div>
-              <div class="field full"><label for="notes">Catatan (opsional)</label><textarea id="notes" rows="2" placeholder="Tambahkan catatan untuk setoran ini"></textarea></div>
-            </div><div class="form-actions"><button class="btn btn-primary" type="submit">Simpan Setoran</button><button class="btn btn-outline" type="reset" id="resetDeposit">Reset</button></div></form>
-          </div>
-          <div class="card"><h2>Estimasi setoran</h2><p style="font-size:12px;margin-top:5px">Perkiraan otomatis dari input kamu.</p><div class="estimate"><small>Estimasi RILO Points</small><div class="big" id="estimatePoints">100 pts</div><small id="estimateDetail">1 kg × 100 poin/kg</small></div>
-            <div class="summary-row"><span>Material</span><strong id="summaryMaterial">Botol plastik (PET)</strong></div><div class="summary-row"><span>Berat</span><strong id="summaryWeight">1,0 kg</strong></div><div class="summary-row"><span>Metode</span><strong id="summaryMethod">Antar ke RILO Point</strong></div><p style="font-size:11px;margin-top:16px">Poin final pada produk nyata sebaiknya ditentukan setelah material ditimbang dan diverifikasi petugas.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="page" id="page-transactions">
-        <div class="heading-row"><div><div class="eyebrow">YOUR ACTIVITY</div><h1>Riwayat transaksi</h1><p>Semua setoran dan poin yang tercatat di prototype.</p></div><button class="btn btn-primary" data-go="deposit">＋ Setoran baru</button></div>
-        <div class="card"><div class="section-head"><div><h2>Semua aktivitas</h2><p id="transactionCount">0 transaksi</p></div><select id="statusFilter" style="width:auto;border:1px solid var(--line);border-radius:10px;padding:10px"><option value="all">Semua status</option><option value="Selesai">Selesai</option><option value="Menunggu">Menunggu</option></select></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Tanggal</th><th>Material</th><th>Berat</th><th>Metode</th><th>Poin</th><th>Status</th></tr></thead><tbody id="transactionRows"></tbody></table></div></div>
-      </section>
-
-      <section class="page" id="page-rewards">
-        <div class="heading-row"><div><div class="eyebrow">RILO REWARDS</div><h1>Poin yang jadi manfaat</h1><p>Tukar poin simulasi dengan reward yang tersedia.</p></div></div>
-        <div class="grid home-grid" style="margin-bottom:20px"><div class="wine-card"><div class="label">POIN TERSEDIA</div><div class="points"><span id="rewardBalance">1.240</span> <span style="font-size:14px;letter-spacing:0">pts</span></div><p>Poin berasal dari transaksi yang berhasil.</p></div><div class="card"><h2>Reward berikutnya</h2><p style="margin-top:7px">Voucher pilihan tersedia mulai dari 500 poin.</p><div class="progress"><span id="rewardProgress" style="width:62%"></span></div><div class="progress-meta"><span>Menuju 2.000 poin</span><strong id="rewardGap">760 lagi</strong></div></div></div>
-        <div class="grid reward-grid">
-          <div class="reward-card"><div class="reward-art">☕</div><div class="reward-body"><strong>Voucher minuman</strong><p>Contoh voucher mitra lokal.</p><div class="reward-cost">500 poin</div><button class="btn btn-primary redeem" data-cost="500" data-name="Voucher minuman">Tukar poin</button></div></div>
-          <div class="reward-card"><div class="reward-art">🚚</div><div class="reward-body"><strong>Diskon penjemputan</strong><p>Diskon simulasi layanan pickup.</p><div class="reward-cost">750 poin</div><button class="btn btn-primary redeem" data-cost="750" data-name="Diskon penjemputan">Tukar poin</button></div></div>
-          <div class="reward-card"><div class="reward-art">👜</div><div class="reward-body"><strong>RILO tote bag</strong><p>Merchandise brand RILO.</p><div class="reward-cost">1.500 poin</div><button class="btn btn-primary redeem" data-cost="1500" data-name="RILO tote bag">Tukar poin</button></div></div>
-          <div class="reward-card"><div class="reward-art">🌱</div><div class="reward-body"><strong>Kontribusi komunitas</strong><p>Simulasikan donasi poin untuk program lokal.</p><div class="reward-cost">500 poin</div><button class="btn btn-primary redeem" data-cost="500" data-name="Kontribusi komunitas">Tukar poin</button></div></div>
-        </div>
-      </section>
-
-      <section class="page" id="page-impact">
-        <div class="heading-row"><div><div class="eyebrow">YOUR IMPACT</div><h1>Dampak saya</h1><p>Kenali progres setoranmu dan kontribusi material.</p></div></div>
-        <div class="grid impact-grid" style="margin-bottom:20px"><div class="card"><div class="stat-top">Total material <span class="stat-icon">♻</span></div><div class="stat-value" id="impactWeight">18,4 kg</div><div class="stat-foot">Berat dari setoran selesai</div></div><div class="card"><div class="stat-top">Setoran selesai <span class="stat-icon">✓</span></div><div class="stat-value" id="impactCount">42</div><div class="stat-foot">Kontribusi tercatat</div></div><div class="card"><div class="stat-top">Poin diperoleh <span class="stat-icon">◇</span></div><div class="stat-value" id="impactPoints">1.240</div><div class="stat-foot">Saldo dapat berubah setelah penukaran</div></div></div>
-        <div class="grid home-grid"><div class="card"><div class="section-head"><div><h2>Material yang disetor</h2><p>Komposisi dari transaksi contoh dan input baru.</p></div></div><div id="materialBreakdown"></div></div><div class="card"><h2>Kenapa pemilahan penting?</h2><p style="font-size:13px;margin-top:10px">Material yang dipilah dengan benar lebih mudah diperiksa, diproses, dan disalurkan ke mitra daur ulang.</p><div style="background:var(--green-soft);color:var(--green);padding:15px;border-radius:12px;margin-top:18px;font-size:12px;line-height:1.6">Dampak lingkungan pada layar ini berupa ringkasan aktivitas. Angka pengurangan emisi atau klaim dampak spesifik memerlukan metode perhitungan dan verifikasi yang jelas.</div></div></div>
-      </section>
-
-      <section class="page" id="page-learn">
-        <div class="heading-row"><div><div class="eyebrow">RILO LEARN</div><h1>Belajar memilah</h1><p>Informasi singkat untuk membantu menyiapkan material sebelum disetor.</p></div></div>
-        <div class="grid learn-grid">
-          <article class="learn-card"><div class="learn-art">🧴</div><h3>Botol plastik</h3><p>Kosongkan isi botol. Ikuti arahan titik setor mengenai tutup dan label.</p><button class="btn btn-light learn-more" data-title="Botol plastik" data-copy="Kosongkan botol dan tiriskan sisa cairan. Jangan mencampur botol dengan sampah organik. Persyaratan tutup dan label dapat berbeda menurut mitra daur ulang.">Baca panduan</button></article>
-          <article class="learn-card"><div class="learn-art">📦</div><h3>Kertas dan kardus</h3><p>Pastikan material sekering mungkin dan pisahkan dari sisa makanan.</p><button class="btn btn-light learn-more" data-title="Kertas dan kardus" data-copy="Lipat kardus agar lebih mudah disimpan. Hindari kertas yang basah, berminyak, atau terkontaminasi makanan karena dapat mengganggu proses daur ulang.">Baca panduan</button></article>
-          <article class="learn-card"><div class="learn-art">🥫</div><h3>Kaleng dan logam</h3><p>Kosongkan wadah dan pisahkan dari material lainnya.</p><button class="btn btn-light learn-more" data-title="Kaleng dan logam" data-copy="Kosongkan kaleng dan pastikan tidak ada cairan tersisa. Hati-hati terhadap tepi tajam; jangan menekan material dengan tangan kosong.">Baca panduan</button></article>
-          <article class="learn-card"><div class="learn-art">🫙</div><h3>Kaca</h3><p>Simpan dengan aman dan pastikan titik RILO menerima kaca.</p><button class="btn btn-light learn-more" data-title="Kaca" data-copy="Kaca dapat berisiko pecah. Bungkus atau simpan dengan aman dan konfirmasi apakah titik setor menerima kaca sebelum membawanya.">Baca panduan</button></article>
-          <article class="learn-card"><div class="learn-art">🧼</div><h3>Bersihkan secukupnya</h3><p>Kurangi sisa isi yang dapat mengotori material lain.</p><button class="btn btn-light learn-more" data-title="Bersihkan secukupnya" data-copy="Ikuti panduan mitra setempat. Biasanya mengosongkan wadah dan menghilangkan sisa kotoran berlebih sudah membantu; tidak semua material memerlukan pencucian intensif.">Baca panduan</button></article>
-          <article class="learn-card"><div class="learn-art">🔄</div><h3>Setelah disetor</h3><p>Material diperiksa, dipilah, lalu disalurkan sesuai jenisnya.</p><button class="btn btn-light learn-more" data-title="Setelah disetor" data-copy="Dalam alur bank sampah, material ditimbang dan diverifikasi, dicatat, lalu disimpan dan disalurkan ke mitra yang sesuai. Tidak semua jenis plastik otomatis dapat didaur ulang.">Baca panduan</button></article>
-        </div>
-      </section>
-
-      <section class="page" id="page-community">
-        <div class="heading-row"><div><div class="eyebrow">RILO COMMUNITY</div><h1>Bergerak bersama</h1><p>Setoran individu ikut membangun progres komunitas.</p></div></div>
-        <div class="community-banner"><div><div class="eyebrow">MONTHLY CHALLENGE</div><h2>Tantangan Pilah Bareng</h2><p>Target simulasi pengumpulan material komunitas bulan ini.</p></div><div><div class="big">720 kg</div><div style="font-size:12px;color:var(--muted)">dari target 1.000 kg</div></div></div>
-        <div class="card" style="margin-bottom:18px"><div class="section-head"><div><h2>Progres target</h2><p>Data komunitas ini adalah data contoh untuk demonstrasi.</p></div><strong style="color:var(--wine)">72%</strong></div><div class="progress"><span style="width:72%"></span></div></div>
-        <div class="card"><div class="section-head"><div><h2>Papan peringkat komunitas</h2><p>Contoh leaderboard antar komunitas.</p></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Peringkat</th><th>Komunitas</th><th>Material terkumpul</th><th>Status</th></tr></thead><tbody><tr><td>01</td><td><strong>Komunitas A</strong></td><td>240 kg</td><td><span class="pill">Aktif</span></td></tr><tr><td>02</td><td><strong>Komunitas B</strong></td><td>190 kg</td><td><span class="pill">Aktif</span></td></tr><tr><td>03</td><td><strong>Komunitas C</strong></td><td>165 kg</td><td><span class="pill pending">Berlangsung</span></td></tr></tbody></table></div><div class="form-actions"><button class="btn btn-primary" id="joinChallenge">Ikut tantangan</button></div></div>
-      </section>
-
-      <section class="page" id="page-profile">
-        <div class="heading-row"><div><div class="eyebrow">YOUR ACCOUNT</div><h1>Profil saya</h1><p>Informasi anggota dalam prototype RILO.</p></div></div>
-        <div class="form-layout"><div class="card"><div style="display:flex;align-items:center;gap:15px;margin-bottom:24px"><div class="avatar" style="width:62px;height:62px;font-size:22px">K</div><div><h2>Kaila Zanita</h2><p style="font-size:12px;margin-top:5px">Anggota RILO · Bergabung September 2026</p></div></div><form id="profileForm"><div class="form-grid"><div class="field full"><label for="profileName">Nama</label><input id="profileName" value="Kaila Zanita" required /></div><div class="field full"><label for="profileEmail">Email</label><input id="profileEmail" type="email" value="kaila@example.com" required /></div><div class="field full"><label for="profileAddress">Alamat utama</label><input id="profileAddress" value="Depok, Jawa Barat" /></div></div><div class="form-actions"><button class="btn btn-primary" type="submit">Simpan profil</button></div></form></div>
-      </section>
+  <!-- MOBILE DEVICE SHELL / WRAPPER -->
+  <div class="mobile-device-shell">
+    
+    <!-- Notch Hiasan (Desktop Preview) -->
+    <div class="device-notch">
+      <div class="notch-pill"></div>
     </div>
-  </main>
-</div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script>
-const rates = {"Plastik PET":100,"Plastik campuran":60,"Kertas":50,"Kardus":45,"Logam":150,"Kaca":30};
-let points = 1240;
-let totalWeight = 18.4;
-let completedDeposits = 42;
-let transactions = [
- {date:"2026-10-18",material:"Plastik PET",weight:1.8,method:"Drop-off",points:180,status:"Selesai"},
- {date:"2026-10-15",material:"Kertas",weight:2.4,method:"Drop-off",points:120,status:"Selesai"},
- {date:"2026-10-11",material:"Kardus",weight:1.2,method:"Pickup",points:54,status:"Selesai"},
- {date:"2026-10-08",material:"Logam",weight:0.7,method:"Drop-off",points:105,status:"Selesai"}
-];
-let toastTimer;
-const fmt = n => new Intl.NumberFormat("id-ID",{maximumFractionDigits:1}).format(n);
-const dateFmt = s => new Date(s+"T12:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});
-function showToast(message){const t=document.getElementById("toast");t.textContent=message;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),3000)}
-function go(page){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+page));document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));const btn=document.querySelector(`#nav button[data-page="${page}"]`);document.getElementById("topTitle").textContent=btn?btn.textContent.trim():"RILO";document.getElementById("sidebar").classList.remove("open");window.scrollTo({top:0,behavior:"smooth"});if(page==="transactions")renderTransactions();if(page==="impact")renderImpact()}
-document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g)go(g.dataset.go);const n=e.target.closest("#nav button");if(n)go(n.dataset.page)});
-document.getElementById("menuBtn").addEventListener("click",()=>document.getElementById("sidebar").classList.toggle("open"));
-const material=document.getElementById("material"), weight=document.getElementById("weight"), method=document.getElementById("method");
-function updateEstimate(){const w=Math.max(0,Number(weight.value)||0),pts=Math.round(w*(rates[material.value]||0));document.getElementById("estimatePoints").textContent=fmt(pts)+" pts";document.getElementById("estimateDetail").textContent=`${fmt(w)} kg × ${rates[material.value]} poin/kg`;document.getElementById("summaryMaterial").textContent=material.options[material.selectedIndex].text;document.getElementById("summaryWeight").textContent=fmt(w)+" kg";document.getElementById("summaryMethod").textContent=method.value==="Pickup"?"Jemput oleh RILO":"Antar ke RILO Point"}
-[material,weight,method].forEach(el=>el.addEventListener("input",updateEstimate));
-document.getElementById("depositForm").addEventListener("submit",e=>{e.preventDefault();const w=Number(weight.value);if(!w||w<=0){showToast("Masukkan berat yang valid.");return}const pts=Math.round(w*rates[material.value]);const tx={date:new Date().toISOString().slice(0,10),material:material.value,weight:w,method:method.value,points:pts,status:method.value==="Pickup"?"Menunggu":"Selesai"};transactions.unshift(tx);if(tx.status==="Selesai"){points+=pts;totalWeight+=w;completedDeposits++}renderAll();showToast(tx.status==="Selesai"?`Setoran dicatat! +${fmt(pts)} poin ditambahkan.`:"Permintaan pickup dibuat. Poin akan ditambahkan setelah diverifikasi.");go("transactions");e.target.reset();document.getElementById("location").value="RILO Point Kampus";updateEstimate()});
-document.getElementById("resetDeposit").addEventListener("click",()=>setTimeout(updateEstimate,0));
-function statusPill(s){return `<span class="pill ${s==="Menunggu"?"pending":s==="Dibatalkan"?"cancelled":""}">${s}</span>`}
-function renderTransactions(){const filter=document.getElementById("statusFilter").value;const list=transactions.filter(t=>filter==="all"||t.status===filter);document.getElementById("transactionCount").textContent=`${list.length} transaksi ditampilkan`;document.getElementById("transactionRows").innerHTML=list.length?list.map(t=>`<tr><td>${dateFmt(t.date)}</td><td><strong>${t.material}</strong></td><td>${fmt(t.weight)} kg</td><td>${t.method==="Pickup"?"Pickup":"Drop-off"}</td><td style="color:var(--wine);font-weight:800">${t.status==="Selesai"?"+"+fmt(t.points):"—"}</td><td>${statusPill(t.status)}</td></tr>`).join(""):`<tr><td colspan="6"><div class="empty"><div>🧾</div>Belum ada transaksi untuk filter ini.</div></td></tr>`;document.getElementById("recentRows").innerHTML=transactions.slice(0,4).map(t=>`<tr><td>${dateFmt(t.date)}</td><td><strong>${t.material}</strong></td><td>${fmt(t.weight)} kg</td><td style="font-weight:800;color:var(--wine)">${t.status==="Selesai"?"+"+fmt(t.points):"—"}</td><td>${statusPill(t.status)}</td></tr>`).join("")}
-function renderImpact(){const done=transactions.filter(t=>t.status==="Selesai");const by={};done.forEach(t=>by[t.material]=(by[t.material]||0)+t.weight);const total=Object.values(by).reduce((a,b)=>a+b,0)||1;document.getElementById("materialBreakdown").innerHTML=Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([name,w])=>`<div class="bar-row"><span>${name}</span><div class="bar"><span style="width:${Math.max(4,w/total*100)}%"></span></div><strong>${fmt(w)} kg</strong></div>`).join("")||'<div class="empty">Belum ada data material.</div>';document.getElementById("impactWeight").textContent=fmt(totalWeight)+" kg";document.getElementById("impactCount").textContent=fmt(completedDeposits);document.getElementById("impactPoints").textContent=fmt(points)}
-function renderAll(){document.getElementById("statPoints").textContent=fmt(points);document.getElementById("heroPoints").innerHTML=fmt(points)+' <span style="font-size:14px;font-weight:600;letter-spacing:0">pts</span>';document.getElementById("rewardBalance").textContent=fmt(points);document.getElementById("statWeight").textContent=fmt(totalWeight)+" kg";document.getElementById("statDeposits").textContent=fmt(completedDeposits);document.getElementById("monthlyWeight").textContent=fmt(Math.min(totalWeight,10))+" kg";const pct=Math.min(100,Math.round(totalWeight/10*100));document.getElementById("monthlyBar").style.width=pct+"%";document.getElementById("monthlyPercent").textContent=pct+"%";document.getElementById("nextReward").textContent=points>=2000?"Kamu sudah mencapai target reward 2.000 poin!":`Kumpulkan ${fmt(2000-points)} poin lagi untuk reward berikutnya.`;document.getElementById("rewardProgress").style.width=Math.min(100,points/2000*100)+"%";document.getElementById("rewardGap").textContent=points>=2000?"Target tercapai":fmt(2000-points)+" lagi";renderTransactions();renderImpact()}
-document.getElementById("statusFilter").addEventListener("change",renderTransactions);
-document.querySelectorAll(".redeem").forEach(b=>b.addEventListener("click",()=>{const cost=Number(b.dataset.cost),name=b.dataset.name;if(points<cost){showToast("Poin belum cukup untuk reward ini.");return}if(!confirm(`Tukar ${fmt(cost)} poin untuk ${name}? Ini hanya simulasi.`))return;points-=cost;renderAll();showToast(`${name} berhasil ditukar dalam simulasi.`)}));
-document.querySelectorAll(".learn-more").forEach(b=>b.addEventListener("click",()=>alert(b.dataset.title+"\n\n"+b.dataset.copy)));
-document.getElementById("joinChallenge").addEventListener("click",()=>showToast("Kamu bergabung dalam tantangan komunitas (simulasi)."));
-document.getElementById("profileForm").addEventListener("submit",e=>{e.preventDefault();const name=document.getElementById("profileName").value.trim();document.querySelector(".profile-copy strong").textContent=name.split(" ")[0]||"Anggota";document.querySelector(".avatar").textContent=(name[0]||"R").toUpperCase();showToast("Profil diperbarui untuk sesi ini.")});
-document.getElementById("resetDemo").addEventListener("click",()=>{if(!confirm("Reset seluruh data demo ke nilai awal?"))return;points=1240;totalWeight=18.4;completedDeposits=42;transactions=[{date:"2026-10-18",material:"Plastik PET",weight:1.8,method:"Drop-off",points:180,status:"Selesai"},{date:"2026-10-15",material:"Kertas",weight:2.4,method:"Drop-off",points:120,status:"Selesai"},{date:"2026-10-11",material:"Kardus",weight:1.2,method:"Pickup",points:54,status:"Selesai"},{date:"2026-10-08",material:"Logam",weight:0.7,method:"Drop-off",points:105,status:"Selesai"}];renderAll();showToast("Data demo dikembalikan ke nilai awal.")});
-updateEstimate();renderAll();
-</script>
+
+    <!-- TOP APP BAR -->
+    <header class="mobile-topbar">
+      <div class="topbar-brand">
+        <div class="brand-icon-mobile">R</div>
+        <div class="brand-info">
+          <span class="app-title">RILO</span>
+          <span class="app-tagline">Bank Sampah Digital</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn-badge" id="btnNotification" aria-label="Notifikasi">
+          <span>🔔</span>
+          <span class="badge-dot"></span>
+        </button>
+        <div class="avatar-badge" data-go-view="profile" title="Profil Pengguna">
+          <span id="topbarAvatar" class="user-avatar-text">K</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- SCROLLABLE MAIN CONTENT -->
+    <main class="mobile-content" id="mainScrollArea">
+
+      <!-- ==================== VIEW 1: BERANDA (HOME) ==================== -->
+      <section class="view-section active-view" id="view-home">
+        
+        <!-- Kartu Dompet Poin RILO -->
+        <div class="wallet-hero-card">
+          <div class="wallet-label-row">
+            <span>Saldo RILO Points</span>
+            <span class="wallet-tier-badge">Eco Hero Tier 1</span>
+          </div>
+          <div class="wallet-points">
+            <span id="homePointsVal">1.240</span> <span>pts</span>
+          </div>
+          <div class="wallet-desc" id="homeUserGreeting">
+            Halo, Kaila 👋 Setiap setoran sampahmu bernilai kebaikan dan rupiah.
+          </div>
+          <div class="wallet-actions">
+            <button class="btn-wallet" data-go-view="deposit">
+              <span>♻️</span> Setor Sampah
+            </button>
+            <button class="btn-wallet btn-wallet-outline" data-go-view="rewards">
+              <span>🎁</span> Tukar Poin
+            </button>
+          </div>
+        </div>
+
+        <!-- 2x2 Mini Statistik -->
+        <div class="mobile-stat-grid">
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <span>Sampah Disetor</span>
+              <span class="stat-box-icon">⚖️</span>
+            </div>
+            <div class="stat-box-val" id="homeTotalWeight">18,4 kg</div>
+            <div class="stat-box-sub">Total terverifikasi</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <span>Total Transaksi</span>
+              <span class="stat-box-icon">🧾</span>
+            </div>
+            <div class="stat-box-val" id="homeDepositCount">42x</div>
+            <div class="stat-box-sub">Riwayat setoran</div>
+          </div>
+        </div>
+
+        <!-- Target Bulanan Card -->
+        <div class="card-clean">
+          <div class="section-title-row" style="margin-bottom:8px;">
+            <div class="section-title"><span>🎯</span> Target Bulan Ini</div>
+            <span style="font-size:12px;font-weight:750;color:var(--wine);" id="homeMonthlyPercent">84%</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>Terkumpul: <b id="homeMonthlyWeight" style="color:var(--text-main);">8,4 kg</b></span>
+            <span>Target: 20 kg</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-fill" id="homeMonthlyProgress" style="width: 42%;"></div>
+          </div>
+        </div>
+
+        <!-- Menu Aksi Cepat (Quick Actions) -->
+        <div class="section-title-row">
+          <div class="section-title">Aksi Cepat</div>
+        </div>
+        <div class="quick-action-row">
+          <div class="qa-item" data-go-view="deposit">
+            <div class="qa-icon-circle">♻️</div>
+            <span class="qa-label">Setor</span>
+          </div>
+          <div class="qa-item" data-go-view="transactions">
+            <div class="qa-icon-circle">🧾</div>
+            <span class="qa-label">Riwayat</span>
+          </div>
+          <div class="qa-item" data-go-view="rewards">
+            <div class="qa-icon-circle">🎁</div>
+            <span class="qa-label">Voucher</span>
+          </div>
+          <div class="qa-item" data-go-view="learn">
+            <div class="qa-icon-circle">📚</div>
+            <span class="qa-label">Panduan</span>
+          </div>
+        </div>
+
+        <!-- Aktivitas Terbaru -->
+        <div class="section-title-row">
+          <div class="section-title">Aktivitas Terakhir</div>
+          <button class="section-link" data-go-view="transactions">Lihat Semua →</button>
+        </div>
+        <div class="tx-list" id="homeRecentTxList">
+          <!-- Render dinamis dari app.js -->
+        </div>
+
+      </section>
+
+      <!-- ==================== VIEW 2: FORM SETOR SAMPAH (DEPOSIT) ==================== -->
+      <section class="view-section" id="view-deposit">
+        
+        <div class="section-title-row" style="margin-bottom:6px;">
+          <h2 style="font-size:18px;font-weight:850;color:var(--wine-dark);">Setor Sampah</h2>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+          Pilih material dan masukkan berat untuk mendapatkan estimasi RILO points.
+        </p>
+
+        <!-- Kartu Pemilihan Material Sampah -->
+        <div class="input-group">
+          <label class="input-label">Pilih Jenis Material</label>
+          <div class="material-selector-grid" id="materialSelectorGrid">
+            <!-- Chip selector dirender via app.js -->
+          </div>
+        </div>
+
+        <form id="formDepositWaste">
+          <!-- Input Berat -->
+          <div class="input-group">
+            <label class="input-label" for="depositWeight">Perkiraan Berat (kg)</label>
+            <input type="number" id="depositWeight" class="input-text" step="0.1" min="0.1" max="500" value="1.0" required />
+          </div>
+
+          <!-- Pilihan Metode: Drop-off vs Pickup -->
+          <div class="input-group">
+            <label class="input-label">Metode Setoran</label>
+            <div class="input-radio-cards">
+              <div class="radio-card active" data-method-radio="Drop-off">
+                <span>📍</span> Antar Sendiri
+              </div>
+              <div class="radio-card" data-method-radio="Pickup">
+                <span>🚚</span> Jemput Driver
+              </div>
+            </div>
+          </div>
+
+          <!-- Lokasi / Alamat -->
+          <div class="input-group">
+            <label class="input-label" id="depositLocationLabel" for="depositLocation">Pilihan RILO Point / Drop Point</label>
+            <input type="text" id="depositLocation" class="input-text" value="RILO Point Kampus Utama" required />
+          </div>
+
+          <!-- Catatan Tambahan -->
+          <div class="input-group">
+            <label class="input-label" for="depositNotes">Catatan untuk Petugas (Opsional)</label>
+            <textarea id="depositNotes" class="input-textarea" rows="2" placeholder="Contoh: Sudah dipilah dan dikemas dalam kardus"></textarea>
+          </div>
+
+          <!-- Live Kalkulator Preview -->
+          <div class="calc-preview-card">
+            <span class="calc-preview-header">Estimasi Poin Diperoleh</span>
+            <div class="calc-points-big" id="calcPointsVal">100 pts</div>
+            <div class="calc-sub-detail" id="calcFormulaText">1,0 kg × 100 poin/kg (Botol Plastik)</div>
+          </div>
+
+          <button type="submit" class="btn-primary-mobile">
+            <span>✓</span> Simpan & Catat Setoran
+          </button>
+        </form>
+
+      </section>
+
+      <!-- ==================== VIEW 3: RIWAYAT TRANSAKSI ==================== -->
+      <section class="view-section" id="view-transactions">
+        
+        <div class="section-title-row" style="margin-bottom:6px;">
+          <h2 style="font-size:18px;font-weight:850;color:var(--wine-dark);">Riwayat Setoran</h2>
+          <span style="font-size:11px;color:var(--text-muted);" id="txCountSummary">4 transaksi</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+          Pantau status penimbangan dan akumulasi poin dari setiap setoran.
+        </p>
+
+        <!-- Filter Chips -->
+        <div class="tx-filter-bar">
+          <button class="filter-chip active" data-filter="all">Semua Status</button>
+          <button class="filter-chip" data-filter="Selesai">Selesai</button>
+          <button class="filter-chip" data-filter="Menunggu">Menunggu</button>
+        </div>
+
+        <!-- Daftar Transaksi -->
+        <div class="tx-list" id="txListContainer">
+          <!-- Render via app.js -->
+        </div>
+
+      </section>
+
+      <!-- ==================== VIEW 4: REWARDS & VOUCHER ==================== -->
+      <section class="view-section" id="view-rewards">
+        
+        <!-- Saldo Header -->
+        <div class="card-clean" style="background: linear-gradient(135deg, #fdf5f8, #f7e7ee); border-color:#ebccd9;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700;">
+            Saldo Poin Kamu
+          </div>
+          <div style="font-size:26px;font-weight:850;color:var(--wine);margin:4px 0;" id="rewardUserBalance">
+            1.240 pts
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);">
+            Tukarkan poin simulasi dengan voucher makanan, ongkir, donasi, atau merchandise.
+          </p>
+        </div>
+
+        <div class="section-title-row">
+          <div class="section-title">Katalog Penukaran</div>
+        </div>
+
+        <div class="reward-catalog-grid" id="rewardCatalogGrid">
+          <!-- Render via app.js -->
+        </div>
+
+      </section>
+
+      <!-- ==================== VIEW 5: LAINNYA / HUB MENU ==================== -->
+      <section class="view-section" id="view-more">
+        
+        <!-- Kartu Mini Profil -->
+        <div class="card-clean" style="display:flex;align-items:center;gap:14px;">
+          <div class="avatar-badge" style="width:52px;height:52px;font-size:20px;">
+            <span class="user-avatar-text">K</span>
+          </div>
+          <div style="flex:1;">
+            <strong style="font-size:15px;display:block;" id="profNameDisplay">Kaila Zanita</strong>
+            <span style="font-size:11px;color:var(--text-muted);" id="profEmailDisplay">kaila.zanita@example.com</span>
+            <div style="margin-top:4px;">
+              <span class="wallet-tier-badge" style="background:var(--wine-soft);color:var(--wine);padding:2px 8px;" id="profTierDisplay">RILO Eco Hero</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigasi Menu Tambahan -->
+        <div class="section-title-row">
+          <div class="section-title">Fitur & Eksplorasi</div>
+        </div>
+
+        <div class="menu-list-card">
+          <button class="menu-list-item" data-go-view="impact">
+            <div class="menu-left">
+              <div class="menu-icon-box">↗️</div>
+              <div class="menu-text">
+                <strong>Dampak Lingkungan Saya</strong>
+                <span>Statistik jejak karbon & komposisi material</span>
+              </div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </button>
+
+          <button class="menu-list-item" data-go-view="learn">
+            <div class="menu-left">
+              <div class="menu-icon-box">📚</div>
+              <div class="menu-text">
+                <strong>RILO Learn - Panduan Memilah</strong>
+                <span>Tata cara dan tips daur ulang yang benar</span>
+              </div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </button>
+
+          <button class="menu-list-item" data-go-view="community">
+            <div class="menu-left">
+              <div class="menu-icon-box">🤝</div>
+              <div class="menu-text">
+                <strong>Tantangan Komunitas</strong>
+                <span>Leaderboard & gerakan pilah bareng</span>
+              </div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </button>
+
+          <button class="menu-list-item" data-go-view="profile">
+            <div class="menu-left">
+              <div class="menu-icon-box">⚙️</div>
+              <div class="menu-text">
+                <strong>Pengaturan Profil</strong>
+                <span>Ubah nama, email, dan alamat jemput</span>
+              </div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </button>
+        </div>
+
+        <div class="menu-list-card">
+          <button class="menu-list-item" id="btnResetDemo">
+            <div class="menu-left">
+              <div class="menu-icon-box" style="background:#feecee;color:var(--danger);">↺</div>
+              <div class="menu-text">
+                <strong style="color:var(--danger);">Reset Data Demo</strong>
+                <span>Kembalikan data ke kondisi awal prototype</span>
+              </div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </button>
+        </div>
+
+        <div style="text-align:center;font-size:11px;color:var(--text-muted);padding:10px 0;">
+          RILO Mobile Prototype v1.0 • Sustainability Project
+        </div>
+
+      </section>
+
+      <!-- ==================== SUB-VIEW: DAMPAK SAYA ==================== -->
+      <section class="view-section" id="view-impact">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="icon-btn-badge" data-go-view="more">‹</button>
+          <h2 style="font-size:17px;font-weight:800;">Dampak Lingkungan Saya</h2>
+        </div>
+
+        <div class="mobile-stat-grid">
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <span>Total Material</span>
+              <span class="stat-box-icon">♻️</span>
+            </div>
+            <div class="stat-box-val" id="impactTotalWeight">18,4 kg</div>
+            <div class="stat-box-sub">Terselamatkan</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <span>Setoran Sukses</span>
+              <span class="stat-box-icon">✓</span>
+            </div>
+            <div class="stat-box-val" id="impactDepositsCount">42</div>
+            <div class="stat-box-sub">Transaksi</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <span>Estimasi CO2 Dicegah</span>
+              <span class="stat-box-icon">🌱</span>
+            </div>
+            <div class="stat-box-val" id="impactCO2Saved">27,2 kg</div>
+            <div class="stat-box-sub">Jejak emisi berkurang</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-top">
+              <span>Setara Tanam</span>
+              <span class="stat-box-icon">🌳</span>
+            </div>
+            <div class="stat-box-val" id="impactTreesSaved">1,5 pohon</div>
+            <div class="stat-box-sub">Kontribusi hijau</div>
+          </div>
+        </div>
+
+        <div class="card-clean">
+          <div class="section-title-row">
+            <div class="section-title">Komposisi Material Disetor</div>
+          </div>
+          <div id="impactBreakdownBars">
+            <!-- Render via app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SUB-VIEW: RILO LEARN ==================== -->
+      <section class="view-section" id="view-learn">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="icon-btn-badge" data-go-view="more">‹</button>
+          <h2 style="font-size:17px;font-weight:800;">RILO Learn — Panduan</h2>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+          Kenali cara memilah sampah yang tepat agar nilai daur ulangnya maksimal.
+        </p>
+
+        <div id="learnGuidesList">
+          <!-- Render via app.js -->
+        </div>
+      </section>
+
+      <!-- ==================== SUB-VIEW: KOMUNITAS ==================== -->
+      <section class="view-section" id="view-community">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="icon-btn-badge" data-go-view="more">‹</button>
+          <h2 style="font-size:17px;font-weight:800;">Gerakan Komunitas</h2>
+        </div>
+
+        <!-- Banner Challenge -->
+        <div class="community-hero">
+          <h3>Tantangan Pilah Bareng Kampus</h3>
+          <p>Bersama kumpulkan 1.000 kg sampah daur ulang bulan ini!</p>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span>Progres Bersama</span>
+            <strong id="commCurrentKg">720 kg / 1.000 kg</strong>
+          </div>
+          <div class="progress-container" style="background:rgba(255,255,255,0.3);margin:0;">
+            <div class="progress-fill" id="commTargetBar" style="background:#fff;width:72%;"></div>
+          </div>
+        </div>
+
+        <div class="card-clean">
+          <div class="section-title-row">
+            <div class="section-title">🏆 Papan Peringkat (Leaderboard)</div>
+          </div>
+          <div id="commLeaderboardRows">
+            <!-- Render via app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SUB-VIEW: EDIT PROFIL ==================== -->
+      <section class="view-section" id="view-profile">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="icon-btn-badge" data-go-view="more">‹</button>
+          <h2 style="font-size:17px;font-weight:800;">Pengaturan Profil</h2>
+        </div>
+
+        <div class="card-clean">
+          <form id="formEditProfile">
+            <div class="input-group">
+              <label class="input-label" for="profInputName">Nama Lengkap</label>
+              <input type="text" id="profInputName" class="input-text" value="Kaila Zanita" required />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="profInputEmail">Alamat Email</label>
+              <input type="email" id="profInputEmail" class="input-text" value="kaila.zanita@example.com" required />
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="profInputAddress">Alamat Penjemputan Utama</label>
+              <textarea id="profInputAddress" class="input-textarea" rows="2">Jl. Margonda Raya No. 12, Depok, Jawa Barat</textarea>
+            </div>
+            <button type="submit" class="btn-primary-mobile">Simpan Perubahan</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav">
+      <button class="nav-tab-item active" data-nav="home">
+        <span class="tab-icon">⌂</span>
+        <span>Beranda</span>
+      </button>
+
+      <button class="nav-tab-item" data-nav="transactions">
+        <span class="tab-icon">🧾</span>
+        <span>Riwayat</span>
+      </button>
+
+      <!-- FAB Setor di Tengah -->
+      <div class="nav-tab-fab" data-nav="deposit">
+        <div class="fab-circle">♻️</div>
+        <span>Setor</span>
+      </div>
+
+      <button class="nav-tab-item" data-nav="rewards">
+        <span class="tab-icon">🎁</span>
+        <span>Reward</span>
+      </button>
+
+      <button class="nav-tab-item" data-nav="more">
+        <span class="tab-icon">☰</span>
+        <span>Lainnya</span>
+      </button>
+    </nav>
+
+    <!-- TOAST NOTIFIKASI -->
+    <div class="mobile-toast" id="mobileToast" role="status">
+      <span id="toastIcon" style="font-size:16px;">✓</span>
+      <span id="toastMsg">Setoran berhasil dicatat!</span>
+    </div>
+
+    <!-- BACKDROP BOTTOM SHEET -->
+    <div class="bottom-sheet-backdrop" id="bottomSheetBackdrop"></div>
+
+    <!-- BOTTOM SHEET: DETAIL TRANSAKSI -->
+    <div class="bottom-sheet" id="sheetTxDetail">
+      <div class="sheet-handle-bar"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">Rincian Setoran</span>
+        <button class="sheet-close-btn">&times;</button>
+      </div>
+      <div id="txDetailSheetContent">
+        <!-- Render dinamis via app.js -->
+      </div>
+    </div>
+
+    <!-- BOTTOM SHEET: KONFIRMASI REDEEM REWARD -->
+    <div class="bottom-sheet" id="sheetRedeem">
+      <div class="sheet-handle-bar"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">Tukar Poin RILO</span>
+        <button class="sheet-close-btn">&times;</button>
+      </div>
+      <div id="redeemSheetContent">
+        <!-- Render dinamis via app.js -->
+      </div>
+    </div>
+
+    <!-- BOTTOM SHEET: DETAIL PANDUAN EDUKASI -->
+    <div class="bottom-sheet" id="sheetGuide">
+      <div class="sheet-handle-bar"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">Edukasi Memilah</span>
+        <button class="sheet-close-btn">&times;</button>
+      </div>
+      <div id="guideSheetContent">
+        <!-- Render dinamis via app.js -->
+      </div>
+    </div>
+
+    <!-- BOTTOM SHEET: NOTIFIKASI -->
+    <div class="bottom-sheet" id="sheetNotif">
+      <div class="sheet-handle-bar"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">Notifikasi RILO</span>
+        <button class="sheet-close-btn">&times;</button>
+      </div>
+      <div id="notifSheetContent">
+        <!-- Render dinamis via app.js -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPT FILES -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
