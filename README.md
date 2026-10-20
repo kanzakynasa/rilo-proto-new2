@@ -1,87 +1,68 @@
-<<<<<<< HEAD
-# RILO — Web Mobile Prototype Bank Sampah Terintegrasi
+# RILO Mobile Prototype — Bank Sampah Terintegrasi
 
-Aplikasi web mobile prototype (SPA - Single Page Application) untuk demonstrasi inovasi bank sampah digital **RILO (Waste, returned with value)**. 
+Aplikasi web mobile prototype (SPA - Single Page Application) untuk demonstrasi inovasi bank sampah digital **RILO (Waste to Value)**. 
 
-Didesain khusus dengan pendekatan **Mobile-First UX** yang menyerupai aplikasi Android / iOS asli dengan *Bottom Navigation Bar*, *Bottom Sheet Modals*, *Floating Action Button (Setor)*, dan *Interactive State Management*.
+Didesain mengadopsi arsitektur visual **RuntahPedia v2** dengan palet warna signature RILO (*Deep Wine Burgundy `#761a38`* dan *Eco Emerald `#15803d`*). Seluruh emoji generik template AI telah digantikan oleh **Clean SVG Icons** modern, lengkap dengan peta interaktif (*Leaflet.js*) pencari titik Smart Drop Box.
 
 ---
 
-## 📱 Arsitektur & Struktur File
-Proyek ini dibangun modular tanpa framework (Zero Dependency, Pure Vanilla HTML5, CSS3, & Modern JS ES6) sehingga sangat ringan, cepat dibuka di smartphone, dan siap dihubungkan ke backend REST API (PHP & MySQL / phpMyAdmin).
+## 📱 Arsitektur & Struktur Proyek
 
 ```text
 rilo-prototype/
 │
-├── index.html          # Shell aplikasi web mobile utama & container layout
+├── index.html          # Shell aplikasi web mobile (App Bar, Router Panel, Dock Navbar, Sheet Modal)
 ├── css/
-│   └── style.css       # Design system mobile, bottom bar, bottom sheet, & tema wine RILO
+│   └── style.css       # Design System RuntahPedia v2 (Pure mobile 100dvh, wine theme, cards, stepper)
 ├── js/
-│   ├── data.js         # Mock database in-memory (skema tabel: users, materials, deposits, rewards)
-│   └── app.js          # Controller, router tampilan, kalkulator poin live, & interaksi
-└── README.md           # Dokumentasi & panduan deployment
+│   ├── icons.js        # Library Ikon Vektor SVG Clean (Anti-AI Slop)
+│   ├── data.js         # Mock Database In-Memory & Titik Koordinat Smart Drop Box
+│   └── app.js          # Router, Controller, Leaflet Map Integration, & Realtime State
+└── README.md           # Dokumentasi & Panduan Deployment
 ```
 
 ---
 
-## 🚀 Fitur Unggulan Web Mobile
+## ✨ Fitur Unggulan Sesuai Referensi RuntahPedia
+
 1. **Beranda (Home)**:
-   - Dompet digital RILO Points dengan gradien elegan.
-   - Ringkasan total sampah disetor (kg), total transaksi, dan progres target bulanan.
-   - Menu aksi cepat (*Quick Actions*) dan daftar 3 transaksi terakhir.
-2. **Form Setor Sampah Interaktif (FAB Setor)**:
-   - Visual chip selector untuk 6 jenis material sampah (Plastik PET, HDPE, Kertas, Kardus, Kaleng/Logam, Kaca).
-   - Live Point Calculator (kalkulasi poin otomatis secara realtime saat berat/material diubah).
-   - Pilihan metode: **Drop-off** (antar mandiri ke RILO Point) atau **Pickup** (jemput driver).
-   - Notifikasi sukses mengambang (Toast Notification).
-3. **Riwayat Transaksi (History)**:
-   - Filter status dinamis (*Semua*, *Selesai*, *Menunggu*).
-   - Klik kartu transaksi untuk membuka **Bottom Sheet Struk/Invoice Rincian Setoran**.
-4. **Katalog Reward & Voucher**:
-   - Menampilkan saldo poin aktif.
-   - Penukaran reward (voucher kopi/F&B, ongkir penjemputan, merchandise tote bag, donasi bibit pohon).
-   - Dialog konfirmasi penukaran poin + *generator voucher code* simulasi.
-5. **Dampak Lingkungan (Eco Impact)**:
-   - Visualisasi kg sampah terkelola, estimasi emisi $CO_2$ yang dicegah, dan ekuivalen pohon tertanam.
-   - Grafik persentase komposisi jenis sampah yang telah disetor.
-6. **RILO Learn**:
-   - Panduan memilah sampah yang benar untuk edukasi nasabah bank sampah.
-7. **Tantangan Komunitas & Leaderboard**:
-   - Papan peringkat antar komunitas dan progres pengumpulan sampah bersama.
-8. **Pengaturan Akun & Profil**:
-   - Form ganti nama pengguna, email, dan alamat penjemputan.
-   - Tombol **Reset Data Demo** untuk mengembalikan state awal kapan saja.
+   - **Header Lokasi**: Menampilkan geolokasi nasabah (`📍 Margonda, Depok · Drop Point: 120m`).
+   - **Kartu Poin**: Menampilkan saldo poin (`1.240 pts`) + estimasi konversi rupiah (`≈ Rp 12.400`), badge status nasabah, serta tombol aksi **Tukar Hadiah** dan **Voucher Saya** (tanpa tombol setor sampah di kartu ini).
+   - **Peta Interaktif Drop Box**: Peta OpenStreetMap (Leaflet.js) yang disematkan langsung di beranda untuk mengecek titik Smart Drop Box terdekat di Depok/Kampus dengan marker pin RILO berdenyut dan tombol *"Scan & Buka"*.
+   - **Grid 4 Layanan Utama**: *Scan & Setor*, *Cari Drop Box (Peta Penuh)*, *Tukar Hadiah*, dan *Dampak Hijau*.
+   - **Banner Kampanye**: Kartu tantangan kampus pilah botol berhadiah voucher.
+   - **Aktivitas Terakhir**: 3 transaksi setoran terbaru.
+
+2. **Alur Scan QR Terlebih Dahulu Sebelum Input**:
+   - Membuka menu *Setor* akan membawa pengguna ke **Layar Scanner QR**.
+   - Tampilan viewfinder kamera realistis dengan animasi laser scan beam merah/wine, deteksi Smart Drop Box terdekat, dan tombol konfirmasi *"Hubungkan Drop Box & Buka Pintu"*.
+
+3. **Input Setoran Sampah (2 Kategori Spesifik)**:
+   - **Satuan per Ukuran (Per Piece)**:
+     - Botol Plastik PET (250 ml, 330 ml, 600 ml, 1.500 ml)
+     - Kaleng Minuman (250 ml, 330 ml, 500 ml)
+     - Tutup Botol Plastik (pcs)
+     - Botol Kaca (300 ml, 500 ml, 1.000 ml)
+     - Kemasan Karton Minuman Tetra Pak (125 ml, 200 ml, 250 ml, 1.000 ml)
+     - Dilengkapi stepper counter tactile `[−]` `[qty]` `[+]` dan ikon SVG kemasan bersih.
+   - **Timbangan Kiloan (Per Kg)**:
+     - Plastik Campuran, Kardus Paket, Kertas HVS, Kaleng & Besi, Kaca & Beling.
+   - **Sticky Bottom Checkout Bar**: Kalkulasi total poin realtime dan tombol *"Konfirmasi & Setor"*.
+
+4. **Katalog Voucher & Voucher Saya (Poin Berkurang Pasti)**:
+   - Desain kupon modern dengan brand partner (*Kopi Kenangan, Sayurbox, dll.*).
+   - Saat ditukar: Saldo poin langsung berkurang seketika dan kupon masuk ke tab **Voucher Saya** lengkap dengan kode kupon unik dan tanggal kedaluwarsa.
+
+5. **Peta Penuh Titik Drop Box (`map-full`)**:
+   - Navigasi peta menyeluruh untuk melihat semua titik Smart Drop Box dan Mitra Hub RILO.
 
 ---
 
-## 🌐 Cara Hosting Gratis di GitHub Pages
+## 🌐 Cara Menjalankan & Hosting di GitHub Pages
 
-Karena proyek ini bersifat client-side static web:
-1. Pastikan seluruh folder `rilo-prototype` (termasuk folder `css/` dan `js/`) di-push ke repository GitHub Anda:
-   ```bash
-   git add .
-   git commit -m "Update RILO Web Mobile Prototype"
-   git push origin main
-   ```
-2. Buka repository Anda di browser GitHub.
-3. Masuk ke tab **Settings** → menu **Pages** (di sidebar kiri).
-4. Di bagian **Build and deployment**:
-   - **Source**: Pilih *Deploy from a branch*.
-   - **Branch**: Pilih *main* (atau *master*) dan folder */(root)*.
-   - Klik **Save**.
-5. Tunggu sekitar 1–2 menit, GitHub Pages akan memberikan link publik (misalnya: `https://username.github.io/rilo-prototype/`).
-6. Buka link tersebut di smartphone Anda. Anda juga bisa memilih *"Add to Home Screen"* di browser Chrome/Safari smartphone untuk pengalaman seperti aplikasi native!
-
----
-
-## 🗄️ Persiapan Integrasi ke PHP & phpMyAdmin (Tahap Lanjutan)
-Struktur di `js/data.js` telah dimodelkan sesuai entitas database relasional:
-- Tabel `users` $\rightarrow$ kolom `id`, `name`, `email`, `address`, `points`, `total_weight`
-- Tabel `materials` $\rightarrow$ kolom `code`, `name`, `rate_points`, `unit`
-- Tabel `deposits` $\rightarrow$ kolom `id`, `user_id`, `material_code`, `weight`, `method`, `points_earned`, `status`
-- Tabel `rewards` $\rightarrow$ kolom `id`, `title`, `points_cost`, `icon`
-
-Saat backend PHP sudah siap, logic di `js/app.js` cukup digantikan dengan `fetch('/api/deposit.php')` atau AJAX endpoint.
-=======
-# rilo-proto-new2
->>>>>>> 8d56aed5ca437cbda1aa350919a2f1c6123bc86f
+1. **Jalankan Secara Lokal**: Cukup buka file `index.html` di browser Anda.
+2. **Hosting Gratis di GitHub Pages**:
+   - Push seluruh file di dalam folder `rilo-prototype` ke repository GitHub Anda.
+   - Buka **Settings** → **Pages** pada repository.
+   - Di bagian *Build and deployment*, pilih branch `main` dan folder `/(root)`, lalu klik **Save**.
+   - Akses URL yang diberikan di smartphone Anda.
