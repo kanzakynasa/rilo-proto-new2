@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # RILO — Web Mobile Prototype Bank Sampah Terintegrasi
 
 Aplikasi web mobile prototype (SPA - Single Page Application) untuk demonstrasi inovasi bank sampah digital **RILO (Waste, returned with value)**. 
@@ -81,3 +82,6 @@ Struktur di `js/data.js` telah dimodelkan sesuai entitas database relasional:
 - Tabel `rewards` $\rightarrow$ kolom `id`, `title`, `points_cost`, `icon`
 
 Saat backend PHP sudah siap, logic di `js/app.js` cukup digantikan dengan `fetch('/api/deposit.php')` atau AJAX endpoint.
+=======
+# rilo-proto-new2
+>>>>>>> 8d56aed5ca437cbda1aa350919a2f1c6123bc86f
