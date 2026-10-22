@@ -84,13 +84,23 @@
 
     <!-- ==================== TOP USER HEADER (AVATAR SQUIRCLE NON-LINGKARAN) ==================== -->
     <header class="top-user-row">
-      <div>
-        <div class="user-greeting" id="homeGreetingName">Halo, Kaila!</div>
-        <div class="user-subtext" data-i18n="subGreeting">Sudah pilah sampah hari ini?</div>
+      <div class="user-info-cluster">
+        <!-- Profil Non-Lingkaran (Squircle Modern) -->
+        <div class="profile-avatar-squircle" data-go="profile" title="Profil Pengguna">
+          <span id="homeAvatarText">K</span>
+        </div>
+        <div>
+          <div class="user-greeting-pill">
+            <span class="user-greeting" id="homeGreetingName">Halo, Kaila!</span>
+            <span class="pcc-tier-badge" id="userLevelPill">Pahlawan Hijau</span>
+          </div>
+          <div class="user-subtext" data-i18n="subGreeting">Yuk daur ulang sampahmu sekarang</div>
+        </div>
       </div>
-      <!-- Profil Non-Lingkaran (Squircle Modern) -->
-      <div class="profile-avatar-squircle" data-go="profile" title="Profil Pengguna">
-        <span id="homeAvatarText">K</span>
+      <div class="header-action-icons">
+        <button class="btn-header-bell" data-go="rewards" title="Hadiah & Voucher">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </button>
       </div>
     </header>
 
@@ -103,25 +113,26 @@
         <!-- COMPACT POINT STRIP CARD (MENYATU, RAMPING & TIDAK MAKAN TEMPAT) -->
         <div class="point-compact-card">
           <div class="pcc-left">
-            <div class="pcc-tier-row">
-              <span class="pcc-tier-badge" id="userLevelPill">Pahlawan Hijau</span>
-              <span class="pcc-rupiah" id="walletConversionRupiah">≈ Rp 12.400</span>
+            <div class="pcc-title-row">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+              <span class="pcc-label" data-i18n="walletTitle">Saldo RILO Poin</span>
             </div>
             <div class="pcc-points-row">
               <span class="pcc-number" id="walletPointsBigVal">1.240</span>
-              <span class="pcc-label">pts</span>
+              <span class="pcc-unit">pts</span>
+              <span class="pcc-rupiah" id="walletConversionRupiah">≈ Rp 12.400</span>
             </div>
           </div>
 
-          <!-- Aksi Poin: Tukar Hadiah & Voucher Saya -->
+          <!-- Aksi Poin: Tukar Hadiah & Voucher Saya (Tanpa Tombol Setor) -->
           <div class="pcc-right-actions">
-            <button class="btn-point-compact" data-go="rewards">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
+            <button class="btn-point-compact btn-point-primary" data-go="rewards">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
               <span data-i18n="btnRedeemReward">Tukar</span>
             </button>
             <button class="btn-point-compact" data-go="my-vouchers">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-              <span data-i18n="btnMyVouchers">Voucher</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+              <span data-i18n="btnMyVouchers">Kupon</span>
             </button>
           </div>
         </div>
@@ -139,7 +150,7 @@
           <!-- Peta Leaflet Berpusat di Bintaro -->
           <div class="map-canvas-container" id="homeDropMap"></div>
 
-          <!-- Info Drop Box Terdekat Bintaro (Murni Informasi, Tanpa Tombol Scan) -->
+          <!-- Info Drop Box Terdekat Bintaro (Murni Informasi, Tanpa Tombol Scan Sesuai Arahan) -->
           <div class="map-nearest-info-clean">
             <div class="mn-clean-left">
               <strong id="nearestDropBoxName">Smart Drop Box Bintaro Xchange</strong>
@@ -149,7 +160,7 @@
           </div>
         </div>
 
-        <!-- 4 MENU LAYANAN UTAMA RUNTAHPEDIA -->
+        <!-- MENU LAYANAN UTAMA RUNTAHPEDIA (GRID 4 DENGAN IKON FIGMA CLEAN) -->
         <div class="services-section-title" data-i18n="servicesTitle">Layanan Daur Ulang</div>
         <div class="services-grid-4">
           <button class="service-btn-card" data-go="deposit">
