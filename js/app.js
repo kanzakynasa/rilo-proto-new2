@@ -380,25 +380,60 @@ function initFullBintaroMap() {
   renderFullMapBoxList();
 }
 
+let mapSearchQuery = "";
+
+function filterMapLocationsList(query) {
+  mapSearchQuery = (query || "").toLowerCase();
+  renderFullMapBoxList();
+}
+
 function renderFullMapBoxList() {
   const container = document.getElementById("fullMapListLocations");
+  const countEl = document.getElementById("fullMapCountText");
   if (!container) return;
 
   const isEn = AppState.currentLang === "en";
 
-  container.innerHTML = AppState.qrLocations.map((b) => `
-    <div class="clean-item-card">
-      <div class="cic-left">
-        <div class="cic-icon-wrap" style="color:var(--rilo-wine);">${ICONS.pin}</div>
-        <div class="cic-text">
-          <strong>${b.name}</strong>
-          <span>${b.location} • ${b.distance}</span>
-        </div>
+  const list = AppState.qrLocations.filter((b) => {
+    if (!mapSearchQuery) return true;
+    return b.name.toLowerCase().includes(mapSearchQuery) || b.location.toLowerCase().includes(mapSearchQuery);
+  });
+
+  if (countEl) {
+    countEl.textContent = isEn ? `${list.length} Stations Available` : `${list.length} Titik Siap Terima`;
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:28px 16px;background:#fff;border-radius:14px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No drop point matches search.' : 'Tidak ada titik yang cocok dengan pencarian.'}</p>
       </div>
-      <span class="badge-tag-status">${isEn ? b.statusEn : b.status}</span>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map((b) => `
+    <div class="box-station-card" onclick="focusMapStationMarker('${b.id}')">
+      <div class="bsc-meta">
+        <strong>${b.name}</strong>
+        <span>${b.location}</span>
+        <small style="font-size:10px;color:var(--text-muted);">${b.operatingHours}</small>
+      </div>
+      <div class="bsc-badges">
+        <span class="bsc-dist-pill">${b.distance}</span>
+        <span class="bsc-status-pill">${isEn ? b.statusEn : b.status}</span>
+      </div>
     </div>
   `).join("");
 }
+
+window.focusMapStationMarker = function(boxId) {
+  const box = AppState.qrLocations.find(x => x.id === boxId);
+  if (box && fullMapInstance) {
+    fullMapInstance.setView([box.lat, box.lng], 16, { animate: true });
+    showToast(`Lokasi: ${box.name}`, true);
+  }
+};
 
 // === FLOW SCAN QR DROP BOX ===
 function openQrScanFlow() {

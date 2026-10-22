@@ -612,6 +612,99 @@ html, body {
   background: rgba(255, 255, 255, 0.28);
 }
 
+/* === FULL MAP SEARCH & LIST STYLES (RUNTAHPEDIA SPEC) === */
+.map-search-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.map-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--text-main);
+  background: transparent;
+}
+
+.map-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.full-map-card-canvas {
+  height: 250px;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-line);
+  box-shadow: var(--shadow-card);
+}
+
+.box-station-card {
+  background: var(--surface);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.box-station-card:active {
+  transform: scale(0.98);
+  border-color: var(--rilo-wine-border);
+}
+
+.bsc-meta strong {
+  font-size: 13px;
+  color: var(--text-main);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.bsc-meta span {
+  font-size: 11px;
+  color: var(--text-sub);
+  display: block;
+}
+
+.bsc-badges {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.bsc-dist-pill {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--rilo-wine);
+  background: var(--rilo-wine-soft);
+  padding: 2px 7px;
+  border-radius: var(--radius-squircle);
+}
+
+.bsc-status-pill {
+  font-size: 10px;
+  font-weight: 750;
+  color: var(--eco-emerald);
+  background: var(--eco-emerald-soft);
+  padding: 2px 7px;
+  border-radius: var(--radius-squircle);
+}
+
 /* === CARD MAP DROP POINT BINTARO (TANPA TOMBOL SCAN DI DALAMNYA) === */
 .map-preview-card {
   background: var(--surface);

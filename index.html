@@ -367,12 +367,21 @@
           </div>
         </div>
 
-        <!-- Full Map Container Bintaro -->
-        <div style="height:250px;width:100%;border-radius:14px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border-line);" id="fullDropMapContainer"></div>
+        <!-- Search & Filter Bintaro Stations -->
+        <div class="map-search-bar-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="inputSearchDropMap" class="map-search-input" placeholder="Cari titik drop box di Bintaro..." oninput="filterMapLocationsList(this.value)" />
+        </div>
 
-        <div class="services-section-title">Titik Drop Box Bintaro</div>
+        <!-- Full Map Container Bintaro -->
+        <div class="full-map-card-canvas" id="fullDropMapContainer"></div>
+
+        <div class="section-head-row" style="margin-top:14px;margin-bottom:8px;">
+          <h4 style="font-size:13px;font-weight:800;">Daftar Titik Drop Box Bintaro</h4>
+          <span style="font-size:11px;color:var(--text-muted);" id="fullMapCountText">4 Titik Siap Terima</span>
+        </div>
         <div class="activity-list-container" id="fullMapListLocations">
-          <!-- Render via app.js (Murni Informasi tanpa scan di dalam list) -->
+          <!-- Render via app.js -->
         </div>
       </section>
 
