@@ -557,7 +557,12 @@ const INITIAL_DATA = {
       labelPassword: "Kata Sandi",
       tabSignIn: "Masuk",
       tabSignUp: "Daftar Akun",
-      btnLogout: "Keluar Akun"
+      btnLogout: "Keluar Akun",
+      tabAll: "All",
+      tabFood: "Food",
+      tabShopping: "Shopping",
+      tabMerch: "Merch",
+      tabDonate: "Donate"
     },
     en: {
       subGreeting: "Have you sorted your waste today?",
@@ -616,7 +621,12 @@ const INITIAL_DATA = {
       labelPassword: "Password",
       tabSignIn: "Sign In",
       tabSignUp: "Register",
-      btnLogout: "Sign Out"
+      btnLogout: "Sign Out",
+      tabAll: "All",
+      tabFood: "Food",
+      tabShopping: "Shopping",
+      tabMerch: "Merch",
+      tabDonate: "Donate"
     }
   }
 };

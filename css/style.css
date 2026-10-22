@@ -332,6 +332,36 @@ html, body {
   gap: 8px;
 }
 
+.user-tier-badge-glow {
+  background: linear-gradient(135deg, #15803d, #10b981);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 850;
+  padding: 3px 9px;
+  border-radius: var(--radius-squircle);
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5), 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  position: relative;
+  overflow: hidden;
+  animation: heroBlinkPulse 2.8s infinite ease-in-out;
+}
+
+.user-tier-badge-glow::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: rotate(25deg);
+  animation: heroShimmerGleam 2.8s infinite ease-in-out;
+}
+
 .user-greeting {
   font-size: 17px;
   font-weight: 850;
@@ -408,119 +438,178 @@ html, body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* === COMPACT POINT STRIP CARD (RUNTAHPEDIA COMPACT DESIGN) === */
-.point-compact-card {
-  background: var(--surface);
+/* === SIGNATURE RUNTAHPEDIA/RILO WINE POINT CARD (FIGMA AUTHENTIC) === */
+.wine-card {
+  background: linear-gradient(135deg, var(--rilo-wine), #963754);
+  color: #ffffff;
   border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  border: 1px solid var(--border-line);
-  box-shadow: var(--shadow-card);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  padding: 18px 20px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 10px 26px rgba(118, 26, 56, 0.28);
+  margin-bottom: 16px;
 }
 
-.point-compact-card::before {
+.wine-card::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--rilo-wine);
+  width: 170px;
+  height: 170px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  right: -50px;
+  top: -60px;
+  box-shadow: 0 0 0 20px rgba(255, 255, 255, 0.05), 0 0 0 40px rgba(255, 255, 255, 0.03);
+  pointer-events: none;
 }
 
-.pcc-left {
+.wine-card-top {
   display: flex;
-  flex-direction: column;
-}
-
-.pcc-title-row {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  color: var(--text-sub);
-  margin-bottom: 2px;
+  position: relative;
+  z-index: 1;
 }
 
-.pcc-tier-badge {
-  background: var(--eco-emerald-soft);
-  color: var(--eco-emerald);
-  font-size: 10px;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: var(--radius-squircle);
-  letter-spacing: 0.3px;
-}
-
-.pcc-points-row {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.pcc-number {
-  font-size: 26px;
-  font-weight: 850;
-  color: var(--rilo-wine);
-  letter-spacing: -0.5px;
-  line-height: 1.1;
-}
-
-.pcc-unit {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--rilo-wine);
-}
-
-.pcc-label {
+.wine-card-label {
   font-size: 11px;
   font-weight: 750;
-  color: var(--text-sub);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.pcc-rupiah {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-left: 2px;
-}
-
-.pcc-right-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.btn-point-compact {
-  background: var(--surface-subtle);
-  color: var(--text-main);
-  border: 1px solid var(--border-line);
-  padding: 8px 11px;
-  border-radius: var(--radius-xs);
-  font-size: 11px;
-  font-weight: 750;
-  cursor: pointer;
+  letter-spacing: 0.8px;
+  color: #f7e3eb;
   display: flex;
   align-items: center;
   gap: 5px;
-  white-space: nowrap;
-  transition: all 0.15s;
 }
 
-.btn-point-compact.btn-point-primary {
-  background: var(--rilo-wine-soft);
+.wine-card-tier {
+  background: linear-gradient(135deg, #15803d, #10b981);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 850;
+  padding: 3px 9px;
+  border-radius: var(--radius-squircle);
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.65), 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+  animation: heroBlinkPulse 2.8s infinite ease-in-out;
+}
+
+.wine-card-tier::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  transform: rotate(25deg);
+  animation: heroShimmerGleam 2.8s infinite ease-in-out;
+}
+
+@keyframes heroBlinkPulse {
+  0% {
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.35);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.85), 0 0 22px rgba(52, 211, 153, 0.5);
+    border-color: rgba(255, 255, 255, 0.95);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.35);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+}
+
+@keyframes heroShimmerGleam {
+  0% { left: -60%; }
+  30% { left: 160%; }
+  100% { left: 160%; }
+}
+
+.wine-points-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 10px 0 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.wine-points-num {
+  font-size: 34px;
+  font-weight: 850;
+  letter-spacing: -0.8px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.wine-points-unit {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fce8f0;
+}
+
+.wine-points-rupiah {
+  font-size: 11px;
+  font-weight: 600;
+  color: #f5d4e1;
+  margin-left: 4px;
+}
+
+.wine-card-desc {
+  font-size: 11px;
+  color: #f8e5ee;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.wine-card-actions {
+  display: flex;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.btn-wine-card-action {
+  background: #ffffff;
   color: var(--rilo-wine);
-  border-color: var(--rilo-wine-border);
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.15s ease;
 }
 
-.btn-point-compact:active {
+.btn-wine-card-action:active {
   transform: scale(0.96);
+  background: #fdf5f8;
+}
+
+.btn-wine-card-secondary {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.btn-wine-card-secondary:active {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 /* === CARD MAP DROP POINT BINTARO (TANPA TOMBOL SCAN DI DALAMNYA) === */
@@ -1141,6 +1230,248 @@ html, body {
 .btn-confirm-deposit-cta:disabled {
   background: var(--text-muted);
   box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* === REWARD & EXCHANGE PAGE (ALA RUNTAHPEDIA NODE 113:1077 / 136:2494) === */
+.exchange-header-card {
+  background: linear-gradient(135deg, var(--rilo-wine), #963754);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-wine);
+  position: relative;
+  overflow: hidden;
+}
+
+.exchange-header-card::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  right: -20px;
+  top: -30px;
+  pointer-events: none;
+}
+
+.ehc-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.ehc-label {
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #f7e3eb;
+}
+
+.ehc-points-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 3px 0 1px;
+}
+
+.ehc-points-val {
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.ehc-points-unit {
+  font-size: 13px;
+  font-weight: 750;
+  color: #fce8f0;
+}
+
+.ehc-rupiah-est {
+  font-size: 11px;
+  color: #f5d4e1;
+  font-weight: 600;
+}
+
+.btn-ehc-my-vouchers {
+  background: #ffffff;
+  color: var(--rilo-wine);
+  border: none;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-ehc-my-vouchers:active {
+  transform: scale(0.96);
+  background: #fdf5f8;
+}
+
+.ehc-counter-badge {
+  background: var(--rilo-wine);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 850;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+/* Category Filter Chips */
+.exchange-category-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 5;
+}
+
+.exchange-category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-filter-btn {
+  background: var(--surface);
+  color: var(--text-sub);
+  border: 1px solid var(--border-line);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.15s ease;
+}
+
+.chip-filter-btn:active {
+  transform: scale(0.95);
+}
+
+.chip-filter-btn.active {
+  background: var(--rilo-wine);
+  color: #fff;
+  border-color: var(--rilo-wine);
+  box-shadow: 0 2px 8px rgba(118, 26, 56, 0.35);
+}
+
+/* Exchange Voucher Card Layout (Figma Coupon Pattern) */
+.exchange-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exchange-item-ticket {
+  background: var(--surface);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s ease;
+}
+
+.exchange-item-ticket:active {
+  transform: scale(0.98);
+}
+
+.eit-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.eit-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-squircle);
+  background: var(--rilo-wine-soft);
+  color: var(--rilo-wine);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.eit-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.eit-partner-tag {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.eit-info strong {
+  font-size: 13px;
+  color: var(--text-main);
+  margin: 1px 0 2px;
+}
+
+.eit-info p {
+  font-size: 11px;
+  color: var(--text-sub);
+  line-height: 1.3;
+}
+
+.eit-right-cost {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.eit-cost-badge {
+  font-size: 13px;
+  font-weight: 850;
+  color: var(--rilo-wine);
+}
+
+.btn-redeem-ticket {
+  background: var(--rilo-wine);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-redeem-ticket:disabled {
+  background: var(--text-muted);
   cursor: not-allowed;
 }
 

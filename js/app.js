@@ -25,6 +25,7 @@ function initApp() {
   setupQrScanner();
   setupDepositModeSwitcher();
   setupDepositItems();
+  setupRewardCategoryFilters();
   setupProfileForm();
   renderAllViews();
   setTimeout(initBintaroHomeMap, 300);
@@ -178,9 +179,24 @@ function setLanguage(lang) {
 
   // Re-render semua komponen dengan bahasa yang dipilih
   applyLanguageTranslations();
+  updateCategoryLabels(lang);
   renderAllViews();
   setupDepositItems();
+  setupRewardCategoryFilters();
   showToast(lang === "en" ? "Language changed to English" : "Bahasa diubah ke Bahasa Indonesia", true);
+}
+
+function updateCategoryLabels(lang) {
+  const isEn = lang === "en";
+  const chips = document.querySelectorAll("#exchangeFilterBar .chip-filter-btn");
+  chips.forEach((chip) => {
+    const f = chip.getAttribute("data-filter");
+    if (f === "all") chip.textContent = isEn ? "All" : "Semua";
+    else if (f === "Kuliner") chip.textContent = isEn ? "Food" : "Kuliner";
+    else if (f === "Belanja") chip.textContent = isEn ? "Shopping" : "Belanja";
+    else if (f === "Merchandise") chip.textContent = isEn ? "Merch" : "Merchandise";
+    else if (f === "Donasi") chip.textContent = isEn ? "Donate" : "Donasi";
+  });
 }
 
 function applyLanguageTranslations() {
@@ -242,6 +258,19 @@ function setupNavigation() {
   });
 
   document.addEventListener("click", (e) => {
+    // 1. Tangani filter chips kategori voucher di halaman Hadiah
+    const chip = e.target.closest("#exchangeFilterBar .chip-filter-btn");
+    if (chip) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.querySelectorAll("#exchangeFilterBar .chip-filter-btn").forEach((b) => b.classList.remove("active"));
+      chip.classList.add("active");
+      activeRewardFilter = chip.getAttribute("data-filter") || "all";
+      renderRewards();
+      return;
+    }
+
+    // 2. Tangani navigasi view universal
     const trigger = e.target.closest("[data-go]");
     if (trigger) {
       const page = trigger.dataset.go;
@@ -689,7 +718,12 @@ function renderHome() {
 
   document.getElementById("locationTagText").textContent = user.locationTag;
   document.getElementById("homeGreetingName").textContent = isEn ? `Hello, ${user.name.split(" ")[0]}!` : `Halo, ${user.name.split(" ")[0]}!`;
-  document.getElementById("userLevelPill").textContent = isEn ? user.levelNameEn : user.levelName;
+  const heroTitle = isEn ? "★ Eco Hero" : "★ Pahlawan Hijau";
+  const pillEl = document.getElementById("userLevelPill");
+  if (pillEl) pillEl.textContent = heroTitle;
+
+  const cardPillEl = document.getElementById("walletCardLevelPill");
+  if (cardPillEl) cardPillEl.textContent = heroTitle;
   document.getElementById("homeAvatarText").textContent = user.avatar || user.name[0];
 
   // Point Compact Strip Card
@@ -761,36 +795,82 @@ function renderTransactions() {
   `).join("");
 }
 
-// 3. Rewards & Penukaran (Poin Pasti Berkurang)
+// 3. Rewards & Penukaran (Exchange RuntahPedia Style)
+let activeRewardFilter = "all";
+
+function setupRewardCategoryFilters() {
+  const chips = document.querySelectorAll("#exchangeFilterBar .chip-filter-btn");
+  chips.forEach((chip) => {
+    chip.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      chips.forEach((c) => c.classList.remove("active"));
+      this.classList.add("active");
+      activeRewardFilter = this.getAttribute("data-filter") || "all";
+      renderRewards();
+    };
+  });
+}
+
+function updateVoucherCounterUI() {
+  const count = (AppState.redemptions && AppState.redemptions.length) ? AppState.redemptions.length : 0;
+  document.querySelectorAll("#myVouchersCounterBadge, .my-vouchers-count-badge, .home-voucher-counter").forEach((el) => {
+    el.textContent = count;
+  });
+}
+
 function renderRewards() {
   const container = document.getElementById("rewardsCardsContainer");
   const balanceEl = document.getElementById("rewardsPointsBalanceDisplay");
+  const rupiahEstEl = document.getElementById("rewardsRupiahEst");
   const isEn = AppState.currentLang === "en";
 
-  if (balanceEl) balanceEl.textContent = `${fmt(AppState.user.points)} pts`;
+  if (balanceEl) balanceEl.textContent = fmt(AppState.user.points);
+  if (rupiahEstEl) rupiahEstEl.textContent = `≈ Rp ${fmt(Math.round(AppState.user.points * 10))}`;
+  
+  updateVoucherCounterUI();
 
   if (!container) return;
 
-  container.innerHTML = AppState.rewards.map((r) => {
+  const filteredRewards = AppState.rewards.filter((r) => {
+    if (activeRewardFilter === "all") return true;
+    return r.tag === activeRewardFilter;
+  });
+
+  if (filteredRewards.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:32px 16px;background:#fff;border-radius:14px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No rewards in this category.' : 'Belum ada hadiah di kategori ini.'}</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filteredRewards.map((r) => {
     const canAfford = AppState.user.points >= r.pointsCost;
     const titleText = isEn ? r.titleEn : r.title;
     const descText = isEn ? r.descriptionEn : r.description;
     const btnText = isEn ? "Redeem" : "Tukar";
 
     return `
-      <div class="voucher-coupon-card">
-        <div class="vcc-badge-box">${ICONS.gift}</div>
-        <div class="vcc-body">
-          <span class="vcc-partner">${r.partner}</span>
-          <strong>${titleText}</strong>
-          <p>${descText}</p>
-          <span class="vcc-cost">${fmt(r.pointsCost)} Poin</span>
+      <div class="exchange-item-ticket">
+        <div class="eit-left">
+          <div class="eit-icon-box">${ICONS.gift}</div>
+          <div class="eit-info">
+            <span class="eit-partner-tag">${r.partner} • ${isEn ? r.tagEn : r.tag}</span>
+            <strong>${titleText}</strong>
+            <p>${descText}</p>
+          </div>
         </div>
-        <button class="btn-redeem-action" 
-                onclick="promptVoucherRedeem('${r.id}')"
-                style="background: ${canAfford ? 'var(--rilo-wine)' : 'var(--text-muted)'}">
-          ${btnText}
-        </button>
+        <div class="eit-right-cost">
+          <span class="eit-cost-badge">${fmt(r.pointsCost)} pts</span>
+          <button class="btn-redeem-ticket" 
+                  onclick="promptVoucherRedeem('${r.id}')"
+                  ${canAfford ? '' : 'disabled'}
+                  style="background: ${canAfford ? 'var(--rilo-wine)' : 'var(--text-muted)'}">
+            ${btnText}
+          </button>
+        </div>
       </div>
     `;
   }).join("");
@@ -854,6 +934,7 @@ window.promptVoucherRedeem = function (rewardId) {
     });
 
     // 3. UPDATE TAMPILAN
+    updateVoucherCounterUI();
     renderAllViews();
 
     // 4. BUKTI KUPON VOUCHER
@@ -887,6 +968,8 @@ function renderMyVouchers() {
   if (!container) return;
   const isEn = AppState.currentLang === "en";
 
+  updateVoucherCounterUI();
+
   if (AppState.redemptions.length === 0) {
     container.innerHTML = `
       <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:14px;border:1px solid var(--border-line);">
@@ -896,20 +979,42 @@ function renderMyVouchers() {
     return;
   }
 
-  container.innerHTML = AppState.redemptions.map((v) => `
-    <div style="background:#fff;border-radius:14px;border:1px solid var(--border-line);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-        <span style="font-size:11px;color:var(--text-muted);font-weight:700;">${v.partner}</span>
-        <span class="badge-tag-status">${isEn ? v.statusEn : v.status}</span>
+  container.innerHTML = AppState.redemptions.map((v) => {
+    const titleText = isEn ? (v.rewardTitleEn || v.rewardTitle) : v.rewardTitle;
+    const statusText = isEn ? (v.statusEn || "Available") : (v.status || "Tersedia");
+
+    return `
+      <div style="background:#fff;border-radius:14px;border:1px solid var(--border-line);padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--text-muted);font-weight:700;">${v.partner}</span>
+          <span class="badge-tag-status">${statusText}</span>
+        </div>
+        <strong style="font-size:13px;display:block;margin-bottom:8px;">${titleText}</strong>
+        <div style="background:var(--rilo-wine-soft);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:14px;letter-spacing:1.5px;font-weight:800;color:var(--rilo-wine);">${v.code}</span>
+          <small style="font-size:10px;color:var(--text-sub);">${isEn ? 'Exp:' : 'Berlaku s/d:'} ${v.expiry}</small>
+        </div>
+        <button class="btn-solid-wine" style="padding:7px;font-size:11px;background:var(--surface-subtle);color:var(--rilo-wine);border:1px solid var(--rilo-wine-border);box-shadow:none;" onclick="useVoucherItem('${v.id}')">
+          ${isEn ? 'Use Voucher Now' : 'Gunakan Voucher Sekarang'}
+        </button>
       </div>
-      <strong style="font-size:13px;display:block;margin-bottom:8px;">${isEn ? v.rewardTitleEn : v.rewardTitle}</strong>
-      <div style="background:var(--rilo-wine-soft);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:14px;letter-spacing:1.5px;font-weight:800;color:var(--rilo-wine);">${v.code}</span>
-        <small style="font-size:10px;color:var(--text-sub);">Exp: ${v.expiry}</small>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
+
+window.useVoucherItem = function(voucherId) {
+  const v = AppState.redemptions.find(x => x.id === voucherId);
+  if (!v) return;
+  const isEn = AppState.currentLang === "en";
+
+  if (confirm(isEn ? `Use voucher "${v.rewardTitle}" now?` : `Gunakan voucher "${v.rewardTitle}" sekarang?`)) {
+    AppState.redemptions = AppState.redemptions.filter(x => x.id !== voucherId);
+    updateVoucherCounterUI();
+    renderAllViews();
+    renderMyVouchers();
+    showToast(isEn ? "Voucher successfully used!" : "Voucher berhasil digunakan!", true);
+  }
+};
 
 // 5. Bukti Struk Transaksi
 window.openTxReceiptModal = function (txId) {

@@ -92,7 +92,7 @@
         <div>
           <div class="user-greeting-pill">
             <span class="user-greeting" id="homeGreetingName">Halo, Kaila!</span>
-            <span class="pcc-tier-badge" id="userLevelPill">Pahlawan Hijau</span>
+            <span class="user-tier-badge-glow" id="userLevelPill">★ Pahlawan Hijau</span>
           </div>
           <div class="user-subtext" data-i18n="subGreeting">Yuk daur ulang sampahmu sekarang</div>
         </div>
@@ -110,29 +110,31 @@
       <!-- ==================== 1. BERANDA (HOME VIEW) ==================== -->
       <section class="view-panel active" id="panel-home">
         
-        <!-- COMPACT POINT STRIP CARD (MENYATU, RAMPING & TIDAK MAKAN TEMPAT) -->
-        <div class="point-compact-card">
-          <div class="pcc-left">
-            <div class="pcc-title-row">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
-              <span class="pcc-label" data-i18n="walletTitle">Saldo RILO Poin</span>
-            </div>
-            <div class="pcc-points-row">
-              <span class="pcc-number" id="walletPointsBigVal">1.240</span>
-              <span class="pcc-unit">pts</span>
-              <span class="pcc-rupiah" id="walletConversionRupiah">≈ Rp 12.400</span>
-            </div>
+        <!-- SIGNATURE RILO WINE POINT CARD (VISUAL LAMA YANG ELEGAN) -->
+        <div class="wine-card">
+          <div class="wine-card-top">
+            <span class="wine-card-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+              <span data-i18n="walletTitle">SALDO POIN RILO</span>
+            </span>
+            <span class="wine-card-tier" id="walletCardLevelPill">★ Pahlawan Hijau</span>
           </div>
-
-          <!-- Aksi Poin: Tukar Hadiah & Voucher Saya (Tanpa Tombol Setor) -->
-          <div class="pcc-right-actions">
-            <button class="btn-point-compact btn-point-primary" data-go="rewards">
+          <div class="wine-points-row">
+            <span class="wine-points-num" id="walletPointsBigVal">1.240</span>
+            <span class="wine-points-unit">pts</span>
+            <span class="wine-points-rupiah" id="walletConversionRupiah">≈ Rp 12.400</span>
+          </div>
+          <p class="wine-card-desc">Tukarkan poinmu dengan voucher kopi, belanja, atau donasi pohon.</p>
+          <!-- Tombol Aksi: Tukar Hadiah & Kupon Saya (Tanpa Tombol Setor) -->
+          <div class="wine-card-actions">
+            <button class="btn-wine-card-action" data-go="rewards">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
-              <span data-i18n="btnRedeemReward">Tukar</span>
+              <span data-i18n="btnRedeemReward">Tukar Hadiah</span>
             </button>
-            <button class="btn-point-compact" data-go="my-vouchers">
+            <button class="btn-wine-card-action btn-wine-card-secondary" data-go="my-vouchers">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-              <span data-i18n="btnMyVouchers">Kupon</span>
+              <span data-i18n="btnMyVouchers">Voucher Saya</span>
+              <span class="ehc-counter-badge home-voucher-counter" style="background:#fff;color:var(--rilo-wine);margin-left:4px;">1</span>
             </button>
           </div>
         </div>
@@ -299,25 +301,39 @@
         </div>
       </section>
 
-      <!-- ==================== 5. KATALOG REWARD & HADIAH ==================== -->
+      <!-- ==================== 5. KATALOG REWARD & HADIAH (EXCHANGE RUNTAHPEDIA) ==================== -->
       <section class="view-panel" id="panel-rewards">
         
-        <div class="point-compact-card" style="margin-bottom:16px;">
-          <div class="pcc-left">
-            <span class="pcc-label" data-i18n="walletTitle">Saldo RILO Poin</span>
-            <div class="pcc-points-row">
-              <span class="pcc-number" id="rewardsPointsBalanceDisplay">1.240 pts</span>
+        <!-- HEADER SALDO POIN RUNTAHPEDIA (WITH POINTS PILL & VOUCHER COUNTER) -->
+        <div class="exchange-header-card">
+          <div class="ehc-meta">
+            <span class="ehc-label" data-i18n="walletTitle">SALDO POIN RILO</span>
+            <div class="ehc-points-row">
+              <span class="ehc-points-val" id="rewardsPointsBalanceDisplay">1.240</span>
+              <span class="ehc-points-unit">pts</span>
             </div>
+            <span class="ehc-rupiah-est" id="rewardsRupiahEst">≈ Rp 12.400</span>
           </div>
-          <button class="btn-point-compact" data-go="my-vouchers" data-i18n="btnMyVouchers">
-            Voucher Saya →
+          <button class="btn-ehc-my-vouchers" data-go="my-vouchers">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+            <span data-i18n="btnMyVouchers">Voucher Saya</span>
+            <span class="ehc-counter-badge" id="myVouchersCounterBadge">1</span>
           </button>
         </div>
 
-        <div class="services-section-title" data-i18n="rewardCatalogTitle">Katalog Hadiah & Voucher</div>
+        <!-- CATEGORY FILTER CHIPS -->
+        <div class="exchange-category-scroll" id="exchangeFilterBar">
+          <button type="button" class="chip-filter-btn active" data-filter="all">All</button>
+          <button type="button" class="chip-filter-btn" data-filter="Kuliner">Food</button>
+          <button type="button" class="chip-filter-btn" data-filter="Belanja">Shopping</button>
+          <button type="button" class="chip-filter-btn" data-filter="Merchandise">Merch</button>
+          <button type="button" class="chip-filter-btn" data-filter="Donasi">Donate</button>
+        </div>
 
-        <div id="rewardsCardsContainer">
-          <!-- Render via app.js -->
+        <div class="services-section-title" data-i18n="rewardCatalogTitle">Pilihan Penukaran Hadiah</div>
+
+        <div class="exchange-cards-grid" id="rewardsCardsContainer">
+          <!-- Render dinamis via app.js -->
         </div>
 
       </section>
