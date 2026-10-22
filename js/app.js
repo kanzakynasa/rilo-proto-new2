@@ -26,6 +26,7 @@ function initApp() {
   setupDepositModeSwitcher();
   setupDepositItems();
   setupRewardCategoryFilters();
+  setupNewsCategoryChips();
   setupProfileForm();
   renderAllViews();
   setTimeout(initBintaroHomeMap, 300);
@@ -183,6 +184,7 @@ function setLanguage(lang) {
   renderAllViews();
   setupDepositItems();
   setupRewardCategoryFilters();
+  setupNewsCategoryChips();
   showToast(lang === "en" ? "Language changed to English" : "Bahasa diubah ke Bahasa Indonesia", true);
 }
 
@@ -192,6 +194,7 @@ function updateCategoryLabels(lang) {
   chips.forEach((chip) => {
     const f = chip.getAttribute("data-filter");
     if (f === "all") chip.textContent = isEn ? "All" : "Semua";
+    else if (f === "e-Wallet") chip.textContent = "e-Wallet";
     else if (f === "Kuliner") chip.textContent = isEn ? "Food" : "Kuliner";
     else if (f === "Belanja") chip.textContent = isEn ? "Shopping" : "Belanja";
     else if (f === "Merchandise") chip.textContent = isEn ? "Merch" : "Merchandise";
@@ -387,6 +390,8 @@ function filterMapLocationsList(query) {
   renderFullMapBoxList();
 }
 
+let expandedStationId = null;
+
 function renderFullMapBoxList() {
   const container = document.getElementById("fullMapListLocations");
   const countEl = document.getElementById("fullMapCountText");
@@ -396,11 +401,13 @@ function renderFullMapBoxList() {
 
   const list = AppState.qrLocations.filter((b) => {
     if (!mapSearchQuery) return true;
-    return b.name.toLowerCase().includes(mapSearchQuery) || b.location.toLowerCase().includes(mapSearchQuery);
+    return b.name.toLowerCase().includes(mapSearchQuery) || 
+           b.location.toLowerCase().includes(mapSearchQuery) || 
+           (b.address && b.address.toLowerCase().includes(mapSearchQuery));
   });
 
   if (countEl) {
-    countEl.textContent = isEn ? `${list.length} Stations Available` : `${list.length} Titik Siap Terima`;
+    countEl.textContent = isEn ? `${list.length} Stations Ready` : `${list.length} Titik Siap Terima`;
   }
 
   if (list.length === 0) {
@@ -412,26 +419,74 @@ function renderFullMapBoxList() {
     return;
   }
 
-  container.innerHTML = list.map((b) => `
-    <div class="box-station-card" onclick="focusMapStationMarker('${b.id}')">
-      <div class="bsc-meta">
-        <strong>${b.name}</strong>
-        <span>${b.location}</span>
-        <small style="font-size:10px;color:var(--text-muted);">${b.operatingHours}</small>
+  container.innerHTML = list.map((b) => {
+    const isExpanded = expandedStationId === b.id;
+    const statusText = isEn ? (b.statusEn || "Ready to Accept") : (b.status || "Siap Terima");
+    const slotsText = isEn ? (b.slotsAvailableEn || b.slotsAvailable) : b.slotsAvailable;
+
+    return `
+      <div class="box-station-card ${isExpanded ? 'expanded' : ''}" onclick="toggleStationDetailCard('${b.id}')">
+        <div class="bsc-header-row">
+          <div class="bsc-meta">
+            <strong>${b.name}</strong>
+            <span>${b.location}</span>
+          </div>
+          <div class="bsc-badges">
+            <span class="bsc-dist-pill">${b.distance}</span>
+            <span class="bsc-status-pill">${statusText}</span>
+            <span class="bsc-chevron-icon">${ICONS.chevronDown}</span>
+          </div>
+        </div>
+
+        <div class="bsc-expanded-detail">
+          <div class="bed-row">
+            <span>Alamat Lengkap</span>
+            <strong>${b.address || b.location}</strong>
+          </div>
+          <div class="bed-row">
+            <span>Tipe Fasilitas</span>
+            <strong>${b.type}</strong>
+          </div>
+          <div class="bed-row">
+            <span>Kapasitas Tersedia</span>
+            <strong style="color:var(--eco-emerald);">${slotsText}</strong>
+          </div>
+          <div class="bed-row">
+            <span>Jam Operasional</span>
+            <strong>${b.operatingHours}</strong>
+          </div>
+          <div class="bed-row">
+            <span>Kemasan Diterima</span>
+            <strong>${b.accepted || 'Botol Plastik PET, Kaleng Minuman'}</strong>
+          </div>
+
+          ${b.note ? `<div class="bed-note-box">${b.note}</div>` : ''}
+
+          <button type="button" class="btn-locate-map-chip" onclick="event.stopPropagation(); focusMapStationMarker('${b.id}');">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+            ${isEn ? 'Focus on Map' : 'Arahkan Peta ke Titik Ini'}
+          </button>
+        </div>
       </div>
-      <div class="bsc-badges">
-        <span class="bsc-dist-pill">${b.distance}</span>
-        <span class="bsc-status-pill">${isEn ? b.statusEn : b.status}</span>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
-window.focusMapStationMarker = function(boxId) {
+window.toggleStationDetailCard = function(boxId) {
+  expandedStationId = (expandedStationId === boxId) ? null : boxId;
+  renderFullMapBoxList();
+  if (expandedStationId) {
+    focusMapStationMarker(expandedStationId, false);
+  }
+};
+
+window.focusMapStationMarker = function(boxId, notify = true) {
   const box = AppState.qrLocations.find(x => x.id === boxId);
   if (box && fullMapInstance) {
     fullMapInstance.setView([box.lat, box.lng], 16, { animate: true });
-    showToast(`Lokasi: ${box.name}`, true);
+    if (notify) {
+      showToast(`Peta terarah ke ${box.name}`, true);
+    }
   }
 };
 
@@ -735,10 +790,123 @@ function submitFinalDeposit() {
   }, 400);
 }
 
+// === NEWS ENGINE (FIGMA NEWS APP UI KIT SPEC) ===
+let activeNewsCategory = "all";
+
+function setupNewsCategoryChips() {
+  document.querySelectorAll("#homeNewsAppChips .nac-chip").forEach(chip => {
+    chip.onclick = function(e) {
+      e.preventDefault();
+      document.querySelectorAll("#homeNewsAppChips .nac-chip").forEach(c => c.classList.remove("active"));
+      this.classList.add("active");
+      activeNewsCategory = this.getAttribute("data-news-cat") || "all";
+      renderNewsSection();
+    };
+  });
+}
+
+function renderNewsSection() {
+  const container = document.getElementById("homeNewsCardsCarousel");
+  const fullContainer = document.getElementById("allNewsFeedListContainer");
+  const isEn = AppState.currentLang === "en";
+
+  const list = (AppState.newsArticles || []).filter(n => {
+    if (activeNewsCategory === "all") return true;
+    return n.category === activeNewsCategory;
+  });
+
+  // 1. Render Carousel Horizontal di Home
+  if (container) {
+    if (list.length === 0) {
+      container.innerHTML = `<div style="padding:20px;font-size:12px;color:var(--text-sub);">${isEn ? 'No news in this category.' : 'Belum ada berita di kategori ini.'}</div>`;
+    } else {
+      container.innerHTML = list.map(item => {
+        const cat = isEn ? item.categoryEn : item.category;
+        const title = isEn ? item.titleEn : item.title;
+        const desc = isEn ? item.descEn : item.desc;
+        const time = isEn ? item.timeAgoEn : item.timeAgo;
+        const readText = isEn ? "Read Story ›" : "Baca Selengkapnya ›";
+
+        return `
+          <div class="news-figma-card" onclick="openNewsDetailModal('${item.id}')">
+            <div class="nfc-image-wrap">
+              <img src="${item.imageUrl}" alt="${title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80'" />
+              <span class="nfc-badge-floating">${cat}</span>
+            </div>
+            <div class="nfc-body">
+              <div class="nfc-meta-row">
+                <span class="author">${item.author}</span>
+                <span>•</span>
+                <span>${time}</span>
+              </div>
+              <h5>${title}</h5>
+              <p>${desc}</p>
+              <div class="nfc-footer-row">
+                <span class="nfc-time-ago">${time}</span>
+                <span class="nfc-read-more">${readText}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  // 2. Render Full News Feed di Halaman Komunitas & Berita
+  if (fullContainer) {
+    fullContainer.innerHTML = (AppState.newsArticles || []).map(item => {
+      const cat = isEn ? item.categoryEn : item.category;
+      const title = isEn ? item.titleEn : item.title;
+      const time = isEn ? item.timeAgoEn : item.timeAgo;
+
+      return `
+        <div class="clean-item-card" onclick="openNewsDetailModal('${item.id}')" style="align-items:flex-start;">
+          <img src="${item.imageUrl}" alt="${title}" style="width:68px;height:68px;border-radius:10px;object-fit:cover;flex-shrink:0;margin-top:2px;" onerror="this.src='https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80'" />
+          <div class="cic-text" style="flex:1;min-width:0;padding-left:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+              <span class="ncs-category-tag tag-campus" style="font-size:9px;padding:1px 6px;">${cat}</span>
+              <small style="font-size:10px;color:var(--text-muted);">${time}</small>
+            </div>
+            <strong style="font-size:12px;white-space:normal;line-height:1.35;margin-bottom:3px;">${title}</strong>
+            <span style="font-size:10px;color:var(--text-sub);">${item.author}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+}
+
+window.openNewsDetailModal = function(newsId) {
+  const item = (AppState.newsArticles || []).find(n => n.id === newsId);
+  if (!item) return;
+
+  const isEn = AppState.currentLang === "en";
+  const title = isEn ? item.titleEn : item.title;
+  const content = isEn ? item.contentEn : item.content;
+  const cat = isEn ? item.categoryEn : item.category;
+
+  const modalBox = document.getElementById("modalSheetDynamicBox");
+  modalBox.innerHTML = `
+    <div class="news-detail-sheet">
+      <img src="${item.imageUrl}" alt="${title}" onerror="this.src='https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80'" />
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+        <span class="ncs-category-tag tag-campus">${cat}</span>
+        <span style="font-size:11px;color:var(--text-muted);">${item.author} • ${isEn ? item.timeAgoEn : item.timeAgo}</span>
+      </div>
+      <h3 style="font-size:16px;line-height:1.35;margin-bottom:12px;font-weight:850;">${title}</h3>
+      <p style="font-size:12px;line-height:1.65;color:var(--text-sub);margin-bottom:20px;">${content}</p>
+      <button class="btn-solid-wine" onclick="closeModalSheet()">${isEn ? 'Close News' : 'Tutup Berita'}</button>
+    </div>
+  `;
+
+  openModalSheet();
+};
+
 // === RENDER UTAMA SEMUA VIEW ===
 function renderAllViews() {
   applyLanguageTranslations();
   renderHome();
+  renderNewsSection();
   renderTransactions();
   renderRewards();
   renderImpact();
@@ -924,16 +1092,29 @@ window.promptVoucherRedeem = function (rewardId) {
   const content = document.getElementById("modalSheetDynamicBox");
   const titleText = isEn ? reward.titleEn : reward.title;
   const descText = isEn ? reward.descriptionEn : reward.description;
+  const isEwallet = reward.type === "ewallet";
 
   content.innerHTML = `
     <div style="text-align:center;margin-bottom:16px;">
       <div style="width:50px;height:50px;border-radius:12px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;margin:0 auto 10px;">
-        ${ICONS.gift}
+        ${isEwallet ? ICONS.coins : ICONS.gift}
       </div>
       <span style="font-size:11px;font-weight:750;color:var(--text-muted);text-transform:uppercase;">${reward.partner}</span>
       <h3 style="font-size:16px;margin:2px 0 4px;">${titleText}</h3>
       <p style="font-size:12px;color:var(--text-sub);">${descText}</p>
     </div>
+
+    ${isEwallet ? `
+      <div style="margin-bottom:14px;text-align:left;">
+        <label style="font-size:11px;font-weight:750;color:var(--text-main);display:block;margin-bottom:4px;">
+          ${isEn ? 'Destination Phone Number (e-Wallet)' : 'Nomor Handphone Akun e-Wallet'}
+        </label>
+        <input type="tel" id="ewalletTargetPhone" class="input-kg-val" style="width:100%;font-size:13px;font-weight:700;" placeholder="0812xxxxxxxx" value="${AppState.user.phone || '0812-3456-7890'}" required />
+        <small style="font-size:10px;color:var(--text-muted);margin-top:3px;display:block;">
+          ${isEn ? 'Make sure the e-wallet account name matches your registered name.' : 'Pastikan nomor akun terdaftar aktif di aplikasi ' + reward.partner + '.'}
+        </small>
+      </div>
+    ` : ''}
 
     <div style="background:var(--rilo-wine-soft);border:1px dashed var(--rilo-wine-border);border-radius:12px;padding:12px;text-align:center;margin-bottom:16px;">
       <span style="font-size:10px;color:var(--text-sub);text-transform:uppercase;font-weight:700;">${isEn ? 'Points Cost' : 'Biaya Penukaran'}</span>
@@ -943,18 +1124,31 @@ window.promptVoucherRedeem = function (rewardId) {
 
     <div style="display:flex;gap:10px;">
       <button class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">${isEn ? 'Cancel' : 'Batal'}</button>
-      <button class="btn-solid-wine" id="btnConfirmDeductPointsAction">${isEn ? 'Confirm Redeem' : 'Konfirmasi Tukar'}</button>
+      <button class="btn-solid-wine" id="btnConfirmDeductPointsAction">${isEn ? (isEwallet ? 'Transfer Now' : 'Confirm Redeem') : (isEwallet ? 'Tarik Saldo Sekarang' : 'Konfirmasi Tukar')}</button>
     </div>
   `;
 
   openModalSheet();
 
   document.getElementById("btnConfirmDeductPointsAction").onclick = () => {
+    let targetPhone = "";
+    if (isEwallet) {
+      const phoneInput = document.getElementById("ewalletTargetPhone");
+      if (phoneInput && !phoneInput.value.trim()) {
+        showToast(isEn ? "Please enter your destination phone number" : "Masukkan nomor handphone tujuan transfer", false);
+        return;
+      }
+      targetPhone = phoneInput ? phoneInput.value.trim() : "";
+    }
+
     // 1. KURANGI SALDO POIN
     AppState.user.points -= reward.pointsCost;
 
-    // 2. SIMPAN VOUCHER
-    const code = `RILO-${reward.id}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // 2. SIMPAN VOUCHER / BUKTI TRANSFER
+    const code = isEwallet 
+      ? `WD-${reward.partner.replace(/\s+/g,'').toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}` 
+      : `RILO-${reward.id}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     AppState.redemptions.unshift({
       id: `RDM-${Date.now()}`,
       date: new Date().toISOString().slice(0, 10),
@@ -963,37 +1157,77 @@ window.promptVoucherRedeem = function (rewardId) {
       rewardTitleEn: reward.titleEn,
       pointsSpent: reward.pointsCost,
       code: code,
-      expiry: "30 Nov 2026",
-      status: "Tersedia",
-      statusEn: "Available"
+      expiry: isEwallet ? "Selesai" : "30 Nov 2026",
+      status: isEwallet ? "Berhasil Ditransfer" : "Tersedia",
+      statusEn: isEwallet ? "Transfer Successful" : "Available",
+      isEwallet: isEwallet,
+      amountRupiah: reward.amountRupiah || 0,
+      targetPhone: targetPhone
     });
 
     // 3. UPDATE TAMPILAN
     updateVoucherCounterUI();
     renderAllViews();
 
-    // 4. BUKTI KUPON VOUCHER
-    content.innerHTML = `
-      <div style="text-align:center;padding:6px 0;">
-        <div style="width:46px;height:46px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
-          ${ICONS.check}
+    // 4. BUKTI KUPON / NOTIFIKASI TRANSFER SUKSES
+    if (isEwallet) {
+      content.innerHTML = `
+        <div style="text-align:center;padding:6px 0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
+            ${ICONS.check}
+          </div>
+          <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">
+            ${isEn ? 'Transfer Successful!' : 'Saldo Berhasil Ditransfer!'}
+          </h3>
+          <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">
+            ${isEn 
+              ? `IDR ${fmt(reward.amountRupiah)} has been sent to ${reward.partner} (${targetPhone}).` 
+              : `Rp ${fmt(reward.amountRupiah)} berhasil dikirimkan ke akun ${reward.partner} (${targetPhone}).`}
+          </p>
+
+          <div style="background:#f8fafc;border-radius:12px;padding:12px 14px;border:1.5px dashed #cbd5e1;margin-bottom:16px;text-align:left;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+              <span style="color:var(--text-muted);">${isEn ? 'Transaction ID' : 'ID Transaksi'}:</span>
+              <strong>${code}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+              <span style="color:var(--text-muted);">${isEn ? 'Points Deducted' : 'Poin Terpotong'}:</span>
+              <strong style="color:var(--rilo-wine);">${fmt(reward.pointsCost)} pts</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;">
+              <span style="color:var(--text-muted);">${isEn ? 'Status' : 'Status'}:</span>
+              <span class="bsc-status-pill" style="height:20px;font-size:10px;">${isEn ? 'Completed' : 'Berhasil'}</span>
+            </div>
+          </div>
+
+          <button class="btn-solid-wine" onclick="closeModalSheet(); switchView('my-vouchers');">
+            ${isEn ? 'View Transaction in My Vouchers' : 'Lihat di Voucher & Dompet Saya'}
+          </button>
         </div>
-        <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">${isEn ? 'Voucher Redeemed!' : 'Voucher Berhasil Ditukar!'}</h3>
-        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">${isEn ? `Points deducted: ${fmt(reward.pointsCost)} pts` : `Saldo poin terpotong ${fmt(reward.pointsCost)} pts`}</p>
+      `;
+    } else {
+      content.innerHTML = `
+        <div style="text-align:center;padding:6px 0;">
+          <div style="width:46px;height:46px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
+            ${ICONS.check}
+          </div>
+          <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">${isEn ? 'Voucher Redeemed!' : 'Voucher Berhasil Ditukar!'}</h3>
+          <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">${isEn ? `Points deducted: ${fmt(reward.pointsCost)} pts` : `Saldo poin terpotong ${fmt(reward.pointsCost)} pts`}</p>
 
-        <div style="background:#f8fafc;border-radius:12px;padding:14px;border:1.5px dashed #cbd5e1;margin-bottom:16px;">
-          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;display:block;">${isEn ? 'VOUCHER CODE' : 'KODE KUPON'}</span>
-          <strong style="font-size:18px;letter-spacing:2px;color:var(--text-main);display:block;margin:3px 0;">${code}</strong>
-          <small style="font-size:10px;color:var(--text-sub);">${isEn ? 'Valid until Nov 30, 2026' : 'Masa berlaku s/d 30 November 2026'}</small>
+          <div style="background:#f8fafc;border-radius:12px;padding:14px;border:1.5px dashed #cbd5e1;margin-bottom:16px;">
+            <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:700;display:block;">${isEn ? 'VOUCHER CODE' : 'KODE KUPON'}</span>
+            <strong style="font-size:18px;letter-spacing:2px;color:var(--text-main);display:block;margin:3px 0;">${code}</strong>
+            <small style="font-size:10px;color:var(--text-sub);">${isEn ? 'Valid until Nov 30, 2026' : 'Masa berlaku s/d 30 November 2026'}</small>
+          </div>
+
+          <button class="btn-solid-wine" onclick="closeModalSheet(); switchView('my-vouchers');">
+            ${t("btnMyVouchers")}
+          </button>
         </div>
+      `;
+    }
 
-        <button class="btn-solid-wine" onclick="closeModalSheet(); switchView('my-vouchers');">
-          ${t("btnMyVouchers")}
-        </button>
-      </div>
-    `;
-
-    showToast(isEn ? "Voucher successfully claimed!" : "Voucher berhasil diperoleh!", true);
+    showToast(isEn ? (isEwallet ? "e-Wallet payout sent!" : "Voucher successfully claimed!") : (isEwallet ? "Saldo e-Wallet berhasil ditarik!" : "Voucher berhasil diperoleh!"), true);
   };
 };
 

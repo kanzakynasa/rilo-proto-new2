@@ -31,12 +31,13 @@ const INITIAL_DATA = {
     joinedDate: "September 2026"
   },
 
-  // Titik Smart Drop Box & Hub RILO di BINTARO
+  // Titik Smart Drop Box & Hub RILO di BINTARO (Total 10 Titik Strategis)
   qrLocations: [
     {
       id: "RILO-BX-01",
       name: "Smart Drop Box Bintaro Xchange",
-      location: "Bintaro Jaya Xchange Mall, Lt. LG",
+      location: "Bintaro Jaya Xchange Mall 1, Lt. LG (Dekat Foodcourt)",
+      address: "CBD Bintaro Jaya, Blok O-2, Pd. Jaya, Kec. Pd. Aren",
       lat: -6.2872,
       lng: 106.7280,
       distance: "150m",
@@ -46,27 +47,51 @@ const INITIAL_DATA = {
       slotsAvailable: "Kapasitas Tersedia 65%",
       slotsAvailableEn: "Available Capacity 65%",
       operatingHours: "10.00 - 22.00 WIB",
-      type: "Smart Box"
+      type: "Smart Drop Box",
+      accepted: "Botol Plastik PET, Kaleng Minuman, Tutup Botol, Karton Tetra Pak",
+      note: "Pintu otomatis aktif sensor. Poin langsung masuk aplikasi setelah sensor mendeteksi kemasan."
     },
     {
       id: "RILO-BX-02",
-      name: "RILO Hub Bintaro Sektor 7",
-      location: "Jl. Boulevard Bintaro Jaya No. 18",
-      lat: -6.2795,
-      lng: 106.7210,
-      distance: "800m",
-      status: "Buka Sekarang",
-      statusEn: "Open Now",
-      capacityPercent: 48,
-      slotsAvailable: "Drop Point & Timbangan Kiloan",
-      slotsAvailableEn: "Drop Point & Scale Station",
-      operatingHours: "08.00 - 18.00 WIB",
-      type: "Mitra Hub"
+      name: "Smart Drop Box Kampus UPJ",
+      location: "Universitas Pembangunan Jaya, Gedung Utama Lt. 1",
+      address: "Jl. Cendrawasih Raya Blok B7/P, Sawah Baru, Ciputat",
+      lat: -6.2938,
+      lng: 106.7235,
+      distance: "650m",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 28,
+      slotsAvailable: "Kapasitas Tersedia 72%",
+      slotsAvailableEn: "Available Capacity 72%",
+      operatingHours: "07.00 - 20.00 WIB",
+      type: "Smart Drop Box Kampus",
+      accepted: "Botol Plastik PET, Kaleng Aluminium, Tutup Botol, Kardus & Kertas",
+      note: "Titik resmi kolaborasi Gerakan Mahasiswa Hijau UPJ. Dilengkapi fasilitas setor botol per piece dan timbangan."
     },
     {
       id: "RILO-BX-03",
+      name: "RILO Hub Bintaro Sektor 7",
+      location: "Jl. Boulevard Bintaro Jaya No. 18 (Samping Bank Mandiri)",
+      address: "Sektor 7 Bintaro Jaya, Pondok Aren, Tangerang Selatan",
+      lat: -6.2795,
+      lng: 106.7210,
+      distance: "800m",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 48,
+      slotsAvailable: "Kapasitas Tersedia 52%",
+      slotsAvailableEn: "Available Capacity 52%",
+      operatingHours: "08.00 - 18.00 WIB",
+      type: "Mitra Hub & Timbangan",
+      accepted: "Semua Kategori (Satuan per piece & Kiloan Partai Besar)",
+      note: "Pusat verifikasi setoran kiloan, kardus paket, botol kaca beling, dan logam berat."
+    },
+    {
+      id: "RILO-BX-04",
       name: "Smart Drop Box Stasiun Jurangmangu",
-      location: "Pintu Barat Stasiun KRL Jurangmangu",
+      location: "Pintu Barat Akses Stasiun KRL Jurangmangu",
+      address: "Jl. Tegal Rotan Raya, Sawah Baru, Kec. Ciputat",
       lat: -6.2915,
       lng: 106.7298,
       distance: "1.2 km",
@@ -75,23 +100,118 @@ const INITIAL_DATA = {
       capacityPercent: 52,
       slotsAvailable: "Kapasitas Tersedia 48%",
       slotsAvailableEn: "Available Capacity 48%",
-      operatingHours: "24 Jam",
-      type: "Smart Box"
+      operatingHours: "05.00 - 23.30 WIB",
+      type: "Smart Drop Box Transit",
+      accepted: "Botol Plastik PET, Kaleng Minuman, Tutup Botol",
+      note: "Titik transit komuter KRL. Setor kemasan minuman sebelum naik kereta dan kumpulkan poin perjalanan."
     },
     {
-      id: "RILO-BX-04",
+      id: "RILO-BX-05",
       name: "RILO Drop Point Fresh Market",
-      location: "Kawasan Emerald Bintaro Jaya",
+      location: "Kawasan Emerald Bintaro Jaya, Pintu Timur Pasar",
+      address: "Jl. Bintaro Utama 9, Parigi, Kec. Pd. Aren",
       lat: -6.2710,
       lng: 106.7125,
       distance: "2.1 km",
-      status: "Buka Pagi",
-      statusEn: "Open Morning",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
       capacityPercent: 30,
       slotsAvailable: "Kapasitas Tersedia 70%",
       slotsAvailableEn: "Available Capacity 70%",
       operatingHours: "06.00 - 17.00 WIB",
-      type: "Mitra Hub"
+      type: "Mitra Hub",
+      accepted: "Kardus Paket Kiloan, Plastik Campur, Botol Beling, Kaleng",
+      note: "Sangat cocok untuk setor sampah belanjaan rumah tangga dan kemasan boks kardus tebal."
+    },
+    {
+      id: "RILO-BX-06",
+      name: "Smart Drop Box Bintaro Plaza",
+      location: "Bintaro Plaza Sektor 3, Lobby Selatan (Dekat Parkir Motor)",
+      address: "Jl. Bintaro Utama 3A No. 1, Pondok Karya, Pondok Aren",
+      lat: -6.2738,
+      lng: 106.7380,
+      distance: "2.5 km",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 40,
+      slotsAvailable: "Kapasitas Tersedia 60%",
+      slotsAvailableEn: "Available Capacity 60%",
+      operatingHours: "10.00 - 22.00 WIB",
+      type: "Smart Drop Box",
+      accepted: "Botol Plastik PET, Kaleng Minuman, Tutup Botol",
+      note: "Drop box modern di kawasan kuliner & belanja Bintaro Sektor 3."
+    },
+    {
+      id: "RILO-BX-07",
+      name: "Smart Drop Box Stasiun Pondok Ranji",
+      location: "Lobby Luar Pintu Timur Stasiun KRL Pondok Ranji",
+      address: "Jl. WR Supratman, Rengas, Kec. Ciputat Timur",
+      lat: -6.2855,
+      lng: 106.7445,
+      distance: "2.8 km",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 45,
+      slotsAvailable: "Kapasitas Tersedia 55%",
+      slotsAvailableEn: "Available Capacity 55%",
+      operatingHours: "05.00 - 23.30 WIB",
+      type: "Smart Drop Box Transit",
+      accepted: "Botol Plastik PET, Kaleng Minuman, Tutup Botol",
+      note: "Smart box terhubung ke integrasi pejalan kaki Stasiun Pondok Ranji baru."
+    },
+    {
+      id: "RILO-BX-08",
+      name: "RILO Point Bintaro Loop",
+      location: "Kawasan Olahraga Bintaro Loop, Pos Informasi Hijau",
+      address: "Boulevard Bintaro Jaya Sektor 9, Pondok Pucung",
+      lat: -6.2750,
+      lng: 106.7080,
+      distance: "3.2 km",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 22,
+      slotsAvailable: "Kapasitas Tersedia 78%",
+      slotsAvailableEn: "Available Capacity 78%",
+      operatingHours: "05.30 - 21.00 WIB",
+      type: "Community Drop Point",
+      accepted: "Botol Minum Isotonik Plastik, Kaleng, Tutup Botol",
+      note: "Titik setor favorit para pesepeda dan pelari pagi di jalur Bintaro Loop."
+    },
+    {
+      id: "RILO-BX-09",
+      name: "Smart Drop Box Transpark Bintaro",
+      location: "Transpark Mall Bintaro Sektor 7, Pintu Lobby Barat",
+      address: "Jl. Prof. DR. Satrio No. 5, Pondok Jaya, Pondok Aren",
+      lat: -6.2820,
+      lng: 106.7245,
+      distance: "950m",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 38,
+      slotsAvailable: "Kapasitas Tersedia 62%",
+      slotsAvailableEn: "Available Capacity 62%",
+      operatingHours: "10.00 - 22.00 WIB",
+      type: "Smart Drop Box",
+      accepted: "Botol Plastik PET, Kaleng Minuman, Kemasan Karton",
+      note: "Terletak di kawasan apartemen dan mall Transpark Sektor 7."
+    },
+    {
+      id: "RILO-BX-10",
+      name: "RILO Eco Hub Kebayoran Park",
+      location: "Taman Kebayoran Park Bintaro Sektor 7",
+      address: "Jl. Kebayoran Residences, Bintaro Jaya, Tangerang Selatan",
+      lat: -6.2780,
+      lng: 106.7160,
+      distance: "1.7 km",
+      status: "Siap Terima",
+      statusEn: "Ready to Accept",
+      capacityPercent: 25,
+      slotsAvailable: "Kapasitas Tersedia 75%",
+      slotsAvailableEn: "Available Capacity 75%",
+      operatingHours: "07.00 - 19.00 WIB",
+      type: "Eco Hub Komunitas",
+      accepted: "Semua Kategori (Kiloan, Kertas Arsip, Kardus, Botol Beling)",
+      note: "Pusat edukasi daur ulang dan penimbangan komunitas warga perumahan Kebayoran."
     }
   ],
 
@@ -393,8 +513,64 @@ const INITIAL_DATA = {
     }
   ],
 
-  // Katalog Reward & Voucher
+  // Katalog Reward & Voucher (Termasuk Saldo e-Wallet RuntahPedia)
   rewards: [
+    {
+      id: "REW-EW-01",
+      partner: "GoPay",
+      title: "Saldo GoPay Rp 10.000",
+      titleEn: "GoPay Balance IDR 10,000",
+      description: "Transfer instan ke nomor HP akun GoPay kamu tanpa potongan admin.",
+      descriptionEn: "Instant balance transfer to your GoPay registered mobile number.",
+      pointsCost: 1000,
+      tag: "e-Wallet",
+      tagEn: "e-Wallet",
+      type: "ewallet",
+      amountRupiah: 10000,
+      stock: 999
+    },
+    {
+      id: "REW-EW-02",
+      partner: "OVO Cash",
+      title: "Saldo OVO Cash Rp 20.000",
+      titleEn: "OVO Cash Balance IDR 20,000",
+      description: "Tarik saldo ke dompet OVO Premier kamu dalam hitungan detik.",
+      descriptionEn: "Instant payout to your verified OVO Premier wallet.",
+      pointsCost: 2000,
+      tag: "e-Wallet",
+      tagEn: "e-Wallet",
+      type: "ewallet",
+      amountRupiah: 20000,
+      stock: 999
+    },
+    {
+      id: "REW-EW-03",
+      partner: "DANA",
+      title: "Saldo DANA Rp 25.000",
+      titleEn: "DANA Balance IDR 25,000",
+      description: "Top-up saldo akun DANA kamu langsung dari poin sampah terpilah.",
+      descriptionEn: "Direct balance top-up straight to your DANA account.",
+      pointsCost: 2500,
+      tag: "e-Wallet",
+      tagEn: "e-Wallet",
+      type: "ewallet",
+      amountRupiah: 25000,
+      stock: 999
+    },
+    {
+      id: "REW-EW-04",
+      partner: "ShopeePay",
+      title: "Saldo ShopeePay Rp 50.000",
+      titleEn: "ShopeePay Balance IDR 50,000",
+      description: "Saldo ShopeePay untuk belanja online dan pembayaran merchant QRIS.",
+      descriptionEn: "ShopeePay balance for online shopping & QRIS offline merchants.",
+      pointsCost: 5000,
+      tag: "e-Wallet",
+      tagEn: "e-Wallet",
+      type: "ewallet",
+      amountRupiah: 50000,
+      stock: 999
+    },
     {
       id: "REW-01",
       partner: "Kopi Kenangan",
@@ -405,6 +581,7 @@ const INITIAL_DATA = {
       pointsCost: 500,
       tag: "Kuliner",
       tagEn: "F&B",
+      type: "voucher",
       stock: 45
     },
     {
@@ -417,6 +594,7 @@ const INITIAL_DATA = {
       pointsCost: 750,
       tag: "Belanja",
       tagEn: "Groceries",
+      type: "voucher",
       stock: 30
     },
     {
@@ -429,6 +607,7 @@ const INITIAL_DATA = {
       pointsCost: 1500,
       tag: "Merchandise",
       tagEn: "Merchandise",
+      type: "merchandise",
       stock: 12
     },
     {
@@ -441,6 +620,7 @@ const INITIAL_DATA = {
       pointsCost: 500,
       tag: "Donasi",
       tagEn: "Donation",
+      type: "donation",
       stock: 999
     }
   ],
@@ -458,6 +638,100 @@ const INITIAL_DATA = {
       expiry: "30 Nov 2026",
       status: "Tersedia",
       statusEn: "Available"
+    }
+  ],
+
+  // Berita & Update Daur Ulang Terkini (Figma News App UI Kit Spec)
+  newsArticles: [
+    {
+      id: "news-01",
+      category: "Kampus",
+      categoryEn: "Campus",
+      title: "Smart Drop Box RILO Resmi Beroperasi di Lobi Utama Universitas Pembangunan Jaya",
+      titleEn: "RILO Smart Drop Box Officially Launches at UPJ University Main Lobby",
+      desc: "Kolaborasi aksi hijau kampus UPJ untuk mengonversi sampah botol plastik dan kaleng menjadi poin beasiswa & voucher kuliner mahasiswa.",
+      descEn: "Green initiative collaboration at UPJ campus converting plastic bottles and beverage cans into scholarship points and student perks.",
+      author: "Admin RILO Bintaro",
+      timeAgo: "15 mnt lalu",
+      timeAgoEn: "15m ago",
+      imageUrl: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
+      content: "Universitas Pembangunan Jaya (UPJ) bersama RILO hari ini meresmikan fasilitas Smart Drop Box pintar pertama di kawasan kampus Bintaro. Dilengkapi sensor pemindaian otomatis, mahasiswa dan dosen dapat langsung menyetor botol plastik PET serta kaleng minuman untuk mendapatkan poin digital secara realtime. Poin ini dapat ditukarkan dengan potongan belanja di kantin, kafe mitra BXC Mall, maupun donasi bibit pohon mangrove pesisir.",
+      contentEn: "Universitas Pembangunan Jaya (UPJ) in collaboration with RILO today inaugurated the first Smart Drop Box facility on Bintaro campus grounds. Equipped with auto-detect sensors, students and faculty can directly deposit recyclable packaging to accumulate digital points redeemable for coffee, food, and eco-initiatives."
+    },
+    {
+      id: "news-02",
+      category: "Inovasi",
+      categoryEn: "Innovation",
+      title: "RILO Kenalkan Sistem Konversi Poin ke Saldo e-Wallet dan Voucher Belanja",
+      titleEn: "RILO Launches Point Conversion to Digital Vouchers & E-Wallets",
+      desc: "Setiap gram material terpilah kini memiliki valuasi transparan yang terhubung ke puluhan merchant gaya hidup ternama.",
+      descEn: "Every sorted gram of waste now bears transparent value linked directly to dozens of leading lifestyle merchants.",
+      author: "Tim Inovasi RILO",
+      timeAgo: "45 mnt lalu",
+      timeAgoEn: "45m ago",
+      imageUrl: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=700&q=80",
+      content: "Melalui integrasi sistem baru, nasabah bank sampah digital RILO dapat melihat estimasi nilai rupiah dari poin yang dikumpulkan secara langsung di layar utama aplikasi. Poin ini dapat ditukarkan dengan voucher Kopi Kenangan, diskon Sayurbox, merchandise tote bag, hingga donasi penanaman mangrove di pesisir.",
+      contentEn: "Through newly updated digital integrations, RILO members can monitor direct currency estimations of accumulated points on their mobile home screens, redeemable across top lifestyle and environmental causes."
+    },
+    {
+      id: "news-03",
+      category: "Edukasi",
+      categoryEn: "Education",
+      title: "Kemasan Karton Minuman Tetra Pak Kini Diterima di Seluruh Smart Box Bintaro",
+      titleEn: "Beverage Drink Cartons Now Accepted Across All Bintaro Smart Drop Boxes",
+      desc: "Daur ulang kemasan susu dan jus kini bernilai hingga 80 poin per kilogram jika disetor dalam kondisi bersih dan pipih.",
+      descEn: "Recycling milk and juice cartons is now rewarded up to 80 points per kg when deposited rinsed and flattened.",
+      author: "Pusat Edukasi Hijau",
+      timeAgo: "2 jam lalu",
+      timeAgoEn: "2h ago",
+      imageUrl: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=700&q=80",
+      content: "Karton kemasan minuman (Tetra Pak) yang selama ini sering terbuang ke TPA kini resmi masuk dalam program daur ulang bernilai tinggi di RILO Bintaro. Serat kertas murni (virgin fiber) pada kemasan karton memiliki kualitas tinggi untuk diolah kembali menjadi produk kertas daur ulang dan papan polimer ramah lingkungan.",
+      contentEn: "Beverage carton packaging (Tetra Pak) often discarded into landfills is now officially integrated into RILO high-value recycling streams across Bintaro. High-grade virgin fibers inside cartons will be reprocessed into recycled paper and durable eco-polymer boards."
+    },
+    {
+      id: "news-04",
+      category: "Komunitas",
+      categoryEn: "Community",
+      title: "Pencapaian 72% Target Pengumpulan 1.000 Botol Plastik di BXC Mall Sektor 7",
+      titleEn: "72% Achievement Toward 1,000 Plastic Bottles Target at BXC Mall",
+      desc: "Apresiasi kepada seluruh nasabah komunitas Bintaro. Kumpulkan 10 botol hari ini untuk klaim voucher kuliner favorit.",
+      descEn: "Kudos to Bintaro green community members. Deposit 10 bottles today to unlock exclusive coffee vouchers.",
+      author: "Komunitas Bintaro",
+      timeAgo: "5 jam lalu",
+      timeAgoEn: "5h ago",
+      imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
+      content: "Antusiasme warga Bintaro Jaya terhadap pemilahan sampah mandiri terus meningkat pesat. Dalam dua pekan terakhir, tercatat lebih dari 720 botol plastik berhasil dikumpulkan dari titik Smart Drop Box Bintaro Xchange Mall 1. Program ini didukung oleh mitra kafe lokal yang menyediakan voucher diskon sebagai bentuk penghargaan aksi ramah lingkungan.",
+      contentEn: "Community participation across Bintaro Jaya has grown exponentially. Over 720 plastic bottles have been safely gathered at the Bintaro Xchange Mall 1 Smart Drop Box over the past two weeks, sponsored by local partner cafes."
+    },
+    {
+      id: "news-05",
+      category: "Inovasi",
+      categoryEn: "Innovation",
+      title: "Teknologi Sensor Optik Cerdas Kenali Jenis Plastik dalam Hitungan Detik",
+      titleEn: "Smart Optical Sensors Identify Plastic Polymer in Seconds",
+      desc: "Smart Box RILO generasi terbaru kini mampu membedakan botol bening PET, tutup botol HDPE, dan kaleng logam secara otomatis.",
+      descEn: "Latest generation RILO Smart Drop Boxes now autonomously distinguish clear PET bottles, HDPE caps, and aluminum cans.",
+      author: "R&D Teknologi Hijau",
+      timeAgo: "1 hari lalu",
+      timeAgoEn: "1d ago",
+      imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=700&q=80",
+      content: "RILO memperkenalkan integrasi sensor near-infrared (NIR) pada mesin Smart Drop Box. Sensor ini membaca kode resin polimer secara otomatis saat kemasan dimasukkan ke corong pintu box, mencegah kontaminasi jenis sampah dan memastikan penghitungan poin berlangsung 100% akurat.",
+      contentEn: "RILO introduces near-infrared (NIR) sensor integration across Smart Drop Box stations. The sensor scans polymer resin codes instantly as items enter the chute, preventing material contamination and ensuring 100% accurate point credits."
+    },
+    {
+      id: "news-06",
+      category: "Kampus",
+      categoryEn: "Campus",
+      title: "Mahasiswa UPJ Luncurkan Gerakan 'Tukar Botol Jadi Kopi' Sepanjang Oktober",
+      titleEn: "UPJ Students Launch 'Bottles for Coffee' Movement Across October",
+      desc: "Setiap setoran 5 botol plastik di area kampus mendapatkan voucher diskon 50% di gerai kopi mitra sekitar Sektor 7.",
+      descEn: "Every 5 plastic bottles deposited on campus grants a 50% discount voucher at partner coffee spots around Sector 7.",
+      author: "Himpunan Lingkungan UPJ",
+      timeAgo: "2 hari lalu",
+      timeAgoEn: "2d ago",
+      imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=700&q=80",
+      content: "Gerakan mahasiswa Fakultas Desain dan Teknologi UPJ bekerja sama dengan bank sampah RILO menggelar kampanye aktif pemilahan sampah kemasan. Program ini bertujuan membiasakan gaya hidup minim sampah (zero waste lifestyle) di kalangan generasi muda urban.",
+      contentEn: "UPJ student associations partnering with RILO have launched a packaging sorting campaign. The program fosters a zero-waste lifestyle among young urban university students through tangible voucher incentives."
     }
   ],
 
@@ -508,7 +782,7 @@ const INITIAL_DATA = {
       mapCardTitle: "Titik Drop Box Bintaro",
       mapFullLink: "Buka Peta Penuh →",
       servicesTitle: "Layanan Daur Ulang",
-      svcScan: "Scan & Setor",
+      svcCommunity: "Komunitas",
       svcFind: "Cari Drop Box",
       svcReward: "Tukar Hadiah",
       svcImpact: "Dampak Hijau",
@@ -562,7 +836,18 @@ const INITIAL_DATA = {
       tabFood: "Food",
       tabShopping: "Shopping",
       tabMerch: "Merch",
-      tabDonate: "Donate"
+      tabDonate: "Donate",
+      newsSectionTitle: "Kabar & Berita Terkini",
+      newsPortalTitle: "Kabar & Portal Berita",
+      newsPortalSub: "Daur ulang, kampus UPJ & aksi lingkungan Bintaro",
+      newsAllArticles: "Semua Artikel & Kabar Terbaru",
+      newsReadMore: "Baca Selengkapnya ›",
+      newsCloseModal: "Tutup Berita",
+      newsChipAll: "Semua Berita",
+      newsChipCampus: "Kampus",
+      newsChipEdu: "Edukasi",
+      newsChipComm: "Komunitas",
+      newsChipInno: "Inovasi"
     },
     en: {
       subGreeting: "Have you sorted your waste today?",
@@ -572,7 +857,7 @@ const INITIAL_DATA = {
       mapCardTitle: "Bintaro Drop Box Points",
       mapFullLink: "Open Full Map →",
       servicesTitle: "Recycle Services",
-      svcScan: "Scan & Deposit",
+      svcCommunity: "Community",
       svcFind: "Find Drop Box",
       svcReward: "Rewards",
       svcImpact: "Eco Impact",
@@ -626,7 +911,18 @@ const INITIAL_DATA = {
       tabFood: "Food",
       tabShopping: "Shopping",
       tabMerch: "Merch",
-      tabDonate: "Donate"
+      tabDonate: "Donate",
+      newsSectionTitle: "Latest News & Updates",
+      newsPortalTitle: "News & Community Portal",
+      newsPortalSub: "Recycling, UPJ campus & Bintaro green initiatives",
+      newsAllArticles: "All Articles & Breaking News",
+      newsReadMore: "Read Story ›",
+      newsCloseModal: "Close Story",
+      newsChipAll: "All News",
+      newsChipCampus: "Campus",
+      newsChipEdu: "Education",
+      newsChipComm: "Community",
+      newsChipInno: "Innovation"
     }
   }
 };

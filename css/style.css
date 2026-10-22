@@ -53,10 +53,14 @@
 html, body {
   background: #0f0d0e;
   color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   height: 100%;
   width: 100%;
   overflow: hidden;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
 }
 
 /* === MOBILE SHELL WRAPPER (100dvh FIT SMARTPHONE) === */
@@ -566,9 +570,68 @@ html, body {
 .wine-card-desc {
   font-size: 11px;
   color: #f8e5ee;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Tracking Target Tantangan di dalam Wine Card */
+.wine-card-challenge-strip {
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
   margin-bottom: 14px;
   position: relative;
   z-index: 1;
+}
+
+.wcc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.wcc-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wcc-status-badge {
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.2);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.wcc-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #fce8f0;
+  margin-bottom: 5px;
+}
+
+.wcc-progress-bar {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.wcc-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
 }
 
 .wine-card-actions {
@@ -653,16 +716,34 @@ html, body {
   border-radius: var(--radius-sm);
   padding: 13px 14px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
   box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 3.5px solid transparent;
 }
 
-.box-station-card:active {
-  transform: scale(0.98);
+.box-station-card:hover {
   border-color: var(--rilo-wine-border);
+}
+
+.box-station-card.expanded {
+  border-left-color: var(--rilo-wine);
+  box-shadow: 0 4px 14px rgba(118, 26, 56, 0.12);
+  background: #fff;
+}
+
+.bsc-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.bsc-meta {
+  flex: 1;
+  min-width: 0;
 }
 
 .bsc-meta strong {
@@ -670,42 +751,139 @@ html, body {
   color: var(--text-main);
   display: block;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bsc-meta span {
   font-size: 11px;
   color: var(--text-sub);
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bsc-badges {
   text-align: right;
   flex-shrink: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
 }
 
 .bsc-dist-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--rilo-wine);
   background: var(--rilo-wine-soft);
-  padding: 2px 7px;
+  padding: 4px 9px;
   border-radius: var(--radius-squircle);
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
 }
 
+/* Badge Status Siap Terima Sinkron & Konsisten */
 .bsc-status-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
-  color: var(--eco-emerald);
-  background: var(--eco-emerald-soft);
-  padding: 2px 7px;
+  color: #15803d;
+  background: #eaf6ee;
+  border: 1px solid #bbf7d0;
+  padding: 4px 10px;
   border-radius: var(--radius-squircle);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  letter-spacing: 0.2px;
 }
 
-/* === CARD MAP DROP POINT BINTARO (TANPA TOMBOL SCAN DI DALAMNYA) === */
+.bsc-status-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+  display: inline-block;
+}
+
+.bsc-chevron-icon {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.box-station-card.expanded .bsc-chevron-icon {
+  transform: rotate(180deg);
+  color: var(--rilo-wine);
+}
+
+/* Panel Detail Expandable saat diklik */
+.bsc-expanded-detail {
+  display: none;
+  border-top: 1px dashed var(--border-line);
+  padding-top: 10px;
+  margin-top: 2px;
+  animation: detailFadeIn 0.2s ease-out;
+}
+
+.box-station-card.expanded .bsc-expanded-detail {
+  display: block;
+}
+
+@keyframes detailFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bed-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 4px 0;
+  color: var(--text-sub);
+}
+
+.bed-row strong {
+  color: var(--text-main);
+  font-weight: 750;
+  text-align: right;
+  max-width: 65%;
+}
+
+.bed-note-box {
+  background: var(--surface-subtle);
+  border-radius: var(--radius-xs);
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--text-sub);
+  line-height: 1.4;
+  margin-top: 6px;
+  border-left: 3px solid var(--rilo-wine);
+}
+
+.btn-locate-map-chip {
+  width: 100%;
+  background: var(--rilo-wine-soft);
+  color: var(--rilo-wine);
+  border: 1px solid var(--rilo-wine-border);
+  padding: 7px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* === CARD MAP DROP POINT BINTARO (OPSI 2: KLIK LANGSUNG PINDAH KE PETA PENUH) === */
 .map-preview-card {
   background: var(--surface);
   border-radius: var(--radius-sm);
@@ -713,6 +891,18 @@ html, body {
   box-shadow: var(--shadow-card);
   margin-bottom: 16px;
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.map-preview-card:hover {
+  border-color: var(--rilo-wine-border);
+  box-shadow: 0 4px 18px rgba(118, 26, 56, 0.1);
+}
+
+.map-preview-card:active {
+  transform: scale(0.99);
 }
 
 .map-card-head {
@@ -731,6 +921,24 @@ html, body {
   gap: 6px;
 }
 
+.map-card-head-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--rilo-wine);
+  background: var(--rilo-wine-soft);
+  padding: 3px 8px;
+  border-radius: var(--radius-squircle);
+  transition: all 0.15s ease;
+}
+
+.map-preview-card:hover .map-card-head-badge {
+  background: var(--rilo-wine);
+  color: #fff;
+}
+
 .map-canvas-container {
   height: 140px;
   width: 100%;
@@ -739,18 +947,61 @@ html, body {
   z-index: 1;
 }
 
+/* Overlay Transparan Halus untuk Interaksi Klik */
+.map-interactive-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+  pointer-events: auto;
+}
+
+.map-overlay-hint {
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.map-preview-card:hover .map-overlay-hint {
+  transform: translateY(-2px);
+  background: rgba(118, 26, 56, 0.88);
+}
+
 /* Info Box Drop Point Terdekat (Tanpa Tombol Scan Sesuai Arahan) */
 .map-nearest-info-clean {
-  padding: 10px 14px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #fff;
+  border-top: 1px solid var(--border-line);
+}
+
+.mn-clean-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .mn-clean-left strong {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-main);
+  font-weight: 800;
   display: block;
 }
 
@@ -759,13 +1010,8 @@ html, body {
   color: var(--text-sub);
 }
 
-.mn-clean-status {
-  font-size: 11px;
-  font-weight: 750;
-  color: var(--eco-emerald);
-  background: var(--eco-emerald-soft);
-  padding: 3px 8px;
-  border-radius: var(--radius-squircle);
+.map-nearest-info-clean .bsc-status-pill {
+  flex-shrink: 0;
 }
 
 /* Leaflet Custom Marker RILO */
@@ -835,39 +1081,306 @@ html, body {
   line-height: 1.2;
 }
 
-/* === BANNER CAMPAIGN CAROUSEL === */
-.campaign-card {
-  background: linear-gradient(135deg, var(--rilo-wine), #8f2349);
-  color: #fff;
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  margin-bottom: 18px;
-  box-shadow: var(--shadow-wine);
+/* === NEWS APP UI DESIGN (FIGMA RAJDEEP BANIK SPEC) === */
+.news-app-container {
+  margin-bottom: 22px;
 }
 
-.campaign-tag {
+.news-app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.news-app-header h4 {
+  font-size: 15px;
+  font-weight: 850;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.news-app-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none;
+  margin-bottom: 4px;
+}
+
+.news-app-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.nac-chip {
+  background: var(--surface);
+  color: var(--text-sub);
+  border: 1px solid var(--border-line);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nac-chip.active {
+  background: var(--rilo-wine);
+  color: #ffffff;
+  border-color: var(--rilo-wine);
+  box-shadow: 0 2px 8px rgba(118, 26, 56, 0.25);
+}
+
+/* Horizontal Track Card Hero Berita */
+.news-cards-carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.news-cards-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.news-figma-card {
+  flex: 0 0 84%;
+  max-width: 320px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-line);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  scroll-snap-align: start;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.news-figma-card:active {
+  transform: scale(0.98);
+}
+
+.nfc-image-wrap {
+  height: 125px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.nfc-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.news-figma-card:hover .nfc-image-wrap img {
+  transform: scale(1.04);
+}
+
+.nfc-badge-floating {
+  position: absolute;
+  top: 10px;
+  left: 10px;
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 850;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 7px;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 3px 8px;
   border-radius: var(--radius-squircle);
-  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nfc-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.nfc-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
   margin-bottom: 6px;
 }
 
-.campaign-card h4 {
-  font-size: 13px;
-  font-weight: 800;
-  margin-bottom: 3px;
-  line-height: 1.35;
+.nfc-meta-row span.author {
+  color: var(--rilo-wine);
+  font-weight: 750;
 }
 
-.campaign-card p {
+.nfc-body h5 {
+  font-size: 13px;
+  font-weight: 850;
+  color: var(--text-main);
+  line-height: 1.4;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nfc-body p {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-sub);
+  line-height: 1.45;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nfc-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  border-top: 1px solid var(--border-line);
+  padding-top: 8px;
+}
+
+.nfc-time-ago {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nfc-read-more {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--rilo-wine);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Halaman Detail Baca Berita (Modal Sheet Bacaan) */
+.news-detail-sheet {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+
+.news-detail-sheet img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+/* === BANNER CAMPAIGN SIMETRIS & MODERN === */
+.campaign-card-symm {
+  background: linear-gradient(135deg, var(--rilo-wine), #963754);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-wine);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.campaign-card-symm::after {
+  content: "";
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  right: -30px;
+  top: -30px;
+  pointer-events: none;
+}
+
+.ccs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ccs-date-pill {
+  font-size: 10px;
+  font-weight: 750;
+  color: #fce8f0;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.campaign-card-symm h4 {
+  font-size: 14px;
+  font-weight: 850;
+  margin: 0 0 5px 0;
   line-height: 1.35;
+  letter-spacing: -0.2px;
+}
+
+.campaign-card-symm p {
+  font-size: 11px;
+  color: #f7e3eb;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.ccs-progress-wrap {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 10px 12px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ccs-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: #fce8f0;
+}
+
+.ccs-progress-labels strong {
+  font-weight: 850;
+  color: #fff;
+}
+
+.ccs-progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.ccs-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
 }
 
 /* === LIST AKTIVITAS TERAKHIR === */
