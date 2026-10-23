@@ -317,37 +317,126 @@
         </div>
       </section>
 
-      <!-- ==================== 5. KATALOG REWARD & HADIAH (EXCHANGE RUNTAHPEDIA) ==================== -->
+      <!-- ==================== 5. BALANCE POINTS (WPAY E-WALLET & EXCHANGE REVOLUTION) ==================== -->
       <section class="view-panel" id="panel-rewards">
         
-        <!-- HEADER SALDO POIN RUNTAHPEDIA (WITH POINTS PILL & VOUCHER COUNTER) -->
-        <div class="exchange-header-card">
-          <div class="ehc-meta">
-            <span class="ehc-label" data-i18n="walletTitle">SALDO POIN RILO</span>
-            <div class="ehc-points-row">
-              <span class="ehc-points-val" id="rewardsPointsBalanceDisplay">1.240</span>
-              <span class="ehc-points-unit">pts</span>
-            </div>
-            <span class="ehc-rupiah-est" id="rewardsRupiahEst">≈ Rp 12.400</span>
+        <!-- HEADER SALDO UTAMA WPAY E-WALLET CARD -->
+        <div class="balance-points-hero-card">
+          <div class="bphc-top">
+            <span class="bphc-tag" data-i18n="balancePointsTitle">BALANCE POINTS</span>
+            <span class="bphc-level" id="rewardsLevelPill">★ Pahlawan Hijau</span>
           </div>
-          <button class="btn-ehc-my-vouchers" data-go="my-vouchers">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-            <span data-i18n="btnMyVouchers">Voucher Saya</span>
-            <span class="ehc-counter-badge" id="myVouchersCounterBadge">1</span>
-          </button>
+          <div class="bphc-val-row">
+            <span class="bphc-points-val" id="rewardsPointsBalanceDisplay">1.240</span>
+            <span class="bphc-points-unit">pts</span>
+          </div>
+          <div class="bphc-rupiah-est" id="rewardsRupiahEst">≈ Rp 12.400</div>
+          <p class="bphc-desc" data-i18n="balancePointsSub">Tukar poin sampahmu ke Saldo e-Wallet, Transfer Bank, atau Voucher Belanja.</p>
+
+          <!-- 2 Aksi Utama Dalam Balance Points: Payout e-Wallet & Voucher Page -->
+          <div class="bphc-action-buttons">
+            <button type="button" class="btn-bphc-action btn-bphc-payout" onclick="scrollToEwalletSection()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Tukar Saldo e-Wallet</span>
+            </button>
+            <button type="button" class="btn-bphc-action btn-bphc-voucher" data-go="my-vouchers">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+              <span data-i18n="btnMyVouchers">Voucher Saya</span>
+              <span class="ehc-counter-badge" id="myVouchersCounterBadge">1</span>
+            </button>
+          </div>
         </div>
 
-        <!-- CATEGORY FILTER CHIPS -->
+        <!-- SECTION 1: SALDO E-WALLET & BANK TRANSFER (WPAY CHANNELS) -->
+        <div class="services-section-title" id="secEwalletPayout" data-i18n="ewalletSectionTitle">Pencairan Saldo e-Wallet & Bank</div>
+        <div class="payout-channels-grid">
+          <!-- GoPay -->
+          <div class="payout-channel-item" onclick="openPayoutModal('ch-gopay')">
+            <div class="pci-brand-badge" style="background:#e0f7fc;color:#00aed6;">
+              <strong>G</strong>
+            </div>
+            <div class="pci-info">
+              <strong style="color:#0085a6;">GoPay</strong>
+              <span>Instan 24 Jam • Saldo</span>
+            </div>
+            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
+          </div>
+
+          <!-- DANA -->
+          <div class="payout-channel-item" onclick="openPayoutModal('ch-dana')">
+            <div class="pci-brand-badge" style="background:#e3f2fd;color:#118eea;">
+              <strong>D</strong>
+            </div>
+            <div class="pci-info">
+              <strong style="color:#0d73be;">DANA</strong>
+              <span>Top-Up Akun DANA</span>
+            </div>
+            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
+          </div>
+
+          <!-- ShopeePay -->
+          <div class="payout-channel-item" onclick="openPayoutModal('ch-shopee')">
+            <div class="pci-brand-badge" style="background:#fbe9e7;color:#ee4d2d;">
+              <strong>S</strong>
+            </div>
+            <div class="pci-info">
+              <strong style="color:#c53517;">ShopeePay</strong>
+              <span>Saldo Dompet Shopee</span>
+            </div>
+            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
+          </div>
+
+          <!-- OVO -->
+          <div class="payout-channel-item" onclick="openPayoutModal('ch-ovo')">
+            <div class="pci-brand-badge" style="background:#f3e5f5;color:#4c2a86;">
+              <strong>O</strong>
+            </div>
+            <div class="pci-info">
+              <strong style="color:#4c2a86;">OVO Cash</strong>
+              <span>Transfer OVO Premier</span>
+            </div>
+            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
+          </div>
+
+          <!-- Bank BCA -->
+          <div class="payout-channel-item" onclick="openPayoutModal('ch-bca')">
+            <div class="pci-brand-badge" style="background:#e1f0fa;color:#0060af;">
+              <strong>BCA</strong>
+            </div>
+            <div class="pci-info">
+              <strong style="color:#004b89;">Bank BCA</strong>
+              <span>Transfer Rekening Bank</span>
+            </div>
+            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
+          </div>
+
+          <!-- Bank Mandiri -->
+          <div class="payout-channel-item" onclick="openPayoutModal('ch-mandiri')">
+            <div class="pci-brand-badge" style="background:#e3ecf5;color:#003d79;">
+              <strong>MDR</strong>
+            </div>
+            <div class="pci-info">
+              <strong style="color:#003060;">Bank Mandiri</strong>
+              <span>Transfer Rekening Livin'</span>
+            </div>
+            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
+          </div>
+        </div>
+
+        <!-- SECTION 2: VOUCHER PAGE & FILTER BELANJA / MITRA -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;margin-bottom:10px;">
+          <div class="services-section-title" style="margin:0;" data-i18n="voucherSectionTitle">Katalog Voucher Belanja</div>
+          <button class="link-all" data-go="my-vouchers" data-i18n="btnMyVouchers">Voucher Saya →</button>
+        </div>
+
+        <!-- CATEGORY FILTER CHIPS KHUSUS VOUCHER (BEBAS DARI E-WALLET) -->
         <div class="exchange-category-scroll" id="exchangeFilterBar">
           <button type="button" class="chip-filter-btn active" data-filter="all">All</button>
-          <button type="button" class="chip-filter-btn" data-filter="e-Wallet">e-Wallet</button>
           <button type="button" class="chip-filter-btn" data-filter="Kuliner">Food</button>
           <button type="button" class="chip-filter-btn" data-filter="Belanja">Shopping</button>
           <button type="button" class="chip-filter-btn" data-filter="Merchandise">Merch</button>
           <button type="button" class="chip-filter-btn" data-filter="Donasi">Donate</button>
         </div>
-
-        <div class="services-section-title" data-i18n="rewardCatalogTitle">Pilihan Penukaran Hadiah</div>
 
         <div class="exchange-cards-grid" id="rewardsCardsContainer">
           <!-- Render dinamis via app.js -->
@@ -659,12 +748,12 @@
   <!-- LEAFLET MAP JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
-  <script src="js/icons.js?v=2.3"></script>
+  <script src="js/icons.js?v=2.4"></script>
   <!-- DATA LAYER & I18N -->
-  <script src="js/data.js?v=2.3"></script>
+  <script src="js/data.js?v=2.4"></script>
   <!-- APP ENGINE -->
-  <script src="js/app.js?v=2.3"></script>
+  <script src="js/app.js?v=2.4"></script>
   <!-- APP STYLESHEET CACHE BUSTER -->
-  <link rel="stylesheet" href="css/style.css?v=2.3" />
+  <link rel="stylesheet" href="css/style.css?v=2.4" />
 </body>
 </html>

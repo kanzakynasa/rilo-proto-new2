@@ -513,64 +513,105 @@ const INITIAL_DATA = {
     }
   ],
 
-  // Katalog Reward & Voucher (Termasuk Saldo e-Wallet RuntahPedia)
+  // Metode Pencairan & Penukaran Saldo e-Wallet / Transfer Bank (Wpay Style)
+  payoutChannels: [
+    {
+      id: "ch-gopay",
+      name: "GoPay",
+      category: "ewallet",
+      color: "#00aed6",
+      desc: "Instan 24 Jam • Bebas Biaya Admin",
+      descEn: "Instant 24/7 • Zero Admin Fee",
+      minPoints: 1000,
+      inputLabel: "Nomor HP Akun GoPay",
+      inputLabelEn: "GoPay Registered Mobile Number",
+      placeholder: "0812xxxxxxxx"
+    },
+    {
+      id: "ch-dana",
+      name: "DANA",
+      category: "ewallet",
+      color: "#118eea",
+      desc: "Top-up Otomatis ke Saldo DANA",
+      descEn: "Auto Top-Up to DANA Balance",
+      minPoints: 1000,
+      inputLabel: "Nomor HP Akun DANA",
+      inputLabelEn: "DANA Registered Mobile Number",
+      placeholder: "0812xxxxxxxx"
+    },
+    {
+      id: "ch-shopee",
+      name: "ShopeePay",
+      category: "ewallet",
+      color: "#ee4d2d",
+      desc: "Masuk Langsung ke Dompet Shopee",
+      descEn: "Direct Transfer to ShopeePay",
+      minPoints: 1000,
+      inputLabel: "Nomor HP ShopeePay",
+      inputLabelEn: "ShopeePay Registered Number",
+      placeholder: "0812xxxxxxxx"
+    },
+    {
+      id: "ch-ovo",
+      name: "OVO Cash",
+      category: "ewallet",
+      color: "#4c2a86",
+      desc: "Transfer Saldo ke OVO Premier",
+      descEn: "Transfer to OVO Premier Wallet",
+      minPoints: 1000,
+      inputLabel: "Nomor HP Akun OVO",
+      inputLabelEn: "OVO Registered Mobile Number",
+      placeholder: "0812xxxxxxxx"
+    },
+    {
+      id: "ch-bca",
+      name: "Bank BCA",
+      category: "bank",
+      color: "#0060af",
+      desc: "Transfer Rekening Bank Central Asia",
+      descEn: "BCA Bank Account Direct Payout",
+      minPoints: 2500,
+      inputLabel: "Nomor Rekening BCA & Nama Pemilik",
+      inputLabelEn: "BCA Account Number & Beneficiary Name",
+      placeholder: "Contoh: 1234567890 (Kaila Zanita)"
+    },
+    {
+      id: "ch-mandiri",
+      name: "Bank Mandiri",
+      category: "bank",
+      color: "#003d79",
+      desc: "Transfer Rekening Livin' by Mandiri",
+      descEn: "Mandiri Bank Account Payout",
+      minPoints: 2500,
+      inputLabel: "Nomor Rekening Mandiri & Nama",
+      inputLabelEn: "Mandiri Account Number & Name",
+      placeholder: "Contoh: 137000xxxx (Kaila Zanita)"
+    },
+    {
+      id: "ch-bri",
+      name: "Bank BRI",
+      category: "bank",
+      color: "#00529c",
+      desc: "Transfer Rekening BRImo",
+      descEn: "BRI Bank Account Payout",
+      minPoints: 2500,
+      inputLabel: "Nomor Rekening BRI & Nama",
+      inputLabelEn: "BRI Account Number & Name",
+      placeholder: "Contoh: 012301xxxx (Kaila Zanita)"
+    }
+  ],
+
+  // Nominal Penukaran Poin ke Saldo (1 Poin = Rp 10)
+  payoutDenominations: [
+    { points: 1000, rupiah: 10000, label: "Rp 10.000" },
+    { points: 2000, rupiah: 20000, label: "Rp 20.000" },
+    { points: 2500, rupiah: 25000, label: "Rp 25.000" },
+    { points: 5000, rupiah: 50000, label: "Rp 50.000" },
+    { points: 10000, rupiah: 100000, label: "Rp 100.000" }
+  ],
+
+  // Katalog Reward & Voucher Fisik / Mitra (Food, Shopping, Merch, Donate)
   rewards: [
-    {
-      id: "REW-EW-01",
-      partner: "GoPay",
-      title: "Saldo GoPay Rp 10.000",
-      titleEn: "GoPay Balance IDR 10,000",
-      description: "Transfer instan ke nomor HP akun GoPay kamu tanpa potongan admin.",
-      descriptionEn: "Instant balance transfer to your GoPay registered mobile number.",
-      pointsCost: 1000,
-      tag: "e-Wallet",
-      tagEn: "e-Wallet",
-      type: "ewallet",
-      amountRupiah: 10000,
-      stock: 999
-    },
-    {
-      id: "REW-EW-02",
-      partner: "OVO Cash",
-      title: "Saldo OVO Cash Rp 20.000",
-      titleEn: "OVO Cash Balance IDR 20,000",
-      description: "Tarik saldo ke dompet OVO Premier kamu dalam hitungan detik.",
-      descriptionEn: "Instant payout to your verified OVO Premier wallet.",
-      pointsCost: 2000,
-      tag: "e-Wallet",
-      tagEn: "e-Wallet",
-      type: "ewallet",
-      amountRupiah: 20000,
-      stock: 999
-    },
-    {
-      id: "REW-EW-03",
-      partner: "DANA",
-      title: "Saldo DANA Rp 25.000",
-      titleEn: "DANA Balance IDR 25,000",
-      description: "Top-up saldo akun DANA kamu langsung dari poin sampah terpilah.",
-      descriptionEn: "Direct balance top-up straight to your DANA account.",
-      pointsCost: 2500,
-      tag: "e-Wallet",
-      tagEn: "e-Wallet",
-      type: "ewallet",
-      amountRupiah: 25000,
-      stock: 999
-    },
-    {
-      id: "REW-EW-04",
-      partner: "ShopeePay",
-      title: "Saldo ShopeePay Rp 50.000",
-      titleEn: "ShopeePay Balance IDR 50,000",
-      description: "Saldo ShopeePay untuk belanja online dan pembayaran merchant QRIS.",
-      descriptionEn: "ShopeePay balance for online shopping & QRIS offline merchants.",
-      pointsCost: 5000,
-      tag: "e-Wallet",
-      tagEn: "e-Wallet",
-      type: "ewallet",
-      amountRupiah: 50000,
-      stock: 999
-    },
     {
       id: "REW-01",
       partner: "Kopi Kenangan",
@@ -794,8 +835,13 @@ const INITIAL_DATA = {
       navHome: "Beranda",
       navHistory: "Riwayat",
       navDeposit: "Setor",
-      navReward: "Hadiah",
+      navReward: "Poin & Saldo",
       navMore: "Lainnya",
+      balancePointsTitle: "Balance Points",
+      balancePointsSub: "Tukar poin sampahmu ke Saldo e-Wallet, Transfer Bank, atau Voucher Belanja.",
+      ewalletSectionTitle: "Pencairan Saldo e-Wallet & Bank",
+      voucherSectionTitle: "Katalog Voucher Belanja",
+      btnCashoutAction: "Tarik Saldo",
       scanTitle: "Scan QR Drop Box",
       scanSub: "Arahkan ke QR Code pada pintu Smart Drop Box",
       scanSearching: "Mencari kode QR Drop Box di sekitar...",
@@ -869,8 +915,13 @@ const INITIAL_DATA = {
       navHome: "Home",
       navHistory: "History",
       navDeposit: "Deposit",
-      navReward: "Rewards",
+      navReward: "Points & Payout",
       navMore: "More",
+      balancePointsTitle: "Balance Points",
+      balancePointsSub: "Exchange recycling points for e-Wallet balance, Bank Payout, or Merchant Vouchers.",
+      ewalletSectionTitle: "e-Wallet & Bank Cashout",
+      voucherSectionTitle: "Merchant Voucher Catalog",
+      btnCashoutAction: "Payout",
       scanTitle: "Scan QR Drop Box",
       scanSub: "Point camera at the QR Code on the Smart Drop Box door",
       scanSearching: "Detecting nearby Drop Box QR Code...",

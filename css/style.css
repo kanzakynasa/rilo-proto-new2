@@ -1839,102 +1839,230 @@ button, input, select, textarea {
   cursor: not-allowed;
 }
 
-/* === REWARD & EXCHANGE PAGE (ALA RUNTAHPEDIA NODE 113:1077 / 136:2494) === */
-.exchange-header-card {
+/* === BALANCE POINTS & WPAY E-WALLET CASHOUT SYSTEM === */
+.balance-points-hero-card {
   background: linear-gradient(135deg, var(--rilo-wine), #963754);
   color: #fff;
   border-radius: var(--radius-sm);
-  padding: 16px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
   box-shadow: var(--shadow-wine);
   position: relative;
   overflow: hidden;
 }
 
-.exchange-header-card::after {
+.balance-points-hero-card::after {
   content: "";
   position: absolute;
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  right: -20px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  right: -30px;
   top: -30px;
   pointer-events: none;
 }
 
-.ehc-meta {
+.bphc-top {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-.ehc-label {
-  font-size: 10px;
-  font-weight: 750;
-  text-transform: uppercase;
+.bphc-tag {
+  font-size: 11px;
+  font-weight: 850;
   letter-spacing: 0.8px;
   color: #f7e3eb;
+  text-transform: uppercase;
 }
 
-.ehc-points-row {
+.bphc-level {
+  background: linear-gradient(135deg, #15803d, #10b981);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 850;
+  padding: 2px 8px;
+  border-radius: var(--radius-squircle);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.bphc-val-row {
   display: flex;
   align-items: baseline;
-  gap: 5px;
-  margin: 3px 0 1px;
+  gap: 6px;
+  margin: 6px 0 2px;
 }
 
-.ehc-points-val {
-  font-size: 28px;
+.bphc-points-val {
+  font-size: 34px;
   font-weight: 850;
-  letter-spacing: -0.5px;
-  line-height: 1.1;
-  color: #fff;
+  letter-spacing: -0.8px;
+  line-height: 1;
 }
 
-.ehc-points-unit {
-  font-size: 13px;
-  font-weight: 750;
+.bphc-points-unit {
+  font-size: 14px;
+  font-weight: 800;
   color: #fce8f0;
 }
 
-.ehc-rupiah-est {
-  font-size: 11px;
+.bphc-rupiah-est {
+  font-size: 12px;
   color: #f5d4e1;
   font-weight: 600;
+  margin-bottom: 8px;
 }
 
-.btn-ehc-my-vouchers {
-  background: #ffffff;
-  color: var(--rilo-wine);
-  border: none;
-  padding: 8px 12px;
+.bphc-desc {
+  font-size: 11px;
+  color: #f8e5ee;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.bphc-action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-bphc-action {
+  flex: 1;
+  padding: 10px 12px;
   border-radius: var(--radius-xs);
   font-size: 11px;
   font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   transition: all 0.15s ease;
-  flex-shrink: 0;
 }
 
-.btn-ehc-my-vouchers:active {
-  transform: scale(0.96);
-  background: #fdf5f8;
+.btn-bphc-payout {
+  background: #ffffff;
+  color: var(--rilo-wine);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.ehc-counter-badge {
+.btn-bphc-voucher {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Payout Channels Grid (Wpay Style) */
+.payout-channels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.payout-channel-item {
+  background: var(--surface);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 105px;
+}
+
+.payout-channel-item:hover {
+  border-color: var(--rilo-wine-border);
+  box-shadow: 0 4px 12px rgba(118, 26, 56, 0.1);
+}
+
+.payout-channel-item:active {
+  transform: scale(0.97);
+}
+
+.pci-brand-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-squircle);
+  display: grid;
+  place-items: center;
+  font-weight: 850;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.pci-info strong {
+  font-size: 13px;
+  display: block;
+  margin-bottom: 1px;
+}
+
+.pci-info span {
+  font-size: 10px;
+  color: var(--text-sub);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.btn-pci-action {
+  width: 100%;
+  background: var(--rilo-wine-soft);
+  color: var(--rilo-wine);
+  border: 1px solid var(--rilo-wine-border);
+  padding: 5px;
+  border-radius: var(--radius-xs);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
+}
+
+.payout-channel-item:hover .btn-pci-action {
   background: var(--rilo-wine);
   color: #fff;
+}
+
+/* Modal Denomination Chips */
+.denom-grid-chips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.denom-chip-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border-line);
+  border-radius: var(--radius-xs);
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.denom-chip-btn.active {
+  border-color: var(--rilo-wine);
+  background: var(--rilo-wine-soft);
+}
+
+.denom-chip-btn strong {
+  font-size: 12px;
+  color: var(--text-main);
+  display: block;
+}
+
+.denom-chip-btn span {
   font-size: 10px;
-  font-weight: 850;
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
+  color: var(--rilo-wine);
+  font-weight: 750;
 }
 
 /* Category Filter Chips */

@@ -1001,19 +1001,167 @@ function renderTransactions() {
 // 3. Rewards & Penukaran (Exchange RuntahPedia Style)
 let activeRewardFilter = "all";
 
-function setupRewardCategoryFilters() {
-  const chips = document.querySelectorAll("#exchangeFilterBar .chip-filter-btn");
-  chips.forEach((chip) => {
-    chip.onclick = function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      chips.forEach((c) => c.classList.remove("active"));
-      this.classList.add("active");
-      activeRewardFilter = this.getAttribute("data-filter") || "all";
-      renderRewards();
-    };
-  });
+function scrollToEwalletSection() {
+  const el = document.getElementById("secEwalletPayout");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
+
+// Modal Payout e-Wallet & Bank Transfer (Wpay UI Kit Style)
+let selectedPayoutDenom = 1000;
+
+window.openPayoutModal = function(channelId) {
+  const ch = (AppState.payoutChannels || []).find(c => c.id === channelId);
+  if (!ch) return;
+
+  const isEn = AppState.currentLang === "en";
+  const content = document.getElementById("modalSheetDynamicBox");
+
+  selectedPayoutDenom = ch.minPoints || 1000;
+  const isBank = ch.category === "bank";
+
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px;">
+      <div style="width:48px;height:48px;border-radius:12px;background:${ch.color}15;color:${ch.color};display:grid;place-items:center;margin:0 auto 8px;font-size:18px;font-weight:850;">
+        ${ch.name.slice(0, 3)}
+      </div>
+      <h3 style="font-size:16px;font-weight:850;margin-bottom:2px;">${isEn ? 'Cashout to ' + ch.name : 'Tukar ke Saldo ' + ch.name}</h3>
+      <span style="font-size:11px;color:var(--text-sub);">${isEn ? ch.descEn : ch.desc}</span>
+    </div>
+
+    <!-- Pilihan Nominal Penukaran Poin -->
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:750;color:var(--text-main);display:block;margin-bottom:6px;">
+        ${isEn ? 'Select Payout Denomination' : 'Pilih Nominal Saldo'}
+      </label>
+      <div class="denom-grid-chips">
+        ${(AppState.payoutDenominations || []).map(d => {
+          const isSelected = d.points === selectedPayoutDenom;
+          const isEligible = AppState.user.points >= d.points;
+          return `
+            <div class="denom-chip-btn ${isSelected ? 'active' : ''}" 
+                 onclick="selectPayoutDenomination(${d.points}, this)"
+                 style="${!isEligible ? 'opacity:0.5;' : ''}">
+              <strong>${d.label}</strong>
+              <span>${fmt(d.points)} pts</span>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- Input Akun Tujuan -->
+    <div style="margin-bottom:14px;text-align:left;">
+      <label style="font-size:11px;font-weight:750;color:var(--text-main);display:block;margin-bottom:4px;">
+        ${isEn ? ch.inputLabelEn : ch.inputLabel}
+      </label>
+      <input type="text" id="payoutAccountTarget" class="input-kg-val" style="width:100%;font-size:13px;font-weight:700;" placeholder="${ch.placeholder}" value="${isBank ? '' : (AppState.user.phone || '0812-3456-7890')}" required />
+      <small style="font-size:10px;color:var(--text-muted);margin-top:3px;display:block;">
+        ${isEn ? 'Make sure destination account details are valid.' : 'Pastikan nomor rekening/e-wallet sudah sesuai atas nama akunmu.'}
+      </small>
+    </div>
+
+    <div style="background:var(--rilo-wine-soft);border:1px dashed var(--rilo-wine-border);border-radius:12px;padding:12px;text-align:center;margin-bottom:16px;">
+      <span style="font-size:10px;color:var(--text-sub);text-transform:uppercase;font-weight:700;">${isEn ? 'Points Required' : 'Poin yang Dipotong'}</span>
+      <div style="font-size:22px;font-weight:850;color:var(--rilo-wine);margin:2px 0;" id="modalRequiredPointsDisplay">${fmt(selectedPayoutDenom)} Poin</div>
+      <small style="font-size:11px;color:var(--text-sub);">${isEn ? 'Current Balance' : 'Saldo Kamu Saat Ini'}: <b>${fmt(AppState.user.points)} pts</b></small>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">${isEn ? 'Cancel' : 'Batal'}</button>
+      <button class="btn-solid-wine" id="btnExecutePayoutAction">${isEn ? 'Process Payout' : 'Proses Pencairan'}</button>
+    </div>
+  `;
+
+  openModalSheet();
+
+  document.getElementById("btnExecutePayoutAction").onclick = () => {
+    if (AppState.user.points < selectedPayoutDenom) {
+      showToast(isEn ? `Insufficient points. You need ${fmt(selectedPayoutDenom - AppState.user.points)} more pts.` : `Poin belum cukup. Butuh ${fmt(selectedPayoutDenom - AppState.user.points)} poin lagi.`, false);
+      return;
+    }
+
+    const inputTarget = document.getElementById("payoutAccountTarget").value.trim();
+    if (!inputTarget) {
+      showToast(isEn ? "Please enter destination account/phone number" : "Masukkan nomor tujuan akun pencairan", false);
+      return;
+    }
+
+    const denomObj = (AppState.payoutDenominations || []).find(d => d.points === selectedPayoutDenom) || { points: selectedPayoutDenom, rupiah: selectedPayoutDenom * 10, label: "Rp " + fmt(selectedPayoutDenom * 10) };
+
+    // 1. Potong Poin
+    AppState.user.points -= selectedPayoutDenom;
+
+    // 2. Catat Bukti Transfer
+    const code = `PAY-${ch.name.replace(/[^A-Z0-9]/gi, '').toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    AppState.redemptions.unshift({
+      id: `RDM-${Date.now()}`,
+      date: new Date().toISOString().slice(0, 10),
+      partner: ch.name,
+      rewardTitle: `Saldo ${ch.name} ${denomObj.label}`,
+      rewardTitleEn: `${ch.name} Balance ${denomObj.label}`,
+      pointsSpent: selectedPayoutDenom,
+      code: code,
+      expiry: isEn ? "Completed" : "Selesai",
+      status: isEn ? "Transfer Successful" : "Berhasil Ditransfer",
+      statusEn: "Transfer Successful",
+      type: "payout",
+      amountRupiah: denomObj.rupiah,
+      targetAccount: inputTarget
+    });
+
+    // 3. Update UI Realtime
+    updateVoucherCounterUI();
+    renderAllViews();
+
+    // 4. Struk Bukti Sukses Transfer Wpay
+    content.innerHTML = `
+      <div style="text-align:center;padding:6px 0;">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
+          ${ICONS.check}
+        </div>
+        <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">
+          ${isEn ? 'Payout Sent Successfully!' : 'Saldo Berhasil Ditransfer!'}
+        </h3>
+        <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">
+          ${isEn 
+            ? `${denomObj.label} has been transferred to ${ch.name} (${inputTarget}).` 
+            : `${denomObj.label} berhasil dikirimkan ke ${ch.name} (${inputTarget}).`}
+        </p>
+
+        <div style="background:#f8fafc;border-radius:12px;padding:12px 14px;border:1.5px dashed #cbd5e1;margin-bottom:16px;text-align:left;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+            <span style="color:var(--text-muted);">${isEn ? 'Ref ID' : 'ID Referensi'}:</span>
+            <strong>${code}</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+            <span style="color:var(--text-muted);">${isEn ? 'Points Exchanged' : 'Poin Ditukar'}:</span>
+            <strong style="color:var(--rilo-wine);">${fmt(selectedPayoutDenom)} pts</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;">
+            <span style="color:var(--text-muted);">${isEn ? 'Status' : 'Status'}:</span>
+            <span class="bsc-status-pill" style="height:20px;font-size:10px;">${isEn ? 'Success' : 'Berhasil'}</span>
+          </div>
+        </div>
+
+        <button class="btn-solid-wine" onclick="closeModalSheet(); switchView('my-vouchers');">
+          ${isEn ? 'View in My Vouchers & Payouts' : 'Lihat di Voucher & Saldo Saya'}
+        </button>
+      </div>
+    `;
+
+    showToast(isEn ? "Payout transfer completed!" : "Pencairan saldo berhasil!", true);
+  };
+};
+
+window.selectPayoutDenomination = function(pts, btn) {
+  selectedPayoutDenom = pts;
+  document.querySelectorAll(".denom-chip-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  const el = document.getElementById("modalRequiredPointsDisplay");
+  if (el) el.textContent = `${fmt(pts)} Poin`;
+};
 
 function updateVoucherCounterUI() {
   const count = (AppState.redemptions && AppState.redemptions.length) ? AppState.redemptions.length : 0;
