@@ -217,6 +217,29 @@
           </div>
         </div>
 
+        <!-- DAMPAK DAUR ULANG (PINDAH KE HOMEPAGE DI BAWAH NEWS SESUAI INSTRUKSI) -->
+        <div class="section-head-row" style="margin-top:10px;margin-bottom:8px;">
+          <h4 style="font-size:14px;font-weight:850;color:var(--text-main);display:flex;align-items:center;gap:6px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--eco-emerald);"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+            <span data-i18n="impactTitle">Dampak Daur Ulang</span>
+          </h4>
+          <button class="link-all" data-go="impact" data-i18n="seeAll">Lihat Detail →</button>
+        </div>
+
+        <!-- 2 Kolom Ringkas Dampak di Home -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div class="clean-item-card" style="flex-direction:column;align-items:flex-start;padding:12px 14px;" data-go="impact">
+            <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;" data-i18n="impactMat">Total Material</span>
+            <strong style="font-size:20px;color:var(--rilo-wine);margin-top:2px;" id="homeImpactWeight">18,4 kg</strong>
+            <small style="font-size:10px;color:var(--text-sub);margin-top:2px;">Terselamatkan</small>
+          </div>
+          <div class="clean-item-card" style="flex-direction:column;align-items:flex-start;padding:12px 14px;" data-go="impact">
+            <span style="font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;" data-i18n="impactCo2">CO2 Dicegah</span>
+            <strong style="font-size:20px;color:var(--eco-emerald);margin-top:2px;" id="homeImpactCo2">27,6 kg</strong>
+            <small style="font-size:10px;color:var(--text-sub);margin-top:2px;">Jejak Karbon</small>
+          </div>
+        </div>
+
         <!-- AKTIVITAS TERAKHIR -->
         <div class="section-head-row">
           <h4 data-i18n="recentTitle">Aktivitas Terakhir</h4>
@@ -474,56 +497,37 @@
         </div>
       </section>
 
-      <!-- ==================== 8. LAINNYA / MENU HUB ==================== -->
+      <!-- ==================== 8. LAINNYA / MENU HUB (FIGMA NODE 42:11 SPEC) ==================== -->
       <section class="view-panel" id="panel-more">
         
-        <div class="clean-item-card" style="margin-bottom:16px;cursor:default;">
+        <!-- Kartu Header Profil Selaras dengan Homepage -->
+        <div class="clean-item-card" style="margin-bottom:16px;cursor:pointer;" data-go="profile">
           <div class="cic-left">
-            <div class="profile-avatar-squircle" style="width:42px;height:42px;font-size:16px;">K</div>
-            <div>
-              <strong style="font-size:14px;" id="profileDisplayNameText">Kaila Zanita</strong>
+            <div class="profile-avatar-squircle" style="width:44px;height:44px;font-size:17px;">
+              <span id="moreAvatarText">K</span>
+            </div>
+            <div class="cic-text">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+                <strong style="font-size:14px;" id="profileDisplayNameText">Kaila Zanita</strong>
+                <span class="user-tier-badge-glow" id="moreTierBadge">★ Pahlawan Hijau</span>
+              </div>
               <span id="profileDisplayEmailText">kaila.zanita@example.com</span>
             </div>
           </div>
-          <span class="badge-tag-status">Pahlawan Hijau</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--text-muted);"><path d="m9 18 6-6-6-6"/></svg>
         </div>
 
-        <div class="services-section-title" data-i18n="servicesTitle">Fitur & Eksplorasi</div>
+        <!-- Daftar Menu Pengaturan Bersih (Tanpa Duplikasi Peta & Voucher yang Sudah Ada) -->
+        <div class="services-section-title" data-i18n="accountSectionTitle">Pengaturan Akun & Aplikasi</div>
         <div class="activity-list-container">
-          <div class="clean-item-card" data-go="map-full">
+          <div class="clean-item-card" data-go="profile">
             <div class="cic-left">
               <div class="cic-icon-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
               <div class="cic-text">
-                <strong data-i18n="fullMapTitle">Peta Drop Point Bintaro</strong>
-                <span>Cek lokasi smart drop box & hub terdekat</span>
-              </div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
-
-          <div class="clean-item-card" data-go="impact">
-            <div class="cic-left">
-              <div class="cic-icon-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-              </div>
-              <div class="cic-text">
-                <strong data-i18n="impactTitle">Dampak Lingkungan Saya</strong>
-                <span>Jejak karbon & total material terselamatkan</span>
-              </div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
-
-          <div class="clean-item-card" data-go="my-vouchers">
-            <div class="cic-left">
-              <div class="cic-icon-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-              </div>
-              <div class="cic-text">
-                <strong data-i18n="myVouchersTitle">Voucher Saya</strong>
-                <span>Daftar kupon yang telah ditukarkan</span>
+                <strong data-i18n="optPersonalProfile">Edit Profil & Alamat</strong>
+                <span data-i18n="optPersonalProfileSub">Nama, email, dan alamat penjemputan</span>
               </div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
@@ -535,8 +539,8 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
               </div>
               <div class="cic-text">
-                <strong>Panduan Daur Ulang</strong>
-                <span>Tips memilah botol, kaleng, dan karton</span>
+                <strong data-i18n="optRecycleGuide">Panduan Pilah Sampah</strong>
+                <span data-i18n="optRecycleGuideSub">Tips memilah botol, kaleng, dan karton</span>
               </div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
@@ -545,11 +549,11 @@
           <div class="clean-item-card" data-go="profile">
             <div class="cic-left">
               <div class="cic-icon-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
               </div>
               <div class="cic-text">
-                <strong data-i18n="profileTitle">Pengaturan Profil</strong>
-                <span>Ubah nama dan alamat utama</span>
+                <strong data-i18n="optLanguageSettings">Pengaturan Bahasa</strong>
+                <span data-i18n="optLanguageSettingsSub">Pilih Bahasa Indonesia atau English</span>
               </div>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
@@ -696,8 +700,23 @@
           </div>
         </div>
 
-        <!-- Form Edit Data Diri -->
-        <div class="services-section-title">Informasi Pribadi</div>
+        <!-- BUKU ALAMAT PENJEMPUTAN (ALA E-COMMERCE: BISA TAMBAH, PILIH & EDIT ALAMAT) -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;margin-bottom:8px;">
+          <div class="services-section-title" style="margin:0;">Buku Alamat Penjemputan</div>
+          <span style="font-size:11px;color:var(--text-muted);" id="addressCountText">2 Alamat</span>
+        </div>
+
+        <div id="addressBookListContainer">
+          <!-- Render dinamis kartu alamat via app.js -->
+        </div>
+
+        <button type="button" class="btn-add-new-address" onclick="openAddNewAddressModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Tambah Alamat Baru</span>
+        </button>
+
+        <!-- Form Edit Data Diri Dasar (Nama & Email) -->
+        <div class="services-section-title">Informasi Akun</div>
         <form id="formUpdateProfileData" style="background:#fff;border-radius:14px;border:1px solid var(--border-line);padding:16px;margin-bottom:14px;">
           <div style="margin-bottom:12px;">
             <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;" data-i18n="labelFullName">Nama Lengkap</label>
@@ -708,14 +727,10 @@
             <input type="email" id="profileInputEmail" class="input-kg-val" style="width:100%;" required />
           </div>
           <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;">Nomor Handphone</label>
+            <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;">Nomor Telepon</label>
             <input type="tel" id="profileInputPhone" class="input-kg-val" style="width:100%;" value="0812-3456-7890" />
           </div>
-          <div style="margin-bottom:16px;">
-            <label style="font-size:11px;font-weight:700;display:block;margin-bottom:4px;">Alamat Penjemputan Utama</label>
-            <textarea id="profileInputAddress" class="input-kg-val" style="width:100%;height:60px;" required></textarea>
-          </div>
-          <button type="submit" class="btn-solid-wine" data-i18n="btnSaveProfile">Simpan Profil</button>
+          <button type="submit" class="btn-solid-wine" data-i18n="btnSaveProfile">Simpan Akun</button>
         </form>
 
         <!-- Tombol Logout di Dalam Halaman Profil -->
@@ -779,12 +794,12 @@
   <!-- LEAFLET MAP JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
-  <script src="js/icons.js?v=3.1"></script>
+  <script src="js/icons.js?v=3.3"></script>
   <!-- DATA LAYER & I18N -->
-  <script src="js/data.js?v=3.1"></script>
+  <script src="js/data.js?v=3.3"></script>
   <!-- APP ENGINE -->
-  <script src="js/app.js?v=3.1"></script>
+  <script src="js/app.js?v=3.3"></script>
   <!-- APP STYLESHEET CACHE BUSTER -->
-  <link rel="stylesheet" href="css/style.css?v=3.1" />
+  <link rel="stylesheet" href="css/style.css?v=3.3" />
 </body>
 </html>

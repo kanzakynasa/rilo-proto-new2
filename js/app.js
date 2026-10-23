@@ -1094,6 +1094,12 @@ function renderHome() {
       `).join("");
     }
   }
+
+  // Update Ringkasan Dampak Hijau di Homepage
+  const homeW = document.getElementById("homeImpactWeight");
+  const homeC = document.getElementById("homeImpactCo2");
+  if (homeW) homeW.textContent = `${fmt(user.totalWeight)} kg`;
+  if (homeC) homeC.textContent = `${(user.totalWeight * 1.5).toFixed(1)} kg`;
 }
 
 // 2. Riwayat Transaksi (History Spec RuntahPedia)
@@ -2098,12 +2104,176 @@ function setupProfileForm() {
   }
 }
 
+// === MANAJEMEN BUKU ALAMAT E-COMMERCE (TAMBAH, PILIH UTAMA, HAPUS) ===
+function renderAddressBook() {
+  const container = document.getElementById("addressBookListContainer");
+  const countEl = document.getElementById("addressCountText");
+  const isEn = AppState.currentLang === "en";
+
+  const addrs = (AppState.user && AppState.user.addresses) ? AppState.user.addresses : [];
+  if (countEl) {
+    countEl.textContent = isEn ? `${addrs.length} Addresses` : `${addrs.length} Alamat`;
+  }
+
+  if (!container) return;
+
+  if (addrs.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:24px 16px;background:#fff;border-radius:12px;border:1px solid var(--border-line);">
+        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No address saved yet.' : 'Belum ada alamat penjemputan tersimpan.'}</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = addrs.map((a) => {
+    const isPrimary = a.isPrimary;
+    const labelTitle = isEn ? (a.labelEn || a.label) : a.label;
+
+    return `
+      <div class="address-card-item ${isPrimary ? 'primary-addr' : ''}">
+        <div class="aci-head">
+          <div class="aci-title-group">
+            <strong>${labelTitle}</strong>
+            ${isPrimary ? `<span class="aci-tag-primary">${isEn ? 'MAIN ADDRESS' : 'UTAMA'}</span>` : ''}
+          </div>
+          ${!isPrimary ? `
+            <button type="button" class="btn-addr-action" onclick="setPrimaryAddress('${a.id}')">
+              ${isEn ? 'Set as Main' : 'Jadikan Utama'}
+            </button>
+          ` : ''}
+        </div>
+        <div class="aci-contact">${a.receiverName} (${a.phone})</div>
+        <div class="aci-address">${a.fullAddress}</div>
+        ${a.notes ? `<div class="aci-notes">Catatan: ${a.notes}</div>` : ''}
+
+        <div class="aci-actions-row">
+          <button type="button" class="btn-addr-action" onclick="deleteAddress('${a.id}')" style="color:#e11d48;">
+            ${isEn ? 'Delete' : 'Hapus'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+window.setPrimaryAddress = function(addrId) {
+  const addrs = AppState.user.addresses || [];
+  addrs.forEach(a => {
+    a.isPrimary = (a.id === addrId);
+    if (a.isPrimary) {
+      AppState.user.address = a.fullAddress;
+    }
+  });
+  renderAddressBook();
+  showToast(AppState.currentLang === "en" ? "Main address updated" : "Alamat utama diperbarui", true);
+};
+
+window.deleteAddress = function(addrId) {
+  const isEn = AppState.currentLang === "en";
+  if (confirm(isEn ? "Are you sure you want to delete this address?" : "Hapus alamat ini dari buku alamat?")) {
+    AppState.user.addresses = (AppState.user.addresses || []).filter(a => a.id !== addrId);
+    if (AppState.user.addresses.length > 0 && !AppState.user.addresses.some(a => a.isPrimary)) {
+      AppState.user.addresses[0].isPrimary = true;
+      AppState.user.address = AppState.user.addresses[0].fullAddress;
+    }
+    renderAddressBook();
+    showToast(isEn ? "Address removed" : "Alamat berhasil dihapus", true);
+  }
+};
+
+window.openAddNewAddressModal = function() {
+  const isEn = AppState.currentLang === "en";
+  const content = document.getElementById("modalSheetDynamicBox");
+
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px;">
+      <h3 style="font-size:16px;font-weight:850;margin-bottom:4px;">
+        ${isEn ? 'Add New Address' : 'Tambah Alamat Penjemputan Baru'}
+      </h3>
+      <span style="font-size:11px;color:var(--text-sub);">
+        ${isEn ? 'Save home, office, or dorm address for waste pickup' : 'Simpan alamat rumah, kost, atau kantor untuk penjemputan'}
+      </span>
+    </div>
+
+    <form id="formAddNewAddress" onsubmit="event.preventDefault(); submitAddNewAddress();">
+      <div style="margin-bottom:10px;text-align:left;">
+        <label style="font-size:11px;font-weight:750;display:block;margin-bottom:3px;">Label Alamat</label>
+        <input type="text" id="newAddrLabel" class="input-kg-val" style="width:100%;" placeholder="Contoh: Rumah, Kantor, Kost" required />
+      </div>
+      <div style="margin-bottom:10px;text-align:left;">
+        <label style="font-size:11px;font-weight:750;display:block;margin-bottom:3px;">Nama Penerima</label>
+        <input type="text" id="newAddrReceiver" class="input-kg-val" style="width:100%;" value="${AppState.user.name}" required />
+      </div>
+      <div style="margin-bottom:10px;text-align:left;">
+        <label style="font-size:11px;font-weight:750;display:block;margin-bottom:3px;">Nomor Telepon</label>
+        <input type="tel" id="newAddrPhone" class="input-kg-val" style="width:100%;" value="${AppState.user.phone || '0812-3456-7890'}" required />
+      </div>
+      <div style="margin-bottom:10px;text-align:left;">
+        <label style="font-size:11px;font-weight:750;display:block;margin-bottom:3px;">Alamat Lengkap</label>
+        <textarea id="newAddrFull" class="input-kg-val" style="width:100%;height:60px;" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan" required></textarea>
+      </div>
+      <div style="margin-bottom:14px;text-align:left;">
+        <label style="font-size:11px;font-weight:750;display:block;margin-bottom:3px;">Catatan Kurir (Opsional)</label>
+        <input type="text" id="newAddrNotes" class="input-kg-val" style="width:100%;" placeholder="Contoh: Pagar hitam depan pos satpam" />
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button type="button" class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">
+          ${isEn ? 'Cancel' : 'Batal'}
+        </button>
+        <button type="submit" class="btn-solid-wine">
+          ${isEn ? 'Save Address' : 'Simpan Alamat'}
+        </button>
+      </div>
+    </form>
+  `;
+
+  openModalSheet();
+};
+
+window.submitAddNewAddress = function() {
+  const label = document.getElementById("newAddrLabel").value.trim();
+  const receiver = document.getElementById("newAddrReceiver").value.trim();
+  const phone = document.getElementById("newAddrPhone").value.trim();
+  const full = document.getElementById("newAddrFull").value.trim();
+  const notes = document.getElementById("newAddrNotes").value.trim();
+  const isEn = AppState.currentLang === "en";
+
+  const newAddrObj = {
+    id: `addr-${Date.now()}`,
+    label: label || "Alamat Tambahan",
+    labelEn: label || "Additional Address",
+    receiverName: receiver || AppState.user.name,
+    phone: phone || "0812-3456-7890",
+    fullAddress: full,
+    notes: notes,
+    isPrimary: (AppState.user.addresses || []).length === 0
+  };
+
+  if (!AppState.user.addresses) AppState.user.addresses = [];
+  AppState.user.addresses.push(newAddrObj);
+
+  if (newAddrObj.isPrimary) {
+    AppState.user.address = newAddrObj.fullAddress;
+  }
+
+  closeModalSheet();
+  renderAddressBook();
+  showToast(isEn ? "New address successfully saved!" : "Alamat baru berhasil ditambahkan!", true);
+};
+
 function renderProfile() {
   const user = AppState.user;
   const isEn = AppState.currentLang === "en";
 
   document.getElementById("profileDisplayNameText").textContent = user.name;
   document.getElementById("profileDisplayEmailText").textContent = user.email;
+
+  const moreAvatarEl = document.getElementById("moreAvatarText");
+  const moreTierEl = document.getElementById("moreTierBadge");
+  if (moreAvatarEl) moreAvatarEl.textContent = user.avatar || user.name[0];
+  if (moreTierEl) moreTierEl.textContent = isEn ? "★ Eco Hero" : "★ Pahlawan Hijau";
 
   const heroNameEl = document.getElementById("profileHeroNameDisplay");
   const heroEmailEl = document.getElementById("profileHeroEmailDisplay");
@@ -2122,13 +2292,15 @@ function renderProfile() {
     profLangEn.classList.toggle("active", AppState.currentLang === "en");
   }
 
+  renderAddressBook();
+
   const inName = document.getElementById("profileInputName");
   const inEmail = document.getElementById("profileInputEmail");
-  const inAddr = document.getElementById("profileInputAddress");
+  const inPhone = document.getElementById("profileInputPhone");
 
   if (inName) inName.value = user.name;
   if (inEmail) inEmail.value = user.email;
-  if (inAddr) inAddr.value = user.address;
+  if (inPhone) inPhone.value = user.phone || "0812-3456-7890";
 }
 
 // === MODAL SHEET ENGINE ===

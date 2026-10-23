@@ -336,34 +336,43 @@ button, input, select, textarea {
   gap: 8px;
 }
 
-.user-tier-badge-glow {
-  background: linear-gradient(135deg, #15803d, #10b981);
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 850;
-  padding: 3px 9px;
-  border-radius: var(--radius-squircle);
-  letter-spacing: 0.4px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5), 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  position: relative;
-  overflow: hidden;
-  animation: heroBlinkPulse 2.8s infinite ease-in-out;
+/* Badge Pahlawan Hijau Istimewa dengan efek Glow Shimmer / Blink Lembut (100% Selaras) */
+.user-tier-badge-glow,
+.wine-card-tier,
+.pcc-tier-badge,
+.badge-special-hero,
+.badge-tag-status.hero-tier-tag {
+  background: linear-gradient(135deg, #15803d, #10b981) !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+  padding: 3px 9px !important;
+  border-radius: var(--radius-squircle) !important;
+  letter-spacing: 0.4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.65), 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  animation: heroBlinkPulse 2.8s infinite ease-in-out !important;
 }
 
-.user-tier-badge-glow::after {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -60%;
-  width: 40%;
-  height: 200%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
-  transform: rotate(25deg);
-  animation: heroShimmerGleam 2.8s infinite ease-in-out;
+.user-tier-badge-glow::after,
+.wine-card-tier::after,
+.pcc-tier-badge::after,
+.badge-special-hero::after,
+.badge-tag-status.hero-tier-tag::after {
+  content: "" !important;
+  position: absolute !important;
+  top: -50% !important;
+  left: -60% !important;
+  width: 40% !important;
+  height: 200% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent) !important;
+  transform: rotate(25deg) !important;
+  animation: heroShimmerGleam 2.8s infinite ease-in-out !important;
 }
 
 .user-greeting {
@@ -898,6 +907,119 @@ button, input, select, textarea {
   font-size: 16px;
   font-weight: 850;
   color: var(--text-main);
+}
+
+/* === E-COMMERCE ADDRESS BOOK CARDS === */
+.address-card-item {
+  background: var(--surface);
+  border: 1.5px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.address-card-item.primary-addr {
+  border-color: var(--rilo-wine-border);
+  background: #fdfafb;
+  border-left: 3.5px solid var(--rilo-wine);
+}
+
+.aci-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aci-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aci-title-group strong {
+  font-size: 13px;
+  color: var(--text-main);
+  font-weight: 850;
+}
+
+.aci-tag-primary {
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+  color: var(--rilo-wine);
+  background: var(--rilo-wine-soft);
+  padding: 2px 7px;
+  border-radius: var(--radius-squircle);
+  border: 1px solid var(--rilo-wine-border);
+}
+
+.aci-contact {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.aci-address {
+  font-size: 11px;
+  color: var(--text-sub);
+  line-height: 1.45;
+}
+
+.aci-notes {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.aci-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-line);
+}
+
+.btn-addr-action {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--rilo-wine);
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.btn-addr-action:hover {
+  text-decoration: underline;
+}
+
+.btn-add-new-address {
+  width: 100%;
+  background: #fff;
+  border: 1.5px dashed var(--rilo-wine-border);
+  color: var(--rilo-wine);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  transition: all 0.15s ease;
+}
+
+.btn-add-new-address:active {
+  background: var(--rilo-wine-soft);
 }
 
 /* === CARD MAP DROP POINT BINTARO (OPSI 2: KLIK LANGSUNG PINDAH KE PETA PENUH) === */
@@ -1693,30 +1815,48 @@ button, input, select, textarea {
   margin-top: 2px;
 }
 
-.btn-qr-circle-action {
-  background: var(--surface);
-  border: 1px solid var(--border-line);
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-squircle);
-  display: grid;
-  place-items: center;
-  color: var(--text-main);
+/* Tombol Back Bersih Tanpa Kotak (Cukup < Sesuai Instruksi) */
+.btn-back-circle {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 4px 6px 4px 0 !important;
+  font-size: 20px !important;
+  color: var(--text-main) !important;
+  display: inline-flex !important;
+  align-items: center !important;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.15s ease;
-  flex-shrink: 0;
+  border-radius: 0 !important;
+  transition: opacity 0.15s ease;
+}
+
+.btn-back-circle:active {
+  opacity: 0.6;
+}
+
+.btn-qr-circle-action {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  width: auto;
+  height: auto;
+  padding: 4px;
+  font-size: 20px;
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
 }
 
 .btn-qr-circle-action:active {
-  transform: scale(0.94);
-  background: var(--surface-subtle);
+  opacity: 0.6;
 }
 
 .btn-qr-circle-action.active-flash {
-  background: #fef3c7;
-  color: #b45309;
-  border-color: #fde68a;
+  color: #f59e0b;
 }
 
 /* Viewfinder Kamera Berstandar Figma UI */

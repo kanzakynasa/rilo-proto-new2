@@ -28,7 +28,30 @@ const INITIAL_DATA = {
     avatar: "K",
     levelName: "Pahlawan Hijau",
     levelNameEn: "Eco Hero",
-    joinedDate: "September 2026"
+    joinedDate: "September 2026",
+    // Manajemen Buku Alamat E-Commerce (Bisa Tambah & Pilih Alamat Utama)
+    addresses: [
+      {
+        id: "addr-01",
+        label: "Rumah Utama",
+        labelEn: "Main House",
+        receiverName: "Kaila Zanita",
+        phone: "0812-3456-7890",
+        fullAddress: "Jl. Kasuari Blok HB2 No. 14, Sektor 9 Bintaro Jaya, Tangerang Selatan",
+        notes: "Pagar hitam depan taman, dekat pos satpam",
+        isPrimary: true
+      },
+      {
+        id: "addr-02",
+        label: "Kost / Kampus UPJ",
+        labelEn: "Dorm / UPJ Campus",
+        receiverName: "Kaila (Mahasiswi UPJ)",
+        phone: "0812-3456-7890",
+        fullAddress: "Asrama Mahasiswa Gedung C, Jl. Cendrawasih Raya, Sawah Baru, Ciputat",
+        notes: "Titip lobi resepsionis lantai 1",
+        isPrimary: false
+      }
+    ]
   },
 
   // Titik Smart Drop Box & Hub RILO di BINTARO (Total 10 Titik Strategis)
@@ -869,6 +892,13 @@ const INITIAL_DATA = {
       btnSaveProfile: "Simpan Profil",
       btnResetDemo: "Reset Data Demo",
       btnResetDemoSub: "Kembalikan data ke awal simulasi",
+      accountSectionTitle: "Pengaturan Akun & Aplikasi",
+      optPersonalProfile: "Edit Profil & Alamat",
+      optPersonalProfileSub: "Nama, email, dan alamat penjemputan",
+      optRecycleGuide: "Panduan Pilah Sampah",
+      optRecycleGuideSub: "Tips memilah botol, kaleng, dan karton",
+      optLanguageSettings: "Pengaturan Bahasa",
+      optLanguageSettingsSub: "Pilih Bahasa Indonesia atau English",
       loginTitle: "Masuk ke RILO",
       loginSub: "Kelola setoran sampahmu dan kumpulkan poin setiap hari.",
       btnGoogleLogin: "Lanjutkan dengan Google",
@@ -951,6 +981,13 @@ const INITIAL_DATA = {
       btnSaveProfile: "Save Profile",
       btnResetDemo: "Reset Demo Data",
       btnResetDemoSub: "Restore initial demo sample data",
+      accountSectionTitle: "Account & App Settings",
+      optPersonalProfile: "Edit Profile & Address",
+      optPersonalProfileSub: "Name, email, and pickup address",
+      optRecycleGuide: "Recycling Guide",
+      optRecycleGuideSub: "Tips on sorting plastic, cans, and cartons",
+      optLanguageSettings: "Language Settings",
+      optLanguageSettingsSub: "Choose Indonesian or English",
       loginTitle: "Sign In to RILO",
       loginSub: "Track your waste deposits and earn rewards every day.",
       btnGoogleLogin: "Continue with Google",
