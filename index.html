@@ -283,17 +283,30 @@
       <section class="view-panel" id="panel-deposit-input">
         
         <div class="connected-hub-badge">
-          <div class="chb-text">
-            <strong id="activeHubTitle">Smart Drop Box Bintaro Xchange</strong>
-            <span id="activeHubSubtitle">Mall Lt. LG • Kapasitas Tersedia</span>
+          <div class="chb-left-icon">
+            <span class="chb-dot-indicator"></span>
+            <div class="chb-text">
+              <strong id="activeHubTitle">Smart Drop Box Bintaro Xchange</strong>
+              <span id="activeHubSubtitle">Mall Lt. LG • Kapasitas Tersedia</span>
+            </div>
           </div>
-          <button style="background:none;border:none;color:var(--rilo-wine);font-size:11px;font-weight:750;cursor:pointer;" data-go="deposit">Ganti Titik</button>
+          <button type="button" class="btn-change-station" data-go="deposit">Ganti Titik</button>
         </div>
 
         <!-- SEGMENTED TABS: PER PIECE VS PER KG -->
         <div class="segmented-pills-wrap">
-          <button class="seg-pill-btn active" id="pillModePiece" data-i18n="tabPiece">Satuan per Ukuran (Per Piece)</button>
-          <button class="seg-pill-btn" id="pillModeKg" data-i18n="tabKg">Timbangan Kiloan (Per Kg)</button>
+          <button type="button" class="seg-pill-btn active" id="pillModePiece" data-i18n="tabPiece">Satuan per Ukuran (Per Piece)</button>
+          <button type="button" class="seg-pill-btn" id="pillModeKg" data-i18n="tabKg">Timbangan Kiloan (Per Kg)</button>
+        </div>
+
+        <!-- QUICK MATERIAL FILTER CHIPS FOR PER PIECE MODE -->
+        <div class="deposit-category-tabs-scroll" id="depositPieceCategoryChips">
+          <button type="button" class="dep-cat-pill active" onclick="filterDepositCategory('all', this)">Semua Kemasan</button>
+          <button type="button" class="dep-cat-pill" onclick="filterDepositCategory('Botol Plastik PET', this)">Botol PET</button>
+          <button type="button" class="dep-cat-pill" onclick="filterDepositCategory('Kaleng Minuman', this)">Kaleng Minuman</button>
+          <button type="button" class="dep-cat-pill" onclick="filterDepositCategory('Tutup Botol', this)">Tutup Botol</button>
+          <button type="button" class="dep-cat-pill" onclick="filterDepositCategory('Botol Kaca', this)">Botol Kaca</button>
+          <button type="button" class="dep-cat-pill" onclick="filterDepositCategory('Kemasan Karton Minuman', this)">Karton Tetra Pak</button>
         </div>
 
         <!-- PANEL PER PIECE (BOTOL ML, KALENG ML, TUTUP PCS, KACA ML, KARTON ML) -->
@@ -312,7 +325,7 @@
             <span id="checkoutTotalSummaryDisplay">0 item terpilih</span>
             <strong id="checkoutTotalPointsDisplay">+0 pts</strong>
           </div>
-          <button class="btn-confirm-deposit-cta" id="btnConfirmDepositAction" disabled data-i18n="btnConfirmDeposit">
+          <button type="button" class="btn-confirm-deposit-cta" id="btnConfirmDepositAction" disabled data-i18n="btnConfirmDeposit">
             Konfirmasi & Setor
           </button>
         </div>
@@ -691,12 +704,12 @@
   <!-- LEAFLET MAP JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
-  <script src="js/icons.js?v=2.7"></script>
+  <script src="js/icons.js?v=2.8"></script>
   <!-- DATA LAYER & I18N -->
-  <script src="js/data.js?v=2.7"></script>
+  <script src="js/data.js?v=2.8"></script>
   <!-- APP ENGINE -->
-  <script src="js/app.js?v=2.7"></script>
+  <script src="js/app.js?v=2.8"></script>
   <!-- APP STYLESHEET CACHE BUSTER -->
-  <link rel="stylesheet" href="css/style.css?v=2.7" />
+  <link rel="stylesheet" href="css/style.css?v=2.8" />
 </body>
 </html>

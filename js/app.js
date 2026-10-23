@@ -598,6 +598,26 @@ function setupDepositModeSwitcher() {
   }
 }
 
+let activeDepositCategory = "all";
+
+function filterDepositCategory(cat, btn) {
+  document.querySelectorAll("#depositPieceCategoryChips .dep-cat-pill").forEach(p => p.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  activeDepositCategory = cat;
+  setupDepositItems();
+}
+
+function quickAddKgWeight(itemId, addAmount) {
+  const current = currentDepositSession.kgWeights[itemId] || 0;
+  const next = parseFloat((current + addAmount).toFixed(1));
+  currentDepositSession.kgWeights[itemId] = next;
+
+  const inputEl = document.getElementById(`kg_input_${itemId}`);
+  if (inputEl) inputEl.value = next;
+
+  calculateDepositTotal();
+}
+
 function setupDepositItems() {
   const isEn = AppState.currentLang === "en";
 
@@ -614,15 +634,25 @@ function setupDepositItems() {
 
     let html = "";
     categories.forEach((cat) => {
+      if (activeDepositCategory !== "all" && activeDepositCategory !== cat.idKey) {
+        return;
+      }
+
       const itemsInCat = AppState.itemsPerPiece.filter((i) => i.category === cat.idKey);
-      html += `<div class="group-title-bar">${isEn ? cat.enKey : cat.idKey}</div>`;
+      html += `<div class="group-title-bar">
+        <span>${isEn ? cat.enKey : cat.idKey}</span>
+        <span style="font-size:10px;font-weight:600;color:var(--text-muted);">${itemsInCat.length} ukuran</span>
+      </div>`;
+
       itemsInCat.forEach((item) => {
         const count = currentDepositSession.pieceCounts[item.id] || 0;
         const iconSvg = getMaterialIcon(item.iconType);
         const titleText = isEn ? item.labelEn : item.label;
         const unitText = isEn ? item.unitLabelEn : item.unitLabel;
+        const hasItemClass = count > 0 ? "has-items" : "";
+
         html += `
-          <div class="piece-stepper-card">
+          <div class="piece-stepper-card ${hasItemClass}" id="card_${item.id}">
             <div class="psc-left">
               <div class="psc-icon">${iconSvg}</div>
               <div class="psc-info">
@@ -643,7 +673,7 @@ function setupDepositItems() {
     pieceContainer.innerHTML = html;
   }
 
-  // 2. Kategori Per Kg
+  // 2. Kategori Per Kg (Kiloan dengan Quick Add Chips)
   const kgContainer = document.getElementById("panelKgItems");
   if (kgContainer) {
     kgContainer.innerHTML = AppState.itemsPerKg.map((item) => {
@@ -661,13 +691,20 @@ function setupDepositItems() {
           <div class="kmc-input-row">
             <input type="number" 
                    class="input-kg-val" 
+                   id="kg_input_${item.id}"
                    step="0.1" 
                    min="0" 
                    max="200" 
                    placeholder="0.0 kg" 
                    value="${w > 0 ? w : ''}" 
                    oninput="setKgWeight('${item.id}', this.value)" />
-            <span style="font-size:12px;font-weight:700;color:var(--text-sub);">kg</span>
+            <span style="font-size:12px;font-weight:800;color:var(--text-sub);">kg</span>
+          </div>
+          <div class="quick-kg-chips">
+            <button type="button" class="btn-quick-kg" onclick="quickAddKgWeight('${item.id}', 0.5)">+0.5 kg</button>
+            <button type="button" class="btn-quick-kg" onclick="quickAddKgWeight('${item.id}', 1.0)">+1 kg</button>
+            <button type="button" class="btn-quick-kg" onclick="quickAddKgWeight('${item.id}', 2.0)">+2 kg</button>
+            <button type="button" class="btn-quick-kg" onclick="quickAddKgWeight('${item.id}', 5.0)">+5 kg</button>
           </div>
         </div>
       `;
@@ -689,6 +726,11 @@ window.stepPiece = function (itemId, delta) {
 
   const el = document.getElementById(`val_${itemId}`);
   if (el) el.textContent = next;
+
+  const card = document.getElementById(`card_${itemId}`);
+  if (card) {
+    card.classList.toggle("has-items", next > 0);
+  }
 
   calculateDepositTotal();
 };
