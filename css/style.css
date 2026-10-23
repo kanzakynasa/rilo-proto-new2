@@ -1482,35 +1482,70 @@ button, input, select, textarea {
   margin-top: 3px;
 }
 
-/* === SCANNER QR VIEW === */
+/* === SCANNER QR VIEW (FIGMA COMMUNITY SCAN QR CODE SPEC) === */
 .qr-container-box {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.qr-top-bar {
+.qr-figma-top-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
-.btn-back-circle {
+.qr-top-title-wrap {
+  flex: 1;
+  text-align: center;
+}
+
+.qr-top-title-wrap h3 {
+  font-size: 16px;
+  font-weight: 850;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.qr-top-title-wrap span {
+  font-size: 11px;
+  color: var(--text-sub);
+  display: block;
+  margin-top: 2px;
+}
+
+.btn-qr-circle-action {
   background: var(--surface);
   border: 1px solid var(--border-line);
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-squircle);
   display: grid;
   place-items: center;
   color: var(--text-main);
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.qr-cam-viewfinder {
-  background: #110e10;
+.btn-qr-circle-action:active {
+  transform: scale(0.94);
+  background: var(--surface-subtle);
+}
+
+.btn-qr-circle-action.active-flash {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+/* Viewfinder Kamera Berstandar Figma UI */
+.qr-figma-viewport {
+  background: radial-gradient(circle at center, #1e1519 0%, #0d0a0c 100%);
   border-radius: var(--radius-md);
-  padding: 26px 16px;
+  padding: 30px 18px 24px;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -1518,46 +1553,87 @@ button, input, select, textarea {
   justify-content: center;
   position: relative;
   overflow: hidden;
-  min-height: 270px;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+  min-height: 290px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.qr-box-corners {
-  width: 180px;
-  height: 180px;
+.qr-scan-target-box {
+  width: 200px;
+  height: 200px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.corner-line {
+/* Sudut Bracket Tebal Sesuai Desain Figma */
+.target-bracket {
   position: absolute;
-  width: 24px;
-  height: 24px;
-  border-color: #fff;
+  width: 32px;
+  height: 32px;
+  border-color: #ffffff;
   border-style: solid;
 }
 
-.cl-tl { top: 0; left: 0; border-width: 4px 0 0 4px; border-radius: 6px 0 0 0; }
-.cl-tr { top: 0; right: 0; border-width: 4px 4px 0 0; border-radius: 0 6px 0 0; }
-.cl-bl { bottom: 0; left: 0; border-width: 0 0 4px 4px; border-radius: 0 0 0 6px; }
-.cl-br { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-radius: 0 0 6px 0; }
+.tb-tl { top: 0; left: 0; border-width: 4px 0 0 4px; border-radius: 8px 0 0 0; }
+.tb-tr { top: 0; right: 0; border-width: 4px 4px 0 0; border-radius: 0 8px 0 0; }
+.tb-bl { bottom: 0; left: 0; border-width: 0 0 4px 4px; border-radius: 0 0 0 8px; }
+.tb-br { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-radius: 0 0 8px 0; }
 
-.laser-scanner {
+.qr-laser-glow-beam {
   position: absolute;
-  width: 90%;
-  height: 2px;
-  background: #ff2a5f;
-  box-shadow: 0 0 12px #ff2a5f;
-  animation: laserScanMove 2.2s infinite ease-in-out;
+  width: 92%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ff2a5f, #ffffff, #ff2a5f, transparent);
+  box-shadow: 0 0 14px #ff2a5f, 0 0 24px rgba(255, 42, 95, 0.5);
+  border-radius: var(--radius-full);
+  animation: laserScanSmooth 2.4s infinite ease-in-out;
 }
 
-@keyframes laserScanMove {
-  0% { top: 10%; opacity: 0.3; }
+@keyframes laserScanSmooth {
+  0% { top: 8%; opacity: 0.2; }
   50% { top: 90%; opacity: 1; }
-  100% { top: 10%; opacity: 0.3; }
+  100% { top: 8%; opacity: 0.2; }
+}
+
+.qr-watermark-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.qr-instruction-pill {
+  background: rgba(15, 23, 42, 0.75);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pulse-recording-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff2a5f;
+  box-shadow: 0 0 8px #ff2a5f;
+  animation: pulseDotAnim 1.4s infinite ease-in-out;
+}
+
+@keyframes pulseDotAnim {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.6; }
 }
 
 .detected-hub-panel {

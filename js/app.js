@@ -490,7 +490,29 @@ window.focusMapStationMarker = function(boxId, notify = true) {
   }
 };
 
-// === FLOW SCAN QR DROP BOX ===
+// === FLOW SCAN QR DROP BOX (FIGMA SCAN QR COMMUNITY SPEC) ===
+let isScannerFlashlightOn = false;
+
+window.toggleScannerFlashlight = function() {
+  isScannerFlashlightOn = !isScannerFlashlightOn;
+  const btn = document.getElementById("btnToggleScannerFlash");
+  const viewport = document.getElementById("qrFigmaViewport");
+  const isEn = AppState.currentLang === "en";
+
+  if (btn) {
+    btn.classList.toggle("active-flash", isScannerFlashlightOn);
+  }
+  if (viewport) {
+    viewport.style.background = isScannerFlashlightOn 
+      ? "radial-gradient(circle at center, #38252d 0%, #171114 100%)" 
+      : "radial-gradient(circle at center, #1e1519 0%, #0d0a0c 100%)";
+  }
+
+  showToast(isScannerFlashlightOn 
+    ? (isEn ? "Flashlight turned on" : "Lampu kilat dinyalakan") 
+    : (isEn ? "Flashlight turned off" : "Lampu kilat dimatikan"), true);
+};
+
 function openQrScanFlow() {
   if (!currentDepositSession.selectedBox) {
     currentDepositSession.selectedBox = AppState.qrLocations[0];
