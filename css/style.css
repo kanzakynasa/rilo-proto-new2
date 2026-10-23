@@ -1929,7 +1929,7 @@ button, input, select, textarea {
 
 .btn-bphc-action {
   flex: 1;
-  padding: 10px 12px;
+  padding: 10px 8px;
   border-radius: var(--radius-xs);
   font-size: 11px;
   font-weight: 800;
@@ -1937,13 +1937,21 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-bphc-payout {
   background: #ffffff;
   color: var(--rilo-wine);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.btn-bphc-bank {
+  background: #ffffff;
+  color: #00529c;
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
@@ -1954,6 +1962,90 @@ button, input, select, textarea {
   border: 1px solid rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+}
+
+/* Modal Channel Selection Wpay List */
+.wallet-channel-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wallet-channel-row {
+  background: var(--surface);
+  border: 1.5px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wallet-channel-row:hover {
+  border-color: var(--rilo-wine-border);
+  background: var(--surface-subtle);
+}
+
+.wallet-channel-row:active {
+  transform: scale(0.98);
+}
+
+.wcr-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wcr-logo-box {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-squircle);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.wcr-info strong {
+  font-size: 13px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.wcr-info span {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+/* Step Wizard Bank Transfer */
+.bank-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--text-muted);
+}
+
+.bank-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.bank-step-dot.active {
+  background: var(--rilo-wine);
+  color: #fff;
 }
 
 /* Payout Channels Grid (Wpay Style) */

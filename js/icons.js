@@ -49,7 +49,20 @@ const ICONS = {
   navReward: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
   navUser: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
   
-  check: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+  check: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  
+  // Official e-Wallet & Banking Logos (Identitas Resmi & Presisi)
+  gopay: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#00AED6"/><circle cx="50" cy="50" r="22" fill="#FFFFFF"/><circle cx="50" cy="50" r="10" fill="#00AED6"/></svg>`,
+  dana: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#118EEA"/><path d="M28 36h44c3.3 0 6 2.7 6 6v16c0 3.3-2.7 6-6 6H28c-3.3 0-6-2.7-6-6V42c0-3.3 2.7-6 6-6z" fill="#FFFFFF"/><circle cx="50" cy="50" r="7" fill="#118EEA"/></svg>`,
+  shopeepay: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#EE4D2D"/><path d="M50 24c-11 0-20 9-20 20 0 14 20 32 20 32s20-18 20-32c0-11-9-20-20-20zm0 28a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" fill="#FFFFFF"/></svg>`,
+  ovo: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#4C2A86"/><circle cx="50" cy="50" r="24" stroke="#FFFFFF" stroke-width="8" fill="none"/><circle cx="50" cy="50" r="9" fill="#FFFFFF"/></svg>`,
+
+  // Official Indonesian Bank Logos
+  bca: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#0060AF"/><text x="50" y="58" font-family="-apple-system, sans-serif" font-size="25" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">BCA</text></svg>`,
+  mandiri: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#003D79"/><path d="M22 62c6-14 20-22 36-22 8 0 15 2 20 6-6 14-20 22-36 22-8 0-15-2-20-6z" fill="#FDB813"/><text x="50" y="54" font-family="-apple-system, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">mandiri</text></svg>`,
+  bri: `<svg width="34" height="34" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#00529C"/><text x="50" y="58" font-family="-apple-system, sans-serif" font-size="26" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">BRI</text></svg>`,
+  
+  bank: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" x2="9" y1="22" y2="12"/><line x1="15" x2="15" y1="12" y2="22"/><line x1="3" x2="21" y1="9" y2="9"/></svg>`
 };
 
 function getMaterialIcon(type) {

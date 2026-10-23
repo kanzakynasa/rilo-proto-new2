@@ -1001,11 +1001,342 @@ function renderTransactions() {
 // 3. Rewards & Penukaran (Exchange RuntahPedia Style)
 let activeRewardFilter = "all";
 
-function scrollToEwalletSection() {
-  const el = document.getElementById("secEwalletPayout");
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+// Modal Pilihan e-Wallet (Official Logos & Flow Baru)
+window.openEwalletSelectionModal = function() {
+  const isEn = AppState.currentLang === "en";
+  const content = document.getElementById("modalSheetDynamicBox");
+
+  const ewallets = (AppState.payoutChannels || []).filter(c => c.category === "ewallet");
+
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;">
+      <h3 style="font-size:16px;font-weight:850;margin-bottom:4px;">
+        ${isEn ? 'Select e-Wallet Partner' : 'Pilih Dompet Digital (e-Wallet)'}
+      </h3>
+      <span style="font-size:11px;color:var(--text-sub);">
+        ${isEn ? 'Points will be converted directly into your active balance' : 'Poin langsung dikonversi menjadi saldo aktif tanpa potongan admin'}
+      </span>
+    </div>
+
+    <div class="wallet-channel-select-list">
+      ${ewallets.map(w => {
+        let logoSvg = ICONS.gopay;
+        if (w.name.includes("DANA")) logoSvg = ICONS.dana;
+        else if (w.name.includes("Shopee")) logoSvg = ICONS.shopeepay;
+        else if (w.name.includes("OVO")) logoSvg = ICONS.ovo;
+
+        return `
+          <div class="wallet-channel-row" onclick="openPayoutModal('${w.id}')">
+            <div class="wcr-left">
+              <div class="wcr-logo-box">${logoSvg}</div>
+              <div class="wcr-info">
+                <strong>${w.name}</strong>
+                <span>${isEn ? w.descEn : w.desc}</span>
+              </div>
+            </div>
+            <button type="button" class="btn-solid-wine" style="padding:6px 14px;font-size:11px;width:auto;box-shadow:none;">
+              ${t("btnCashoutAction")}
+            </button>
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <button type="button" class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">
+      ${isEn ? 'Close' : 'Tutup'}
+    </button>
+  `;
+
+  openModalSheet();
+};
+
+// Modal Alur Khusus Transfer Bank (Jenis Bank > Rekening > Nominal > Transfer > Selesai)
+let bankTransferState = {
+  selectedBank: null,
+  accountNumber: "",
+  accountName: "",
+  selectedDenom: 2500
+};
+
+window.openBankTransferFlowModal = function(step = 1) {
+  const isEn = AppState.currentLang === "en";
+  const content = document.getElementById("modalSheetDynamicBox");
+  const banks = (AppState.payoutChannels || []).filter(c => c.category === "bank");
+
+  if (step === 1) {
+    // LANGKAH 1: PILIH JENIS BANK
+    content.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div class="bank-step-indicator">
+          <span class="bank-step-dot active">1</span>
+          <span>${isEn ? 'Bank' : 'Jenis Bank'}</span>
+          <span>•</span>
+          <span class="bank-step-dot">2</span>
+          <span>${isEn ? 'Account' : 'Rekening'}</span>
+          <span>•</span>
+          <span class="bank-step-dot">3</span>
+          <span>${isEn ? 'Amount' : 'Nominal'}</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:850;margin-bottom:4px;">
+          ${isEn ? 'Select Destination Bank' : 'Pilih Rekening Bank Tujuan'}
+        </h3>
+        <span style="font-size:11px;color:var(--text-sub);">
+          ${isEn ? 'Direct bank transfer to Indonesian commercial banks' : 'Transfer langsung ke rekening bank umum di Indonesia'}
+        </span>
+      </div>
+
+      <div class="wallet-channel-select-list">
+        ${banks.map(b => {
+          let bankLogoSvg = ICONS.bca;
+          if (b.name.includes("Mandiri")) bankLogoSvg = ICONS.mandiri;
+          else if (b.name.includes("BRI")) bankLogoSvg = ICONS.bri;
+
+          return `
+            <div class="wallet-channel-row" onclick="chooseBankAndNext('${b.id}')">
+              <div class="wcr-left">
+                <div class="wcr-logo-box">
+                  ${bankLogoSvg}
+                </div>
+                <div class="wcr-info">
+                  <strong style="color:${b.color};">${b.name}</strong>
+                  <span>${isEn ? b.descEn : b.desc}</span>
+                </div>
+              </div>
+              <span style="color:var(--rilo-wine);font-size:14px;font-weight:800;">›</span>
+            </div>
+          `;
+        }).join("")}
+      </div>
+
+      <button type="button" class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="closeModalSheet()">
+        ${isEn ? 'Cancel' : 'Batal'}
+      </button>
+    `;
+    openModalSheet();
+  } else if (step === 2) {
+    // LANGKAH 2: INPUT NOMOR REKENING & NAMA PENERIMA
+    const bank = bankTransferState.selectedBank || banks[0];
+
+    content.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div class="bank-step-indicator">
+          <span class="bank-step-dot">✓</span>
+          <span>${bank.name}</span>
+          <span>•</span>
+          <span class="bank-step-dot active">2</span>
+          <span>${isEn ? 'Account' : 'Rekening'}</span>
+          <span>•</span>
+          <span class="bank-step-dot">3</span>
+          <span>${isEn ? 'Amount' : 'Nominal'}</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:850;margin-bottom:4px;">
+          ${isEn ? 'Enter ' + bank.name + ' Account' : 'Masukkan Rekening ' + bank.name}
+        </h3>
+        <span style="font-size:11px;color:var(--text-sub);">
+          ${isEn ? 'Ensure the beneficiary name matches your bank book' : 'Pastikan nama penerima sesuai buku tabungan'}
+        </span>
+      </div>
+
+      <form id="formBankStep2" onsubmit="event.preventDefault(); submitBankStep2();">
+        <div style="margin-bottom:12px;text-align:left;">
+          <label style="font-size:11px;font-weight:750;display:block;margin-bottom:4px;">
+            ${isEn ? 'Bank Account Number' : 'Nomor Rekening Bank'}
+          </label>
+          <input type="number" id="bankInputAccNumber" class="input-kg-val" style="width:100%;font-size:14px;font-weight:750;" placeholder="Contoh: 1234567890" value="${bankTransferState.accountNumber}" required />
+        </div>
+        <div style="margin-bottom:16px;text-align:left;">
+          <label style="font-size:11px;font-weight:750;display:block;margin-bottom:4px;">
+            ${isEn ? 'Beneficiary Name' : 'Nama Lengkap Pemilik Rekening'}
+          </label>
+          <input type="text" id="bankInputAccName" class="input-kg-val" style="width:100%;font-size:13px;" placeholder="Contoh: Kaila Zanita" value="${bankTransferState.accountName || AppState.user.name}" required />
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button type="button" class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="openBankTransferFlowModal(1)">
+            ${isEn ? 'Back' : 'Kembali'}
+          </button>
+          <button type="submit" class="btn-solid-wine">
+            ${isEn ? 'Next: Amount' : 'Lanjut: Pilih Nominal'}
+          </button>
+        </div>
+      </form>
+    `;
+  } else if (step === 3) {
+    // LANGKAH 3: PILIH NOMINAL TRANSFER & KONFIRMASI TRANSFER
+    const bank = bankTransferState.selectedBank || banks[0];
+    const denoms = (AppState.payoutDenominations || []).filter(d => d.points >= 2000);
+
+    content.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div class="bank-step-indicator">
+          <span class="bank-step-dot">✓</span>
+          <span>${bank.name}</span>
+          <span>•</span>
+          <span class="bank-step-dot">✓</span>
+          <span>Rekening</span>
+          <span>•</span>
+          <span class="bank-step-dot active">3</span>
+          <span>${isEn ? 'Transfer' : 'Pencairan'}</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:850;margin-bottom:2px;">
+          ${isEn ? 'Confirm Bank Transfer' : 'Konfirmasi Transfer Bank'}
+        </h3>
+        <span style="font-size:11px;color:var(--text-sub);">
+          ${bank.name} • ${bankTransferState.accountNumber} (${bankTransferState.accountName})
+        </span>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:750;color:var(--text-main);display:block;margin-bottom:6px;">
+          ${isEn ? 'Select Transfer Amount' : 'Pilih Nominal Saldo'}
+        </label>
+        <div class="denom-grid-chips">
+          ${denoms.map(d => {
+            const isSelected = d.points === bankTransferState.selectedDenom;
+            const isEligible = AppState.user.points >= d.points;
+            return `
+              <div class="denom-chip-btn ${isSelected ? 'active' : ''}" 
+                   onclick="selectBankDenomination(${d.points}, this)"
+                   style="${!isEligible ? 'opacity:0.5;' : ''}">
+                <strong>${d.label}</strong>
+                <span>${fmt(d.points)} pts</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+
+      <div style="background:var(--rilo-wine-soft);border:1px dashed var(--rilo-wine-border);border-radius:12px;padding:12px;text-align:center;margin-bottom:16px;">
+        <span style="font-size:10px;color:var(--text-sub);text-transform:uppercase;font-weight:700;">
+          ${isEn ? 'Points Required' : 'Poin yang Dipotong'}
+        </span>
+        <div style="font-size:22px;font-weight:850;color:var(--rilo-wine);margin:2px 0;" id="bankModalRequiredPts">
+          ${fmt(bankTransferState.selectedDenom)} Poin
+        </div>
+        <small style="font-size:11px;color:var(--text-sub);">${isEn ? 'Current Balance' : 'Saldo Kamu Saat Ini'}: <b>${fmt(AppState.user.points)} pts</b></small>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button type="button" class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;" onclick="openBankTransferFlowModal(2)">
+          ${isEn ? 'Back' : 'Kembali'}
+        </button>
+        <button type="button" class="btn-solid-wine" id="btnExecuteBankTransferAction">
+          ${t("btnTransferNow")}
+        </button>
+      </div>
+    `;
+
+    document.getElementById("btnExecuteBankTransferAction").onclick = executeBankTransferSubmission;
   }
+};
+
+window.chooseBankAndNext = function(bankId) {
+  const bank = (AppState.payoutChannels || []).find(b => b.id === bankId);
+  if (bank) {
+    bankTransferState.selectedBank = bank;
+    openBankTransferFlowModal(2);
+  }
+};
+
+window.submitBankStep2 = function() {
+  const accNum = document.getElementById("bankInputAccNumber").value.trim();
+  const accName = document.getElementById("bankInputAccName").value.trim();
+  const isEn = AppState.currentLang === "en";
+
+  if (!accNum || !accName) {
+    showToast(isEn ? "Please fill in bank account number and name" : "Lengkapi nomor rekening dan nama pemilik", false);
+    return;
+  }
+
+  bankTransferState.accountNumber = accNum;
+  bankTransferState.accountName = accName;
+  openBankTransferFlowModal(3);
+};
+
+window.selectBankDenomination = function(pts, btn) {
+  bankTransferState.selectedDenom = pts;
+  document.querySelectorAll(".denom-chip-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  const el = document.getElementById("bankModalRequiredPts");
+  if (el) el.textContent = `${fmt(pts)} Poin`;
+};
+
+function executeBankTransferSubmission() {
+  const isEn = AppState.currentLang === "en";
+  const pts = bankTransferState.selectedDenom || 2500;
+
+  if (AppState.user.points < pts) {
+    showToast(isEn ? `Insufficient points. You need ${fmt(pts - AppState.user.points)} more pts.` : `Poin belum cukup. Butuh ${fmt(pts - AppState.user.points)} poin lagi.`, false);
+    return;
+  }
+
+  const bank = bankTransferState.selectedBank || { name: "Bank BCA" };
+  const denomObj = (AppState.payoutDenominations || []).find(d => d.points === pts) || { points: pts, rupiah: pts * 10, label: "Rp " + fmt(pts * 10) };
+
+  // 1. Potong Poin
+  AppState.user.points -= pts;
+
+  // 2. Buat ID Transaksi Transfer Bank
+  const code = `TRF-${bank.name.replace(/[^A-Z0-9]/gi, '').toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+  AppState.redemptions.unshift({
+    id: `RDM-${Date.now()}`,
+    date: new Date().toISOString().slice(0, 10),
+    partner: bank.name,
+    rewardTitle: `Transfer ${bank.name} ${denomObj.label}`,
+    rewardTitleEn: `${bank.name} Transfer ${denomObj.label}`,
+    pointsSpent: pts,
+    code: code,
+    expiry: isEn ? "Completed" : "Selesai",
+    status: isEn ? "Transfer Successful" : "Berhasil Ditransfer",
+    statusEn: "Transfer Successful",
+    type: "bank_transfer",
+    amountRupiah: denomObj.rupiah,
+    targetAccount: `${bankTransferState.accountNumber} a/n ${bankTransferState.accountName}`
+  });
+
+  // 3. Update UI Realtime
+  updateVoucherCounterUI();
+  renderAllViews();
+
+  // 4. Struk Bukti Transfer Selesai (Sesuai Alur: Jenis Bank > Nominal > Transfer > Selesai)
+  const content = document.getElementById("modalSheetDynamicBox");
+  content.innerHTML = `
+    <div style="text-align:center;padding:6px 0;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--eco-emerald-soft);color:var(--eco-emerald);display:grid;place-items:center;margin:0 auto 10px;">
+        ${ICONS.check}
+      </div>
+      <h3 style="font-size:16px;color:var(--rilo-wine);margin-bottom:4px;">
+        ${isEn ? 'Bank Transfer Successful!' : 'Transfer Bank Berhasil!'}
+      </h3>
+      <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;">
+        ${isEn 
+          ? `${denomObj.label} has been transferred to ${bank.name} a/c ${bankTransferState.accountNumber} (${bankTransferState.accountName}).` 
+          : `${denomObj.label} berhasil dikirim ke ${bank.name} No. Rek ${bankTransferState.accountNumber} (${bankTransferState.accountName}).`}
+      </p>
+
+      <div style="background:#f8fafc;border-radius:12px;padding:12px 14px;border:1.5px dashed #cbd5e1;margin-bottom:16px;text-align:left;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+          <span style="color:var(--text-muted);">${isEn ? 'Reference Number' : 'No. Referensi'}:</span>
+          <strong>${code}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+          <span style="color:var(--text-muted);">${isEn ? 'Points Redeemed' : 'Poin Ditukar'}:</span>
+          <strong style="color:var(--rilo-wine);">${fmt(pts)} pts</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span style="color:var(--text-muted);">${isEn ? 'Status' : 'Status'}:</span>
+          <span class="bsc-status-pill" style="height:20px;font-size:10px;">${isEn ? 'Success' : 'Berhasil'}</span>
+        </div>
+      </div>
+
+      <button class="btn-solid-wine" onclick="closeModalSheet(); switchView('my-vouchers');">
+        ${isEn ? 'View in My Vouchers & Payouts' : 'Lihat di Voucher & Saldo Saya'}
+      </button>
+    </div>
+  `;
+
+  showToast(isEn ? "Bank transfer sent successfully!" : "Transfer bank berhasil dikirim!", true);
 }
 
 // Modal Payout e-Wallet & Bank Transfer (Wpay UI Kit Style)

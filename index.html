@@ -333,98 +333,25 @@
           <div class="bphc-rupiah-est" id="rewardsRupiahEst">≈ Rp 12.400</div>
           <p class="bphc-desc" data-i18n="balancePointsSub">Tukar poin sampahmu ke Saldo e-Wallet, Transfer Bank, atau Voucher Belanja.</p>
 
-          <!-- 2 Aksi Utama Dalam Balance Points: Payout e-Wallet & Voucher Page -->
+          <!-- 3 Aksi Utama: Tukar e-Wallet, Transfer Bank, dan Voucher Saya -->
           <div class="bphc-action-buttons">
-            <button type="button" class="btn-bphc-action btn-bphc-payout" onclick="scrollToEwalletSection()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span>Tukar Saldo e-Wallet</span>
+            <button type="button" class="btn-bphc-action btn-bphc-payout" onclick="openEwalletSelectionModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              <span data-i18n="btnCashoutAction">Tarik Saldo</span>
+            </button>
+            <button type="button" class="btn-bphc-action btn-bphc-bank" onclick="openBankTransferFlowModal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" x2="9" y1="22" y2="12"/><line x1="15" x2="15" y1="12" y2="22"/><line x1="3" x2="21" y1="9" y2="9"/></svg>
+              <span>Transfer Bank</span>
             </button>
             <button type="button" class="btn-bphc-action btn-bphc-voucher" data-go="my-vouchers">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
-              <span data-i18n="btnMyVouchers">Voucher Saya</span>
               <span class="ehc-counter-badge" id="myVouchersCounterBadge">1</span>
             </button>
           </div>
         </div>
 
-        <!-- SECTION 1: SALDO E-WALLET & BANK TRANSFER (WPAY CHANNELS) -->
-        <div class="services-section-title" id="secEwalletPayout" data-i18n="ewalletSectionTitle">Pencairan Saldo e-Wallet & Bank</div>
-        <div class="payout-channels-grid">
-          <!-- GoPay -->
-          <div class="payout-channel-item" onclick="openPayoutModal('ch-gopay')">
-            <div class="pci-brand-badge" style="background:#e0f7fc;color:#00aed6;">
-              <strong>G</strong>
-            </div>
-            <div class="pci-info">
-              <strong style="color:#0085a6;">GoPay</strong>
-              <span>Instan 24 Jam • Saldo</span>
-            </div>
-            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
-          </div>
-
-          <!-- DANA -->
-          <div class="payout-channel-item" onclick="openPayoutModal('ch-dana')">
-            <div class="pci-brand-badge" style="background:#e3f2fd;color:#118eea;">
-              <strong>D</strong>
-            </div>
-            <div class="pci-info">
-              <strong style="color:#0d73be;">DANA</strong>
-              <span>Top-Up Akun DANA</span>
-            </div>
-            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
-          </div>
-
-          <!-- ShopeePay -->
-          <div class="payout-channel-item" onclick="openPayoutModal('ch-shopee')">
-            <div class="pci-brand-badge" style="background:#fbe9e7;color:#ee4d2d;">
-              <strong>S</strong>
-            </div>
-            <div class="pci-info">
-              <strong style="color:#c53517;">ShopeePay</strong>
-              <span>Saldo Dompet Shopee</span>
-            </div>
-            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
-          </div>
-
-          <!-- OVO -->
-          <div class="payout-channel-item" onclick="openPayoutModal('ch-ovo')">
-            <div class="pci-brand-badge" style="background:#f3e5f5;color:#4c2a86;">
-              <strong>O</strong>
-            </div>
-            <div class="pci-info">
-              <strong style="color:#4c2a86;">OVO Cash</strong>
-              <span>Transfer OVO Premier</span>
-            </div>
-            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
-          </div>
-
-          <!-- Bank BCA -->
-          <div class="payout-channel-item" onclick="openPayoutModal('ch-bca')">
-            <div class="pci-brand-badge" style="background:#e1f0fa;color:#0060af;">
-              <strong>BCA</strong>
-            </div>
-            <div class="pci-info">
-              <strong style="color:#004b89;">Bank BCA</strong>
-              <span>Transfer Rekening Bank</span>
-            </div>
-            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
-          </div>
-
-          <!-- Bank Mandiri -->
-          <div class="payout-channel-item" onclick="openPayoutModal('ch-mandiri')">
-            <div class="pci-brand-badge" style="background:#e3ecf5;color:#003d79;">
-              <strong>MDR</strong>
-            </div>
-            <div class="pci-info">
-              <strong style="color:#003060;">Bank Mandiri</strong>
-              <span>Transfer Rekening Livin'</span>
-            </div>
-            <button type="button" class="btn-pci-action" data-i18n="btnCashoutAction">Tarik Saldo</button>
-          </div>
-        </div>
-
-        <!-- SECTION 2: VOUCHER PAGE & FILTER BELANJA / MITRA -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;margin-bottom:10px;">
+        <!-- SECTION VOUCHER PAGE & FILTER BELANJA / MITRA -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;margin-bottom:10px;">
           <div class="services-section-title" style="margin:0;" data-i18n="voucherSectionTitle">Katalog Voucher Belanja</div>
           <button class="link-all" data-go="my-vouchers" data-i18n="btnMyVouchers">Voucher Saya →</button>
         </div>
@@ -748,12 +675,12 @@
   <!-- LEAFLET MAP JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
-  <script src="js/icons.js?v=2.4"></script>
+  <script src="js/icons.js?v=2.6"></script>
   <!-- DATA LAYER & I18N -->
-  <script src="js/data.js?v=2.4"></script>
+  <script src="js/data.js?v=2.6"></script>
   <!-- APP ENGINE -->
-  <script src="js/app.js?v=2.4"></script>
+  <script src="js/app.js?v=2.6"></script>
   <!-- APP STYLESHEET CACHE BUSTER -->
-  <link rel="stylesheet" href="css/style.css?v=2.4" />
+  <link rel="stylesheet" href="css/style.css?v=2.6" />
 </body>
 </html>
