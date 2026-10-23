@@ -2100,8 +2100,27 @@ function setupProfileForm() {
 
 function renderProfile() {
   const user = AppState.user;
+  const isEn = AppState.currentLang === "en";
+
   document.getElementById("profileDisplayNameText").textContent = user.name;
   document.getElementById("profileDisplayEmailText").textContent = user.email;
+
+  const heroNameEl = document.getElementById("profileHeroNameDisplay");
+  const heroEmailEl = document.getElementById("profileHeroEmailDisplay");
+  const heroAvatarEl = document.getElementById("profileAvatarBigText");
+  const heroTierEl = document.getElementById("profileHeroTierDisplay");
+
+  if (heroNameEl) heroNameEl.textContent = user.name;
+  if (heroEmailEl) heroEmailEl.textContent = user.email;
+  if (heroAvatarEl) heroAvatarEl.textContent = user.avatar || user.name[0];
+  if (heroTierEl) heroTierEl.textContent = isEn ? "★ Eco Hero" : "★ Pahlawan Hijau";
+
+  const profLangId = document.getElementById("profBtnLangId");
+  const profLangEn = document.getElementById("profBtnLangEn");
+  if (profLangId && profLangEn) {
+    profLangId.classList.toggle("active", AppState.currentLang === "id");
+    profLangEn.classList.toggle("active", AppState.currentLang === "en");
+  }
 
   const inName = document.getElementById("profileInputName");
   const inEmail = document.getElementById("profileInputEmail");

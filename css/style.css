@@ -883,6 +883,23 @@ button, input, select, textarea {
   gap: 5px;
 }
 
+/* === PROFILE HERO CARD & SETTINGS === */
+.profile-hero-card {
+  background: var(--surface);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-sm);
+  padding: 20px 16px;
+  text-align: center;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-hero-card h4 {
+  font-size: 16px;
+  font-weight: 850;
+  color: var(--text-main);
+}
+
 /* === CARD MAP DROP POINT BINTARO (OPSI 2: KLIK LANGSUNG PINDAH KE PETA PENUH) === */
 .map-preview-card {
   background: var(--surface);
