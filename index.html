@@ -282,7 +282,8 @@
       <!-- ==================== 3. FLOW INPUT SETOR SAMPAH (SETELAH SCAN) ==================== -->
       <section class="view-panel" id="panel-deposit-input">
         
-        <div class="connected-hub-badge">
+        <!-- STATUS DROP BOX TERHUBUNG (DESAIN PREMIUM WITH STATION PICKER) -->
+        <div class="connected-hub-badge" onclick="openStationPickerModal()">
           <div class="chb-left-icon">
             <span class="chb-dot-indicator"></span>
             <div class="chb-text">
@@ -290,7 +291,10 @@
               <span id="activeHubSubtitle">Mall Lt. LG • Kapasitas Tersedia</span>
             </div>
           </div>
-          <button type="button" class="btn-change-station" data-go="deposit">Ganti Titik</button>
+          <button type="button" class="btn-change-station" onclick="event.stopPropagation(); openStationPickerModal();">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            <span>Ganti Titik</span>
+          </button>
         </div>
 
         <!-- SEGMENTED TABS: PER PIECE VS PER KG -->
@@ -332,13 +336,36 @@
 
       </section>
 
-      <!-- ==================== 4. RIWAYAT TRANSAKSI ==================== -->
+      <!-- ==================== 4. RIWAYAT TRANSAKSI (RUNTAHPEDIA HISTORY SPEC) ==================== -->
       <section class="view-panel" id="panel-transactions">
-        <div style="margin-bottom:14px;">
-          <h3 style="font-size:18px;font-weight:800;color:var(--rilo-wine-dark);" data-i18n="historyTitle">Riwayat Setoran</h3>
-          <p style="font-size:12px;color:var(--text-sub);margin-top:2px;" data-i18n="historySub">
-            Catatan sampah yang telah kamu setorkan ke RILO.
-          </p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <h3 style="font-size:18px;font-weight:850;color:var(--text-main);" data-i18n="historyTitle">Riwayat Setoran</h3>
+            <p style="font-size:11px;color:var(--text-sub);margin-top:2px;" data-i18n="historySub">
+              Catatan sampah yang telah kamu setorkan ke RILO.
+            </p>
+          </div>
+          <span class="tx-total-badge" id="txHistoryCountBadge">4 Setoran</span>
+        </div>
+
+        <!-- Filter Status Transaksi (Semua, Selesai, Proses) -->
+        <div class="tx-filter-chips-bar">
+          <button type="button" class="tx-chip-btn active" data-tx-filter="all" onclick="filterTransactionsStatus('all', this)">Semua</button>
+          <button type="button" class="tx-chip-btn" data-tx-filter="Selesai" onclick="filterTransactionsStatus('Selesai', this)">Selesai</button>
+          <button type="button" class="tx-chip-btn" data-tx-filter="Proses" onclick="filterTransactionsStatus('Proses', this)">Dalam Proses</button>
+        </div>
+
+        <!-- Ringkasan Statistik Riwayat -->
+        <div class="tx-summary-strip">
+          <div class="tss-item">
+            <span>Total Poin Didapat</span>
+            <strong id="txTotalEarnedPointsDisplay">+1.025 pts</strong>
+          </div>
+          <div class="tss-divider"></div>
+          <div class="tss-item">
+            <span>Sampah Terpilah</span>
+            <strong id="txTotalWeightSumDisplay">5.1 kg</strong>
+          </div>
         </div>
 
         <div class="activity-list-container" id="transactionsFullListContainer">
@@ -704,12 +731,12 @@
   <!-- LEAFLET MAP JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
-  <script src="js/icons.js?v=2.8"></script>
+  <script src="js/icons.js?v=2.9"></script>
   <!-- DATA LAYER & I18N -->
-  <script src="js/data.js?v=2.8"></script>
+  <script src="js/data.js?v=2.9"></script>
   <!-- APP ENGINE -->
-  <script src="js/app.js?v=2.8"></script>
+  <script src="js/app.js?v=2.9"></script>
   <!-- APP STYLESHEET CACHE BUSTER -->
-  <link rel="stylesheet" href="css/style.css?v=2.8" />
+  <link rel="stylesheet" href="css/style.css?v=2.9" />
 </body>
 </html>

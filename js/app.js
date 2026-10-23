@@ -521,6 +521,62 @@ function openQrScanFlow() {
   switchView("scan-qr");
 }
 
+// Modal Dialog Pemilihan Titik Drop Box Langsung
+window.openStationPickerModal = function() {
+  const isEn = AppState.currentLang === "en";
+  const content = document.getElementById("modalSheetDynamicBox");
+
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px;">
+      <h3 style="font-size:16px;font-weight:850;margin-bottom:4px;">
+        ${isEn ? 'Change Drop Box Station' : 'Pilih Titik Smart Drop Box'}
+      </h3>
+      <span style="font-size:11px;color:var(--text-sub);">
+        ${isEn ? 'Select station location to open door and deposit waste' : 'Pilih lokasi box aktif di kawasan Bintaro untuk menyetor'}
+      </span>
+    </div>
+
+    <div class="wallet-channel-select-list" style="max-height:360px;overflow-y:auto;padding-right:2px;">
+      ${AppState.qrLocations.map(b => {
+        const isCurrent = currentDepositSession.selectedBox && currentDepositSession.selectedBox.id === b.id;
+        return `
+          <div class="wallet-channel-row" onclick="selectStationDirectly('${b.id}')" style="${isCurrent ? 'border-color:var(--rilo-wine);background:var(--rilo-wine-soft);' : ''}">
+            <div class="wcr-left">
+              <div class="wcr-logo-box" style="background:var(--rilo-wine-soft);color:var(--rilo-wine);">
+                ${ICONS.pin}
+              </div>
+              <div class="wcr-info">
+                <strong>${b.name}</strong>
+                <span>${b.location} • ${b.distance}</span>
+                <small style="color:var(--eco-emerald);font-weight:700;font-size:10px;">${isEn ? b.slotsAvailableEn : b.slotsAvailable}</small>
+              </div>
+            </div>
+            ${isCurrent ? '<span style="color:var(--rilo-wine);font-weight:800;font-size:12px;">✓ Aktif</span>' : '<button class="btn-solid-wine" style="padding:5px 10px;font-size:10px;width:auto;box-shadow:none;">Pilih</button>'}
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <button type="button" class="btn-solid-wine" style="background:var(--surface-subtle);color:var(--text-main);box-shadow:none;margin-top:10px;" onclick="closeModalSheet()">
+      ${isEn ? 'Close' : 'Tutup'}
+    </button>
+  `;
+
+  openModalSheet();
+};
+
+window.selectStationDirectly = function(boxId) {
+  const box = AppState.qrLocations.find(b => b.id === boxId);
+  if (box) {
+    currentDepositSession.selectedBox = box;
+    const isEn = AppState.currentLang === "en";
+    document.getElementById("activeHubTitle").textContent = box.name;
+    document.getElementById("activeHubSubtitle").textContent = `${box.location} • ${isEn ? box.slotsAvailableEn : box.slotsAvailable}`;
+    closeModalSheet();
+    showToast(`${isEn ? 'Station changed to' : 'Titik setor berganti ke'} ${box.name}`, true);
+  }
+};
+
 function renderQrDetectedBox() {
   const container = document.getElementById("qrDetectedHubCard");
   if (!container) return;
@@ -1030,22 +1086,58 @@ function renderHome() {
   }
 }
 
-// 2. Riwayat Transaksi
+// 2. Riwayat Transaksi (History Spec RuntahPedia)
+let activeTxStatusFilter = "all";
+
+function filterTransactionsStatus(status, btn) {
+  document.querySelectorAll(".tx-chip-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  activeTxStatusFilter = status;
+  renderTransactions();
+}
+
 function renderTransactions() {
   const container = document.getElementById("transactionsFullListContainer");
-  if (!container) return;
+  const countBadge = document.getElementById("txHistoryCountBadge");
+  const pointsSumEl = document.getElementById("txTotalEarnedPointsDisplay");
+  const weightSumEl = document.getElementById("txTotalWeightSumDisplay");
   const isEn = AppState.currentLang === "en";
 
-  if (AppState.deposits.length === 0) {
+  if (!container) return;
+
+  const filtered = (AppState.deposits || []).filter(tx => {
+    if (activeTxStatusFilter === "all") return true;
+    return tx.status === activeTxStatusFilter;
+  });
+
+  // Hitung total poin & berat dari riwayat yang tampil
+  let totalPts = 0;
+  let totalW = 0;
+  AppState.deposits.forEach(t => {
+    totalPts += (t.pointsEarned || 0);
+    totalW += (t.weightApprox || 0);
+  });
+
+  if (countBadge) {
+    countBadge.textContent = isEn ? `${AppState.deposits.length} Records` : `${AppState.deposits.length} Setoran`;
+  }
+  if (pointsSumEl) {
+    pointsSumEl.textContent = `+${fmt(totalPts)} pts`;
+  }
+  if (weightSumEl) {
+    weightSumEl.textContent = `${fmt(totalW)} kg`;
+  }
+
+  if (filtered.length === 0) {
     container.innerHTML = `
       <div style="text-align:center;padding:40px 20px;background:#fff;border-radius:14px;border:1px solid var(--border-line);">
-        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No recorded deposits yet.' : 'Belum ada catatan setoran sampah.'}</p>
+        <p style="font-size:12px;color:var(--text-sub);">${isEn ? 'No deposit records in this filter.' : 'Belum ada catatan setoran pada filter ini.'}</p>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = AppState.deposits.map((tx) => `
+  container.innerHTML = filtered.map((tx) => `
     <div class="clean-item-card" onclick="openTxReceiptModal('${tx.id}')">
       <div class="cic-left">
         <div class="cic-icon-wrap">${ICONS.history}</div>
@@ -1828,7 +1920,7 @@ window.useVoucherItem = function(voucherId) {
   }
 };
 
-// 5. Bukti Struk Transaksi
+// 5. Bukti Struk Transaksi Digital (Invoice Spec)
 window.openTxReceiptModal = function (txId) {
   const tx = AppState.deposits.find((t) => t.id === txId);
   if (!tx) return;
@@ -1836,38 +1928,50 @@ window.openTxReceiptModal = function (txId) {
 
   const content = document.getElementById("modalSheetDynamicBox");
   content.innerHTML = `
-    <div style="text-align:center;margin-bottom:14px;">
-      <div style="width:46px;height:46px;border-radius:12px;background:var(--rilo-wine-soft);color:var(--rilo-wine);display:grid;place-items:center;margin:0 auto 8px;">
-        ${ICONS.history}
+    <div class="invoice-receipt-sheet">
+      <div class="irs-badge-header">
+        <div class="irs-success-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="font-size:16px;font-weight:850;margin-bottom:2px;">
+          ${isEn ? 'Deposit Successful!' : 'Setoran Sampah Berhasil!'}
+        </h3>
+        <span style="font-size:11px;color:var(--text-muted);">${tx.id}</span>
+        <div class="irs-points-earned">+${fmt(tx.pointsEarned)} pts</div>
+        <small style="font-size:11px;color:var(--eco-emerald);font-weight:750;">
+          ${isEn ? 'Points credited to your balance' : 'Poin telah ditambahkan ke saldo utama'}
+        </small>
       </div>
-      <h3 style="font-size:16px;">${isEn ? 'Deposit Receipt' : 'Struk Setoran RILO'}</h3>
-      <span style="font-size:11px;color:var(--text-sub);">${tx.id}</span>
-    </div>
 
-    <div style="background:var(--surface-subtle);border-radius:12px;padding:12px;margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">${isEn ? 'Date' : 'Tanggal'}</span>
-        <strong>${formatDate(tx.date)}</strong>
+      <div class="irs-details-box">
+        <div class="irs-row">
+          <span>${isEn ? 'Date & Time' : 'Waktu Transaksi'}</span>
+          <strong>${formatDate(tx.date)} ${tx.time ? '• ' + tx.time : ''}</strong>
+        </div>
+        <div class="irs-row">
+          <span>${isEn ? 'Drop Box Station' : 'Titik Smart Drop Box'}</span>
+          <strong>${tx.qrBox}</strong>
+        </div>
+        <div class="irs-row">
+          <span>${isEn ? 'Deposit Category' : 'Kategori Setoran'}</span>
+          <strong>${isEn ? (tx.modeEn || tx.mode) : tx.mode}</strong>
+        </div>
+        <div class="irs-row">
+          <span>${isEn ? 'Material Summary' : 'Rincian Material'}</span>
+          <strong>${tx.summary}</strong>
+        </div>
+        <div class="irs-row">
+          <span>${isEn ? 'Est. Weight' : 'Perkiraan Berat'}</span>
+          <strong>${tx.weightApprox ? fmt(tx.weightApprox) + ' kg' : '0.8 kg'}</strong>
+        </div>
+        <div class="irs-row">
+          <span>${isEn ? 'Status' : 'Status Verifikasi'}</span>
+          <span class="bsc-status-pill" style="height:20px;font-size:10px;">${isEn ? (tx.statusEn || 'Verified') : 'Terverifikasi'}</span>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">${isEn ? 'Drop Box Station' : 'Titik Setor'}</span>
-        <strong>${tx.qrBox}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">${isEn ? 'Mode' : 'Kategori'}</span>
-        <strong>${isEn ? tx.modeEn : tx.mode}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border-line);">
-        <span style="color:var(--text-sub);">${isEn ? 'Summary' : 'Rincian'}</span>
-        <strong style="text-align:right;max-width:180px;">${tx.summary}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
-        <span style="color:var(--text-sub);">${isEn ? 'Points Earned' : 'Poin Didapat'}</span>
-        <strong style="color:var(--rilo-wine);font-size:13px;">+${fmt(tx.pointsEarned)} pts</strong>
-      </div>
-    </div>
 
-    <button class="btn-solid-wine" onclick="closeModalSheet()">${isEn ? 'Close' : 'Tutup'}</button>
+      <button class="btn-solid-wine" onclick="closeModalSheet()">${isEn ? 'Close Receipt' : 'Tutup Struk'}</button>
+    </div>
   `;
 
   openModalSheet();
