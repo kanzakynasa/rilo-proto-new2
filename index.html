@@ -608,7 +608,7 @@
         </div>
       </section>
 
-      <!-- ==================== SUB-VIEW: DAMPAK SAYA ==================== -->
+      <!-- ==================== SUB-VIEW: DAMPAK SAYA (SUSTAINABILITY & ECO IMPACT) ==================== -->
       <section class="view-panel" id="panel-impact">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <button class="btn-back-circle" data-go="home">
@@ -617,6 +617,7 @@
           <h3 style="font-size:16px;font-weight:800;" data-i18n="impactTitle">Dampak Daur Ulang</h3>
         </div>
 
+        <!-- 2 Kolom Metrik Ringkas -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
           <div class="clean-item-card" style="flex-direction:column;align-items:flex-start;">
             <span style="font-size:11px;color:var(--text-sub);" data-i18n="impactMat">Total Material</span>
@@ -628,12 +629,19 @@
           </div>
         </div>
 
-        <div class="point-compact-card" style="flex-direction:column;align-items:flex-start;padding:14px;">
-          <span class="pcc-label" data-i18n="impactCo2">Estimasi Emisi CO2 Dicegah</span>
-          <div style="font-size:24px;font-weight:850;color:var(--eco-emerald);margin:4px 0;" id="impactCo2Total">27,6 kg</div>
-          <p style="font-size:11px;color:var(--text-sub);line-height:1.4;" data-i18n="impactCo2Sub">
+        <!-- Hero Card Karbon Emisi -->
+        <div class="balance-points-hero-card" style="padding:16px;margin-bottom:16px;">
+          <span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:#fce8f0;text-transform:uppercase;" data-i18n="impactCo2">Estimasi Emisi CO2 Dicegah</span>
+          <div style="font-size:26px;font-weight:850;color:#fff;margin:4px 0;" id="impactCo2Total">27,6 kg</div>
+          <p style="font-size:11px;color:#fce8f0;line-height:1.45;margin:0;" data-i18n="impactCo2Sub">
             Setara dengan menanam 1,8 pohon muda yang menyerap karbon dioksida selama satu tahun penuh.
           </p>
+        </div>
+
+        <!-- Rincian Kontribusi Material Daur Ulang -->
+        <div class="services-section-title">Komposisi Sampah yang Disetor</div>
+        <div class="activity-list-container" id="impactMaterialCompositionBars">
+          <!-- Render via app.js -->
         </div>
       </section>
 
@@ -731,12 +739,12 @@
   <!-- LEAFLET MAP JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- CLEAN SVG ICONS -->
-  <script src="js/icons.js?v=2.9"></script>
+  <script src="js/icons.js?v=3.0"></script>
   <!-- DATA LAYER & I18N -->
-  <script src="js/data.js?v=2.9"></script>
+  <script src="js/data.js?v=3.0"></script>
   <!-- APP ENGINE -->
-  <script src="js/app.js?v=2.9"></script>
+  <script src="js/app.js?v=3.0"></script>
   <!-- APP STYLESHEET CACHE BUSTER -->
-  <link rel="stylesheet" href="css/style.css?v=2.9" />
+  <link rel="stylesheet" href="css/style.css?v=3.0" />
 </body>
 </html>

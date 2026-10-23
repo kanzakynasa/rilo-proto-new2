@@ -859,7 +859,13 @@ function submitFinalDeposit() {
         totalWeight += qty * 0.04;
       }
     });
-    summaryText = summaryItems.slice(0, 3).join(", ") + (summaryItems.length > 3 ? "..." : "");
+    
+    // Masking jika item sangat banyak agar rapi dan tidak tumpuk
+    if (summaryItems.length <= 2) {
+      summaryText = summaryItems.join(", ");
+    } else {
+      summaryText = `${summaryItems[0]}, ${summaryItems[1]} +${summaryItems.length - 2} item lainnya`;
+    }
   } else {
     const summaryItems = [];
     AppState.itemsPerKg.forEach((item) => {
@@ -870,7 +876,11 @@ function submitFinalDeposit() {
         summaryItems.push(`${fmt(w)} kg ${isEn ? item.labelEn.split(" ")[0] : item.label.split(" ")[0]}`);
       }
     });
-    summaryText = summaryItems.join(", ");
+    if (summaryItems.length <= 2) {
+      summaryText = summaryItems.join(", ");
+    } else {
+      summaryText = `${summaryItems[0]}, ${summaryItems[1]} +${summaryItems.length - 2} lainnya`;
+    }
   }
 
   if (totalPoints <= 0) {
@@ -1977,12 +1987,41 @@ window.openTxReceiptModal = function (txId) {
   openModalSheet();
 };
 
-// 6. Dampak Lingkungan
+// 6. Dampak Lingkungan (Eco Impact & Material Breakdown)
 function renderImpact() {
   const user = AppState.user;
+  const isEn = AppState.currentLang === "en";
+
   document.getElementById("impactWeightTotal").textContent = `${fmt(user.totalWeight)} kg`;
   document.getElementById("impactDepositsFreq").textContent = `${user.completedDeposits}x`;
   document.getElementById("impactCo2Total").textContent = `${(user.totalWeight * 1.5).toFixed(1)} kg`;
+
+  const breakdownContainer = document.getElementById("impactMaterialCompositionBars");
+  if (!breakdownContainer) return;
+
+  const weightByMaterial = {
+    "Botol Plastik PET": 8.4,
+    "Kertas & Kardus": 4.8,
+    "Kaleng Minuman": 3.2,
+    "Kemasan Karton": 2.0
+  };
+
+  const total = Object.values(weightByMaterial).reduce((a, b) => a + b, 0) || 1;
+
+  breakdownContainer.innerHTML = Object.entries(weightByMaterial).map(([name, w]) => {
+    const pct = Math.round((w / total) * 100);
+    return `
+      <div class="clean-item-card" style="flex-direction:column;align-items:stretch;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+          <strong style="color:var(--text-main);">${name}</strong>
+          <span style="font-weight:800;color:var(--rilo-wine);">${fmt(w)} kg (${pct}%)</span>
+        </div>
+        <div style="height:6px;background:var(--surface-subtle);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, var(--rilo-wine), #963754);border-radius:99px;"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 // 7. Panduan Edukasi

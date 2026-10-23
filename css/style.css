@@ -1560,6 +1560,7 @@ button, input, select, textarea {
   box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: transform 0.12s;
+  overflow: hidden;
 }
 
 .clean-item-card:active {
@@ -1571,6 +1572,8 @@ button, input, select, textarea {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .cic-icon-wrap {
@@ -1584,29 +1587,49 @@ button, input, select, textarea {
   flex-shrink: 0;
 }
 
+.cic-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Masking Ellipsis 1 Baris Presisi Anti-Tumpuk */
 .cic-text strong {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 800;
   color: var(--text-main);
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .cic-text span {
   font-size: 11px;
   color: var(--text-sub);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  margin-top: 1px;
 }
 
 .cic-right {
   text-align: right;
   flex-shrink: 0;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .cic-points {
   font-size: 13px;
   font-weight: 800;
   color: var(--rilo-wine);
+  white-space: nowrap;
 }
 
 .badge-tag-status {
